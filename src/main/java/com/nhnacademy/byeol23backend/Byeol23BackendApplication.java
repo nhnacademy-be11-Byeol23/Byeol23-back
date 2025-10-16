@@ -8,6 +8,7 @@ public class Byeol23BackendApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(Byeol23BackendApplication.class, args);
+
     }
 
 }
