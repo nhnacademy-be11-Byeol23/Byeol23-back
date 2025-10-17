@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/backend")
 public class TestController {
-    @GetMapping
+    @GetMapping("/")
     public TestDTO test(){
         return new TestDTO("test", 111);
     }
