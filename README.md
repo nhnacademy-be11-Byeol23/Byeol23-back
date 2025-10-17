@@ -1,3 +1,3 @@
 # Byeol23-back
 
-- server port : 10330, 10331
+- server port : 10332, 10333
