@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequestMapping("/backend")
 public class TestController {
-    @GetMapping("/test")
+    @GetMapping("/testURL")
     public TestDTO test(){
         log.info("back");
         return new TestDTO("test", 111);
