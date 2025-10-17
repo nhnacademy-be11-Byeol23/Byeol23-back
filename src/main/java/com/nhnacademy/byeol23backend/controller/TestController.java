@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 public class TestController {
-    @GetMapping("/backend")
+    @GetMapping("/backend/")
     public TestDTO test(){
         log.info("back");
         return new TestDTO("test", 111);
