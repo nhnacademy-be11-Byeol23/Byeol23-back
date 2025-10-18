@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.CouponPolicy;
-import com.nhnacademy.byeol23backend.memberset.member.Member;
+import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -26,10 +26,10 @@ public class CouponPolicy {
 	@Column(name = "discount_rate")
 	private Integer discountRate;
 
-	@Column(name = "discount_limit")
+	@Column(name = "discount_limit", precision = 10)
 	private BigDecimal discountLimit;
 
-	@Column(name = "discount_amount")
+	@Column(name = "discount_amount", precision = 10)
 	private BigDecimal discountAmount;
 
 	@Column(name = "is_active", nullable = false)
