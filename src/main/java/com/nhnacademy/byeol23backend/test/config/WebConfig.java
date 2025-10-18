@@ -1,6 +1,6 @@
-package com.nhnacademy.byeol23backend.config;
+package com.nhnacademy.byeol23backend.test.config;
 
-import com.nhnacademy.byeol23backend.interceptor.LoggingInterceptor;
+import com.nhnacademy.byeol23backend.test.interceptor.LoggingInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
