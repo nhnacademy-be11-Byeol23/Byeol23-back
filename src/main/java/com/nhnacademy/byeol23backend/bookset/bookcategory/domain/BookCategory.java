@@ -19,7 +19,7 @@ public class BookCategory {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "book_category_id")
-	private long bookCategoryId;
+	private Long bookCategoryId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "book_id")

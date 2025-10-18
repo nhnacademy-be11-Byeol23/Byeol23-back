@@ -19,7 +19,7 @@ public class CartBook {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "cart_book_id")
-	private long cartBookId;
+	private Long cartBookId;
 
 	@Column(name = "quantity", nullable = false)
 	private int quantity;

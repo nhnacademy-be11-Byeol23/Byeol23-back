@@ -21,7 +21,7 @@ public class Book {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "book_id")
-	private long bookId;
+	private Long bookId;
 
 	@Column(name = "book_name", length = 200, nullable = false)
 	private String bookName;
@@ -50,7 +50,7 @@ public class Book {
 	private String bookStatus;
 
 	@Column(name = "stock", nullable = false)
-	private int stock;
+	private Integer stock;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "publisher_id", nullable = false)

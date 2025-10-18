@@ -1,6 +1,6 @@
 package com.nhnacademy.byeol23backend.cartset.cart.domain;
 
-import com.nhnacademy.byeol23backend.memberset.member.Member;
+import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,7 +18,7 @@ public class Cart {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "cart_id")
-	private long cartId;
+	private Long cartId;
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
