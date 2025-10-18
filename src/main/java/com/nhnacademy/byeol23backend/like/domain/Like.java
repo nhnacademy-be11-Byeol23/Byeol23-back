@@ -1,7 +1,7 @@
 package com.nhnacademy.byeol23backend.like.domain;
 
 import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
-import com.nhnacademy.byeol23backend.memberset.member.Member;
+import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

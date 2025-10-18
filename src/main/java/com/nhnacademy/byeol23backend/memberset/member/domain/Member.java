@@ -1,4 +1,4 @@
-package com.nhnacademy.byeol23backend.memberset.member;
+package com.nhnacademy.byeol23backend.memberset.member.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,5 +13,5 @@ public class Member {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "member_id")
-	private long memberId;
+	private Long memberId;
 }
