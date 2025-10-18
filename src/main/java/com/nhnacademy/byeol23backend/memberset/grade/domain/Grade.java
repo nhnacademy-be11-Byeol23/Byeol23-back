@@ -20,7 +20,7 @@ public class Grade {
 	@Column(name = "grade_name", nullable = false, length = 10)
 	private String gradeName;
 
-	@Column(name = "criterion_price", nullable = false)
+	@Column(name = "criterion_price", nullable = false, precision = 10)
 	private BigDecimal criterion_price;
 
 }
