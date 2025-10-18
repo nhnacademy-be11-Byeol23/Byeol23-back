@@ -1,7 +1,7 @@
-package com.nhnacademy.byeol23backend.bookset.booktag.domain;
+package com.nhnacademy.byeol23backend.like.domain;
 
 import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
-import com.nhnacademy.byeol23backend.bookset.tag.domain.Tag;
+import com.nhnacademy.byeol23backend.memberset.member.Member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,19 +14,19 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "book_tag")
-public class BookTag {
+@Table(name = "likes")
+public class Like {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "book_tag_id")
-	private Long bookTagId;
+	@Column(name = "like_id")
+	private Long likeId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "book_id")
+	@JoinColumn(name = "member_id", nullable = false)
+	private Member member;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "book_id", nullable = false)
 	private Book book;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "tag_id")
-	private Tag tag;
 
 }
