@@ -1,4 +1,4 @@
-package com.nhnacademy.byeol23backend.interceptor;
+package com.nhnacademy.byeol23backend.test.interceptor;
 
 
 import jakarta.servlet.http.HttpServletRequest;

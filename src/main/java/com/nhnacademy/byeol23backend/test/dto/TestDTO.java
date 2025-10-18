@@ -1,4 +1,4 @@
-package com.nhnacademy.byeol23backend.dto;
+package com.nhnacademy.byeol23backend.test.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
