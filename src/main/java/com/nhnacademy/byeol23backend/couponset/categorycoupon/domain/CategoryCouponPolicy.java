@@ -1,7 +1,7 @@
-package com.nhnacademy.byeol23backend.bookset.bookcategory.domain;
+package com.nhnacademy.byeol23backend.couponset.categorycoupon.domain;
 
-import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
+import com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.CouponPolicy;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,21 +11,22 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "book_category")
-public class BookCategory {
+@Table(name = "category_coupon_policy")
+public class CategoryCouponPolicy {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "book_category_id")
-	private Long bookCategoryId;
+	@Column(name = "category_coupon_id")
+	private Long categoryCouponId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "book_id")
-	private Book book;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "category_id")
+	@JoinColumn(name = "category_id", nullable = false)
 	private Category category;
+
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "coupon_policy_id", nullable = false)
+	private CouponPolicy couponPolicy;
 }
