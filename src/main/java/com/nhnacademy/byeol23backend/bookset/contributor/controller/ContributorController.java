@@ -31,7 +31,7 @@ public class ContributorController {
 	private ContributorService contributorService;
 
 	@GetMapping("/{contributorId}")
-	public ResponseEntity<ContributorInfoResponse> infoContributor(@PathVariable Long contributorId){
+	public ResponseEntity<ContributorInfoResponse> getContributorByContributorId(@PathVariable Long contributorId){
 		ContributorInfoResponse response = contributorService.getContributorByContributorId(contributorId);
 		return ResponseEntity.ok().body(response);
 	}
@@ -44,14 +44,15 @@ public class ContributorController {
 	}
 
 	@DeleteMapping("/{contributorId}")
-	public ResponseEntity<Void> deleteContributor(@PathVariable Long contributorId){
+	public ResponseEntity<Void> deleteContributorByContributorId(@PathVariable Long contributorId){
 		contributorService.deleteContributorByContributorId(contributorId);
 		return ResponseEntity.noContent().build();
 	}
 
 	@PutMapping("/{contributorId}")
-	public ResponseEntity<ContributorUpdateResponse> updateContributor(@RequestBody ContributorUpdateRequest request){
-
+	public ResponseEntity<ContributorUpdateResponse> updateContributorByContributorId(@PathVariable Long contributorId, @RequestBody ContributorUpdateRequest request){
+		ContributorUpdateResponse response = contributorService.updateContributor(contributorId, request);
+		return ResponseEntity.ok(response);
 	}
 
 }
