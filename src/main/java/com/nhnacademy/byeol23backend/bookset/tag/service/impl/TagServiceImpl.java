@@ -11,6 +11,7 @@ import com.nhnacademy.byeol23backend.bookset.tag.repository.TagRepository;
 import com.nhnacademy.byeol23backend.bookset.tag.service.TagService;
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -32,6 +33,7 @@ public class TagServiceImpl implements TagService {
 	}
 
 	@Override
+	@Transactional
 	public void deleteTagByTagId(Long tagId) {
 		Tag tag = tagRepository.findByTagId(tagId)
 			.orElseThrow(() -> new TagNotFoundException("해당 아이디 태그를 찾을 수 없습니다: " + tagId));
@@ -42,6 +44,7 @@ public class TagServiceImpl implements TagService {
 	public TagUpdateResponse updateTagByTagId(Long tagId, TagUpdateRequest request) {
 		Tag tag = tagRepository.findByTagId(tagId).orElseThrow(() -> new TagNotFoundException("해당 아이디 태그를 찾을 수 없습니다: " + tagId));
 		tag.setTagName(request.tagName());
+		tagRepository.save(tag);
 		return new TagUpdateResponse(tag);
 	}
 }

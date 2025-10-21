@@ -13,3 +13,9 @@ Content-Type: application/json
 {
   "tagName": "나는야 귀요미 노형우"
 }
+
+### Delete
+DELETE http://localhost:8080/api/tags/1
+
+### Get
+GET http://localhost:8080/api/tags/1
