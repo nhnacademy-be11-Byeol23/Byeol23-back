@@ -8,7 +8,7 @@ import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.TagUpdateResponse;
 
 public interface TagService {
 	TagCreateResponse createTag(TagCreateRequest request);
-	TagInfoResponse getTag(Long tagId);
-	void deleteTag(Long tagId);
-	TagUpdateResponse updateTag(Long tagId, TagUpdateRequest request);
+	TagInfoResponse getTagByTagId(Long tagId);
+	void deleteTagByTagId(Long tagId);
+	TagUpdateResponse updateTagByTagId(Long tagId, TagUpdateRequest request);
 }

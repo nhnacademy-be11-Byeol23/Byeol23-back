@@ -1,7 +1,6 @@
 package com.nhnacademy.byeol23backend.bookset.tag.controller;
 
 import java.net.URI;
-import java.util.Objects;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,16 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nhnacademy.byeol23backend.bookset.tag.domain.Tag;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.TagCreateRequest;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.TagCreateResponse;
-import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.TagDeleteResponse;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.TagInfoResponse;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.TagUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.TagUpdateResponse;
-import com.nhnacademy.byeol23backend.bookset.tag.exception.NoSuchTagException;
-import com.nhnacademy.byeol23backend.bookset.tag.exception.TagPostFormatException;
-import com.nhnacademy.byeol23backend.bookset.tag.repository.TagRepository;
 import com.nhnacademy.byeol23backend.bookset.tag.service.TagService;
 
 import lombok.RequiredArgsConstructor;
@@ -34,8 +28,8 @@ public class TagController {
 	private final TagService tagService;
 
 	@GetMapping("/{tagId}")
-	public ResponseEntity<TagInfoResponse> infoTag(@PathVariable Long tagId){
-		TagInfoResponse response = tagService.getTag(tagId);
+	public ResponseEntity<TagInfoResponse> getTagByTagId(@PathVariable Long tagId){
+		TagInfoResponse response = tagService.getTagByTagId(tagId);
 		return ResponseEntity.ok(response);
 	}
 
@@ -50,14 +44,14 @@ public class TagController {
 
 
 	@DeleteMapping("/{tagId}")
-	public ResponseEntity<Void> deleteTag(@PathVariable Long tagId) {
-		tagService.deleteTag(tagId);
+	public ResponseEntity<Void> deleteTagByTagId(@PathVariable Long tagId) {
+		tagService.deleteTagByTagId(tagId);
 		return ResponseEntity.noContent().build();
 	}
 
 	@PutMapping("/{tagId}")
-	public ResponseEntity<TagUpdateResponse> updateTag(@PathVariable Long tagId, @RequestBody TagUpdateRequest tagRequestDto) {
-		TagUpdateResponse response = tagService.updateTag(tagId, tagRequestDto);
+	public ResponseEntity<TagUpdateResponse> updateTagByTagId(@PathVariable Long tagId, @RequestBody TagUpdateRequest tagRequestDto) {
+		TagUpdateResponse response = tagService.updateTagByTagId(tagId, tagRequestDto);
 		return ResponseEntity.ok(response);
 	}
 }
