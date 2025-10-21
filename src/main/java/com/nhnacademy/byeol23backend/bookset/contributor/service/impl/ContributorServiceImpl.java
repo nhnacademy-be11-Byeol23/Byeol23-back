@@ -11,21 +11,22 @@ import com.nhnacademy.byeol23backend.bookset.contributor.repository.ContributorR
 import com.nhnacademy.byeol23backend.bookset.contributor.service.ContributorService;
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Service
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ContributorServiceImpl implements ContributorService {
 
-	private ContributorRepository contributorRepository;
+	private final ContributorRepository contributorRepository;
 
 	@Override
 	public ContributorInfoResponse getContributorByContributorId(Long contributorId) {
 		Contributor contributor = contributorRepository.findById(contributorId)
-			.orElseThrow(() -> new ContributorNotFound("There is no such contributor: " + contributorId));
+			.orElseThrow(() -> new ContributorNotFound("해당 기여자 없음: " + contributorId));
 		return new ContributorInfoResponse(contributor);
 	}
 
@@ -50,6 +51,7 @@ public class ContributorServiceImpl implements ContributorService {
 	}
 
 	@Override
+	@Transactional
 	public ContributorUpdateResponse updateContributor(Long contributorId, ContributorUpdateRequest request) {
 		if (request == null) throw new IllegalArgumentException("request is null");
 		if (request.name() == null || request.name().isBlank()) {

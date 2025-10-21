@@ -22,13 +22,13 @@ import com.nhnacademy.byeol23backend.bookset.contributor.service.ContributorServ
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/contributors")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ContributorController {
-	private ContributorService contributorService;
+	private final ContributorService contributorService;
 
 	@GetMapping("/{contributorId}")
 	public ResponseEntity<ContributorInfoResponse> getContributorByContributorId(@PathVariable Long contributorId){

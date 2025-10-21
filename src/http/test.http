@@ -1,0 +1,23 @@
+### GET request to example server
+GET http://localhost:8080/api/contributors/1
+
+### post
+POST http://localhost:8080/api/contributors
+Content-Type: application/json
+
+{
+  "name": "Hyungwoo Ro",
+  "role": "author"
+}
+
+### PUT
+PUT http://localhost:8080/api/contributors/1
+Content-Type: application/json
+
+{
+  "name": "Yuhyeon Choi",
+  "role": "author"
+}
+
+### DELETE
+DELETE http://localhost:8080/api/contributors/1
