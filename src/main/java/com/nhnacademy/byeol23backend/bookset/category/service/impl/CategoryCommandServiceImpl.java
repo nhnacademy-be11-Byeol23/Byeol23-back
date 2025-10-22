@@ -51,10 +51,10 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
 
         String newPathName = (parent == null) ? updateCategory.getCategoryName() : parent.getPathName() + "/" + updateCategory.getCategoryName();
         String oldPathName = updateCategory.getPathName();
-        String oldPathId = updateCategory.getPathId();
+        String currentPathId = updateCategory.getPathId();
 
-        updateCategory.updatePath(oldPathId, newPathName);
-        categoryRepository.updateSubPathNames(oldPathId, oldPathName, newPathName);
+        updateCategory.updatePath(currentPathId, newPathName);
+        categoryRepository.updateSubPathNames(currentPathId, oldPathName, newPathName);
         log.info("카테고리 수정:{}", updateCategoryName);
         return CategoryUpdateResponse.from(updateCategory);
     }
