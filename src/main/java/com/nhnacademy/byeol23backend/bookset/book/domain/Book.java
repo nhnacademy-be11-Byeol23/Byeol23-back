@@ -14,7 +14,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "books")
 public class Book {
@@ -26,8 +30,8 @@ public class Book {
 	@Column(name = "book_name", length = 200, nullable = false)
 	private String bookName;
 
-	@Column(name = "contents")
-	private String contents;
+	@Column(name = "toc")
+	private String toc;
 
 	@Column(name = "description")
 	private String description;
@@ -55,8 +59,7 @@ public class Book {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "publisher_id", nullable = false)
 	private Publisher publisher;
-
-	@Column(name = "book_img", nullable = false)
-	private String bookImg;
-
+	//고책임님 피드백 이후 바뀐 ERD를 적용하여 작성하였습니다.
+	@Column(name = "is_deleted", nullable = false)
+	private boolean isDeleted;
 }
