@@ -4,14 +4,27 @@ import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryCreateRequest;
 import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryListResponse;
 import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryUpdateResponse;
+import com.nhnacademy.byeol23backend.bookset.category.exception.CategoryDeleteReferencedByBookException;
+import com.nhnacademy.byeol23backend.bookset.category.exception.CategoryNotFoundException;
+import com.nhnacademy.byeol23backend.bookset.category.exception.ErrorResponse;
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryCommandService;
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryQueryService;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -21,19 +34,19 @@ public class CategoryController {
 
     @PostMapping("/categories")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createCategory(@RequestBody CategoryCreateRequest createRequest) {
+    public void createCategory(@RequestBody @Valid CategoryCreateRequest createRequest) {
         categoryCommandService.createCategory(createRequest);
     }
 
     @PutMapping("/categories/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public CategoryUpdateResponse updateCategory(@PathVariable("id") Long id, @RequestBody CategoryUpdateRequest updateRequest) {
+    public CategoryUpdateResponse updateCategory(@PathVariable("id") @NotNull @Min(1) Long id, @RequestBody @Valid CategoryUpdateRequest updateRequest) {
         return categoryCommandService.updateCategory(id, updateRequest);
     }
 
     @DeleteMapping("/categories/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCategory(@PathVariable("id") Long id) {
+    public void deleteCategory(@PathVariable("id") @NotNull @Min(1) Long id) {
         categoryCommandService.deleteCategory(id);
     }
 
@@ -45,7 +58,39 @@ public class CategoryController {
 
     @GetMapping("/categories/{parentId}/children")
     @ResponseStatus(HttpStatus.OK)
-    public List<CategoryListResponse> getChildren(@PathVariable("parentId") Long parentId) {
+    public List<CategoryListResponse> getChildren(@PathVariable("parentId") @NotNull @Min(1) Long parentId) {
         return categoryQueryService.getSubCategories(parentId);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(400, getErrorMessage(e), LocalDateTime.now()));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(400, getErrorMessage(e), LocalDateTime.now()));
+    }
+
+    @ExceptionHandler(CategoryDeleteReferencedByBookException.class)
+    public ResponseEntity<ErrorResponse> handleCategoryDeleteReferencedByBookException(CategoryDeleteReferencedByBookException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(400, e.getMessage(), LocalDateTime.now()));
+    }
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleCategoryNotFoundException(CategoryNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(404, e.getMessage(), LocalDateTime.now()));
+    }
+
+    private String getErrorMessage(MethodArgumentNotValidException e) {
+        return e.getBindingResult().getFieldErrors().stream()
+                .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+                .collect(Collectors.joining(",\n"));
+    }
+
+    private String getErrorMessage(ConstraintViolationException e) {
+        return e.getConstraintViolations().stream()
+                .map(constraintViolation -> constraintViolation.getPropertyPath().toString() + ": " + constraintViolation.getMessage())
+                .collect(Collectors.joining(",\n"));
     }
 }
