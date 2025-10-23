@@ -26,7 +26,7 @@ public class OrderServiceImpl implements OrderService {
 
 		orderRepository.save(order);
 
-		return new OrderPrepareResponse(order.getOrderNumber());
+		return new OrderPrepareResponse(order.getOrderNumber(), order.getActualOrderPrice(), order.getReceiver());
 	}
 
 }

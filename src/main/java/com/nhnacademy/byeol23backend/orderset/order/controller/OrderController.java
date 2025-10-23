@@ -15,7 +15,7 @@ import com.nhnacademy.byeol23backend.orderset.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/order")
+@RequestMapping("/api/orders")
 @RequiredArgsConstructor
 public class OrderController {
 	private final OrderService orderService;
@@ -23,7 +23,7 @@ public class OrderController {
 	@PostMapping
 	public ResponseEntity<OrderPrepareResponse> createOrder(@RequestBody OrderPrepareRequest request) {
 		OrderPrepareResponse response = orderService.prepareOrder(request);
-		URI uri = URI.create("/api/order/" + response.orderNumber());
+		URI uri = URI.create("/api/orders/" + response.orderNumber());
 		return ResponseEntity.created(uri).body(response);
 	}
 
