@@ -23,9 +23,9 @@ jobs:
           cache: maven
 
       - name: Analyze Backend with SonarQube
-        run: mvn sonar:sonar
+        run: mvn verify sonar:sonar
           -Dsonar.projectKey=byeol23-backend
-          -sonar.host.url=${{ env.SONAR_HOST_URL }}
+          -Dsonar.host.url=${{ env.SONAR_HOST_URL }}
           -Dsonar.token=${{ env.SONAR_TOKEN }}
 
       - name: Build with Maven
