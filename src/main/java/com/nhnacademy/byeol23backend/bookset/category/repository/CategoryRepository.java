@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.bookset.category.repository;
 
 import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
+import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse;
 import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryListResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -40,4 +41,11 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
             @Param("oldPathName") String oldPathName,
             @Param("newPathName") String newPathName
     );
+
+    // leaf 카테고리 조회
+    @Query("""
+        select new  com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse(c1.categoryId, c1.categoryName, c1.pathName)
+                from Category c1 where not exists (select 1 from Category c2 where c1.categoryId = c2.parent.categoryId)
+        """)
+    List<CategoryLeafResponse> findLeafCategories();
 }
