@@ -36,7 +36,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
         set path_name = replace(path_name, :oldPathName, :newPathName) 
         where path_id like concat(:pathId, '/%') or path_id = :pathId
         """, nativeQuery = true)
-    int updateSubPathNames(
+    void updateSubPathNames(
             @Param("pathId") String pathId,
             @Param("oldPathName") String oldPathName,
             @Param("newPathName") String newPathName
