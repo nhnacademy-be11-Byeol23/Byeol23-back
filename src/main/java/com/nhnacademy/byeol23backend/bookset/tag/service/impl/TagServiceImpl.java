@@ -39,7 +39,7 @@ public class TagServiceImpl implements TagService {
 	@Override
 	@Transactional
 	public void deleteTagByTagId(Long tagId) {
-		Tag tag = tagRepository.findByTagId(tagId)
+		Tag tag = tagRepository.findTagByTagId(tagId)
 			.orElseThrow(() -> new TagNotFoundException("해당 아이디 태그를 찾을 수 없습니다: " + tagId));
 		tagRepository.deleteTagByTagId(tagId);
 	}
