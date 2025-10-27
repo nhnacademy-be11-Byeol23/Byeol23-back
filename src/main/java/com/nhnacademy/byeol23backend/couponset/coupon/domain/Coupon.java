@@ -24,9 +24,9 @@ public class Coupon {
 	@Column(name = "coupon_id")
 	private Long couponId;
 
-	private LocalDate expiredAt;
+	private LocalDate expiredDate;
 
-	private LocalDate createdAt;
+	private LocalDate createdDate;
 
 	private LocalDateTime usedAt;
 

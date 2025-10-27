@@ -42,16 +42,16 @@ public class Order {
 	@Column(name = "actual_order_price", nullable = false, precision = 10)
 	private BigDecimal actualOrderPrice;
 
-	private LocalDateTime orderDate;
+	private LocalDateTime orderedAt;
 
 	@Column(name = "order_status", nullable = false, length = 10)
 	private String orderStatus;
 
-	private LocalDate deliverySentAt; //배송 시작 날짜
+	private LocalDate deliverySentDate; //배송 시작 날짜
 
-	private LocalDate deliveryArrivedAt; //배송 수령 날짜
+	private LocalDate deliveryArrivedDate; //배송 수령 날짜
 
-	private LocalDate deliveryDesiredAt; //배송 희망 날짜
+	private LocalDate deliveryDesiredDate; //배송 희망 날짜
 
 	@Column(name = "receiver", nullable = false, length = 10)
 	private String receiver;
@@ -80,16 +80,16 @@ public class Order {
 	@JoinColumn(name = "coupon_id")
 	private Coupon coupon;
 
-	public Order(String orderNumber, BigDecimal totalBookPrice, BigDecimal actualOrderPrice, LocalDateTime orderDate,
-		String orderStatus, LocalDate deliverySentAt, String receiver, String postCode, String receiverAddress,
+	public Order(String orderNumber, BigDecimal totalBookPrice, BigDecimal actualOrderPrice, LocalDateTime orderedAt,
+		String orderStatus, LocalDate deliverySentDate, String receiver, String postCode, String receiverAddress,
 		String receiverAddressDetail,
 		String receiverPhone) {
 		this.orderNumber = orderNumber;
 		this.totalBookPrice = totalBookPrice;
 		this.actualOrderPrice = actualOrderPrice;
-		this.orderDate = orderDate;
+		this.orderedAt = orderedAt;
 		this.orderStatus = orderStatus;
-		this.deliverySentAt = deliverySentAt;
+		this.deliverySentDate = deliverySentDate;
 		this.receiver = receiver;
 		this.postCode = postCode;
 		this.receiverAddress = receiverAddress;
