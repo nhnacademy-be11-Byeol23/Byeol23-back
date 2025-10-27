@@ -17,16 +17,16 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "coupon")
+@Table(name = "coupons")
 public class Coupon {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "coupon_id")
 	private Long couponId;
 
-	private LocalDate expiredAt;
+	private LocalDate expiredDate;
 
-	private LocalDate createdAt;
+	private LocalDate createdDate;
 
 	private LocalDateTime usedAt;
 

@@ -19,6 +19,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "orders")
@@ -30,7 +31,7 @@ public class Order {
 	@Column(name = "order_id")
 	private Long orderId;
 
-	@Column(name = "order_number", nullable = false, length = 17)
+	@Column(name = "order_number", nullable = false, length = 18)
 	private String orderNumber;
 
 	@Column(name = "order_password")
@@ -42,16 +43,17 @@ public class Order {
 	@Column(name = "actual_order_price", nullable = false, precision = 10)
 	private BigDecimal actualOrderPrice;
 
-	private LocalDateTime orderDate;
+	private LocalDateTime orderedAt;
 
+	@Setter
 	@Column(name = "order_status", nullable = false, length = 10)
 	private String orderStatus;
 
-	private LocalDate deliverySentAt; //배송 시작 날짜
+	private LocalDate deliverySentDate; //배송 시작 날짜
 
-	private LocalDate deliveryArrivedAt; //배송 수령 날짜
+	private LocalDate deliveryArrivedDate; //배송 수령 날짜
 
-	private LocalDate deliveryDesiredAt; //배송 희망 날짜
+	private LocalDate deliveryDesiredDate; //배송 희망 날짜
 
 	@Column(name = "receiver", nullable = false, length = 10)
 	private String receiver;
@@ -65,7 +67,7 @@ public class Order {
 	@Column(name = "receiver_address_detail", nullable = false, length = 10)
 	private String receiverAddressDetail;
 
-	@Column(name = "receiver_phone", nullable = false, length = 13) //- 때문에 11자리 -> 13자리로 변경,
+	@Column(name = "receiver_phone", nullable = false, length = 11) //- 때문에 11자리 -> 13자리로 변경,
 	private String receiverPhone;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -80,16 +82,16 @@ public class Order {
 	@JoinColumn(name = "coupon_id")
 	private Coupon coupon;
 
-	public Order(String orderNumber, BigDecimal totalBookPrice, BigDecimal actualOrderPrice, LocalDateTime orderDate,
-		String orderStatus, LocalDate deliverySentAt, String receiver, String postCode, String receiverAddress,
+	public Order(String orderNumber, BigDecimal totalBookPrice, BigDecimal actualOrderPrice, LocalDateTime orderedAt,
+		String orderStatus, LocalDate deliverySentDate, String receiver, String postCode, String receiverAddress,
 		String receiverAddressDetail,
 		String receiverPhone) {
 		this.orderNumber = orderNumber;
 		this.totalBookPrice = totalBookPrice;
 		this.actualOrderPrice = actualOrderPrice;
-		this.orderDate = orderDate;
+		this.orderedAt = orderedAt;
 		this.orderStatus = orderStatus;
-		this.deliverySentAt = deliverySentAt;
+		this.deliverySentDate = deliverySentDate;
 		this.receiver = receiver;
 		this.postCode = postCode;
 		this.receiverAddress = receiverAddress;

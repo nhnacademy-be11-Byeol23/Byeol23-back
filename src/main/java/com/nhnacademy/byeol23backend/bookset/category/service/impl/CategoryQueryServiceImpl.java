@@ -1,5 +1,6 @@
 package com.nhnacademy.byeol23backend.bookset.category.service.impl;
 
+import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse;
 import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryListResponse;
 import com.nhnacademy.byeol23backend.bookset.category.repository.CategoryRepository;
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryQueryService;
@@ -21,5 +22,10 @@ public class CategoryQueryServiceImpl implements CategoryQueryService {
     @Override
     public List<CategoryListResponse> getSubCategories(Long parentId) {
         return categoryRepository.findChildrenCategories(parentId);
+    }
+
+    @Override
+    public List<CategoryLeafResponse> getLeafCategories() {
+        return categoryRepository.findLeafCategories();
     }
 }

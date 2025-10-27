@@ -1,4 +1,4 @@
-package com.nhnacademy.byeol23backend.review.domain;
+package com.nhnacademy.byeol23backend.reviewset.review.domain;
 
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.orderset.orderdetail.domain.OrderDetail;
@@ -31,7 +31,7 @@ public class Review {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    @JoinColumn(name = "order_details_id", nullable = false)
+    @JoinColumn(name = "order_detail_id", nullable = false)
     @OneToOne(fetch = FetchType.LAZY)
     private OrderDetail orderDetail;
 
