@@ -70,8 +70,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
-<<<<<<< Updated upstream
-=======
+
 
         <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
         <dependency>
@@ -97,7 +96,6 @@
             <version>3.0.0</version>
         </dependency>
 
->>>>>>> Stashed changes
     </dependencies>
 
     <build>
