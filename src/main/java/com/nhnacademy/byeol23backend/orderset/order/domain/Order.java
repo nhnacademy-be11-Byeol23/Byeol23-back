@@ -19,6 +19,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "orders")
@@ -30,7 +31,7 @@ public class Order {
 	@Column(name = "order_id")
 	private Long orderId;
 
-	@Column(name = "order_number", nullable = false, length = 17)
+	@Column(name = "order_number", nullable = false, length = 18)
 	private String orderNumber;
 
 	@Column(name = "order_password")
@@ -44,6 +45,7 @@ public class Order {
 
 	private LocalDateTime orderedAt;
 
+	@Setter
 	@Column(name = "order_status", nullable = false, length = 10)
 	private String orderStatus;
 
@@ -65,7 +67,7 @@ public class Order {
 	@Column(name = "receiver_address_detail", nullable = false, length = 10)
 	private String receiverAddressDetail;
 
-	@Column(name = "receiver_phone", nullable = false, length = 13) //- 때문에 11자리 -> 13자리로 변경,
+	@Column(name = "receiver_phone", nullable = false, length = 11) //- 때문에 11자리 -> 13자리로 변경,
 	private String receiverPhone;
 
 	@ManyToOne(fetch = FetchType.LAZY)
