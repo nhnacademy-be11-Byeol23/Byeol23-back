@@ -11,6 +11,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 @Entity
 @Table(name = "addresses")
@@ -20,6 +22,8 @@ public class Address {
 	@Column(name = "address_id")
 	private Long addressId;
 
+	@Min(1000)
+	@Max(63999)
 	@Column(name = "post_code", nullable = false, length = 5)
 	private String postCode;
 
