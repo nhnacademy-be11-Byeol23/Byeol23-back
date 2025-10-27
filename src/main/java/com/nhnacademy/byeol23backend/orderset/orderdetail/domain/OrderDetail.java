@@ -35,7 +35,7 @@ public class OrderDetail {
 	private Book book;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "packages_id", nullable = false)
+	@JoinColumn(name = "packaging_id", nullable = false)
 	private Packaging packaging;
 
 	@ManyToOne(fetch = FetchType.LAZY)

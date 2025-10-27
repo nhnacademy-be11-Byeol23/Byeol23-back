@@ -1,18 +1,26 @@
 package com.nhnacademy.byeol23backend.orderset.payment.service.impl;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Base64;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.byeol23backend.orderset.order.domain.Order;
+import com.nhnacademy.byeol23backend.orderset.order.exception.OrderNotFoundException;
+import com.nhnacademy.byeol23backend.orderset.order.repository.OrderRepository;
+import com.nhnacademy.byeol23backend.orderset.payment.domain.Payment;
 import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentCancelRequest;
 import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentParamRequest;
 import com.nhnacademy.byeol23backend.orderset.payment.repository.PaymentRepository;
@@ -24,7 +32,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 	private final PaymentRepository paymentRepository;
+	private final OrderRepository orderRepository;
 	private final ObjectMapper objectMapper;
+
 	@Value("${tossPayment.secretKey}")
 	private String secretKey;
 
@@ -65,6 +75,28 @@ public class PaymentServiceImpl implements PaymentService {
 			.build();
 
 		return HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+	}
+
+	@Override
+	public void createPayment(Map<String, Object> responseMap) {
+		String paymentKey = (String)responseMap.get("paymentKey");
+		String orderName = (String)responseMap.get("orderName");
+		String paymentMethod = (String)responseMap.get("method");
+		Number totalPrice = (Number)responseMap.get("totalAmount");
+		String requestedAtStr = (String)responseMap.get("requestedAt");
+		String approvedAtStr = (String)responseMap.get("approvedAt");
+
+		LocalDateTime paymentRequestAt = ZonedDateTime.parse(requestedAtStr).toLocalDateTime();
+		LocalDateTime paymentApprovedAt = ZonedDateTime.parse(approvedAtStr).toLocalDateTime();
+		String orderId = (String)responseMap.get("orderId");
+		Order order = orderRepository.findOrderByOrderNumber(orderId)
+			.orElseThrow(() -> new OrderNotFoundException("해당 주문 번호를 찾을 수 없습니다.: " + orderId));
+
+		Payment payment = new Payment(paymentKey, orderName, paymentMethod, BigDecimal.valueOf(totalPrice.longValue()),
+			paymentRequestAt, paymentApprovedAt, order);
+
+		paymentRepository.save(payment);
+
 	}
 
 	private String getAuthorizations() {
