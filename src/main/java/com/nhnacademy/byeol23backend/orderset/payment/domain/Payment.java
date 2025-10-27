@@ -32,8 +32,8 @@ public class Payment {
 	@Column(name = "payment_method", nullable = false, length = 10)
 	private String paymentMethod;
 
-	@Column(name = "total_price", nullable = false, precision = 10)
-	private BigDecimal totalPrice;
+	@Column(name = "total_amount", nullable = false, precision = 10)
+	private BigDecimal totalAmount;
 
 	private LocalDateTime paymentRequestAt;
 
