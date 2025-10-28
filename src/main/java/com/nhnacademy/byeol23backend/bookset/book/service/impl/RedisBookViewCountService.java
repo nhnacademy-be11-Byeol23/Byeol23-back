@@ -4,6 +4,7 @@ import com.nhnacademy.byeol23backend.bookset.book.service.BookViewCountService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -15,6 +16,7 @@ import java.util.Optional;
 public class RedisBookViewCountService implements BookViewCountService {
     private final StringRedisTemplate stringRedisTemplate;
 
+    @Async("ioExecutor")
     @Override
     public void increaseViewCount(Long bookId, String viewerId) {
         Boolean isFirstViewed = stringRedisTemplate.opsForValue().setIfAbsent(generateBookViewedKey(bookId, viewerId), "1", Duration.ofHours(1));

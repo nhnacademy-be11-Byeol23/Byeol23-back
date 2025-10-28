@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -24,8 +25,14 @@ public class ViewerIdInterceptor implements HandlerInterceptor {
             if(request.getCookies() != null) {
                 Arrays.stream(request.getCookies())
                         .filter(cookie -> cookie.getName().equals("guestId"))
-                        .findFirst().ifPresentOrElse(cookie ->
-                            request.setAttribute("viewerId", "guest:%s".formatted(cookie.getValue()))
+                        .findFirst().ifPresentOrElse(
+                                cookie -> Optional.ofNullable(cookie.getValue())
+                                        .ifPresentOrElse(value -> request.setAttribute("viewerId", "guest:%s".formatted(value)),
+                                                () -> {
+                                            Cookie newCookie = createCookie();
+                                            request.setAttribute("viewerId", "guest:%s".formatted(newCookie.getValue()));
+                                            response.addCookie(newCookie);
+                                        })
                         , () -> {
                             Cookie cookie = createCookie();
                             request.setAttribute("viewerId", "guest:%s".formatted(cookie.getValue()));
