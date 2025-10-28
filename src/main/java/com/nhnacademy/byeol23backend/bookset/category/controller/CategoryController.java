@@ -1,9 +1,6 @@
 package com.nhnacademy.byeol23backend.bookset.category.controller;
 
-import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryCreateRequest;
-import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryListResponse;
-import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryUpdateRequest;
-import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryUpdateResponse;
+import com.nhnacademy.byeol23backend.bookset.category.dto.*;
 import com.nhnacademy.byeol23backend.bookset.category.exception.CategoryDeleteReferencedByBookException;
 import com.nhnacademy.byeol23backend.bookset.category.exception.CategoryNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.category.exception.ErrorResponse;
@@ -60,6 +57,11 @@ public class CategoryController {
     @ResponseStatus(HttpStatus.OK)
     public List<CategoryListResponse> getChildren(@PathVariable("parentId") @NotNull @Min(1) Long parentId) {
         return categoryQueryService.getSubCategories(parentId);
+    }
+
+    @GetMapping("/categories")
+    public List<CategoryLeafResponse> getLeafs() {
+        return categoryQueryService.getLeafCategories();
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

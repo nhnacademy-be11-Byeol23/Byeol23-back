@@ -59,8 +59,8 @@ public class Member {
 	@Column(name = "member_role", nullable = false, length = 10)
 	private String memberRole;
 	
-	@Column(name = "join_from", nullable = false, length = 50)
-	private String joinFrom;
+	@Column(name = "joined_from", nullable = false, length = 50)
+	private String joinedFrom;
 
 	@Column(name = "grade_id", nullable = false)
 	private Long gradeId;
