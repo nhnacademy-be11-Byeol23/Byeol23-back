@@ -1,64 +1,21 @@
-### 도서 API 테스트
-
-# 서버 주소 변수 (필요시 포트 번호 등을 수정하세요)
-@host = http://localhost:8080
-
-### 1. 새로운 도서 생성 (POST /api/books)
-# @name createBook
-POST {{host}}/api/books
+POST http://localhost:8080/api/tags
 Content-Type: application/json
 
 {
-  "bookName": "JPA 프로그래밍 입문",
-  "contents": "1장. JPA 소개...",
-  "description": "자바 개발자를 위한 JPA 프로그래밍의 모든 것을 다룹니다.",
-  "regularPrice": 38000,
-  "salePrice": 34200,
-  "isbn": "979-11-88000-01-1",
-  "publishDate": "2024-05-10",
-  "isPack": true,
-  "bookStatus": "판매중",
-  "stock": 50,
-  "publisherId": 1,
-  "bookImg": "/images/jpa-book.png"
+  "tagName": "tag"
 }
 
-### 2. ID로 도서 조회 (GET /api/books/{id})
-# 위에서 생성된 도서의 ID를 path에 입력하세요 (예: 1)
-GET {{host}}/api/books/1
+### Update
 
-### 3. 도서 이름으로 검색 (GET /api/books/search)
-# 'JPA'라는 키워드가 포함된 도서를 검색합니다.
-GET {{host}}/api/books/search?keyword=JPA
-
-### 3-1. 페이징 및 정렬을 포함한 검색
-# 'JPA' 키워드로 검색, 첫 번째 페이지, 5개씩, 최신 출간일 순으로 정렬
-GET {{host}}/api/books/search?keyword=JPA&page=0&size=5&sort=publishDate,desc
-
-
-### 4. 도서 정보 수정 (PUT /api/books/{id})
-# 수정할 도서의 ID를 path에 입력하세요 (예: 1)
-PUT {{host}}/api/books/1
+PUT http://localhost:8080/api/tags/1
 Content-Type: application/json
 
 {
-  "bookName": "JPA 프로그래밍 입문 (개정판)",
-  "contents": "1장. JPA 소개 (수정됨)...",
-  "description": "최신 버전의 JPA 스펙을 반영한 개정판입니다.",
-  "regularPrice": 40000,
-  "salePrice": 36000,
-  "isbn": "979-11-88000-02-8",
-  "publishDate": "2025-01-20",
-  "isPack": true,
-  "bookStatus": "판매중",
-  "stock": 150,
-  "publisherId": 1,
-  "bookImg": "/images/jpa-book-revised.png"
+  "tagName": "나는야 귀요미 노형우"
 }
 
+### Delete
+DELETE http://localhost:8080/api/tags/1
 
-### 5. 존재하지 않는 도서 조회 (404 Not Found 테스트)
-# 존재하지 않을 가능성이 높은 ID로 조회하여 404 에러를 확인합니다.
-GET {{host}}/api/books/99999
-
-
+### Get
+GET http://localhost:8080/api/tags/1

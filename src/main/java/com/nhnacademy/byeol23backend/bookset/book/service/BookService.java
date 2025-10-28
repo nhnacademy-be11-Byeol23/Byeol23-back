@@ -1,13 +1,13 @@
 package com.nhnacademy.byeol23backend.bookset.book.service;
 
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookRequestDto;
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookResponseDto;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookCreateRequest;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookResponse;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookUpdateRequest;
 
 public interface BookService {
+	BookResponse createBook(BookCreateRequest createRequest);
 
-	BookResponseDto createBook(BookRequestDto requestDto);
+	BookResponse getBook(Long bookId);
 
-	BookResponseDto findById(Long bookId);
-
-	BookResponseDto updateBook(Long bookId, BookRequestDto requestDto);
+	BookResponse updateBook(Long bookId, BookUpdateRequest updateRequest);
 }

@@ -1,11 +1,8 @@
 package com.nhnacademy.byeol23backend.bookset.book.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -13,43 +10,37 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookRequestDto;
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookResponseDto;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookCreateRequest;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookResponse;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.service.BookService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/books")
-class BookController {
+@RequiredArgsConstructor
+public class BookController {
 
 	private final BookService bookService;
 
-	public BookController(BookService bookService) {
-		this.bookService = bookService;
-	}
-
 	@PostMapping
-	public ResponseEntity<BookResponseDto> createBook(@RequestBody BookRequestDto requestDto) {
-		BookResponseDto response = bookService.createBook(requestDto);
+	public ResponseEntity<BookResponse> createBook(@Valid @RequestBody BookCreateRequest createRequest) {
+		BookResponse response = bookService.createBook(createRequest);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
-	@RequestMapping(path = "{id}")
-	public ResponseEntity<BookResponseDto> getBook(@PathVariable("id") Long id) {
-		BookResponseDto response = bookService.findById(id);
+	@GetMapping("/{bookId}")
+	public ResponseEntity<BookResponse> getBook(@PathVariable("bookId") Long bookId) {
+		BookResponse response = bookService.getBook(bookId);
 		return ResponseEntity.ok(response);
 	}
 
-	@PutMapping(path = "{id}")
-	public ResponseEntity<BookResponseDto> updateBook(@PathVariable("id") Long id,
-		@RequestBody BookRequestDto requestDto) {
-		BookResponseDto response = bookService.updateBook(id, requestDto);
+	@PutMapping("/{bookId}")
+	public ResponseEntity<BookResponse> updateBook(@PathVariable("bookId") Long bookId,
+		@Valid @RequestBody BookUpdateRequest updateRequest) {
+		BookResponse response = bookService.updateBook(bookId, updateRequest);
 		return ResponseEntity.ok(response);
-	}
-
-	@ExceptionHandler(IllegalArgumentException.class)
-	public ResponseEntity<Map<String, String>> handleNotFound(IllegalArgumentException ex) {
-		Map<String, String> body = new HashMap<>();
-		body.put("error", ex.getMessage());
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
 	}
 }
