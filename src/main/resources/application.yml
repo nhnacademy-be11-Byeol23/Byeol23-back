@@ -7,7 +7,7 @@ server:
 
 spring:
   application:
-    name: backend-service
+    name: byeol23-backend
   jpa:
     open-in-view: false
     show-sql: true
@@ -43,9 +43,13 @@ tossPayment:
 
 eureka:
   client:
+    healthcheck:
+      enabled: true
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://127.0.0.1:8761/eureka
-    instance:
-      instance-id: ${spring.cloud.client.hostname}:${spring.application.instance_id:${random.value}}
+      defaultZone: http://127.0.0.1:10338/eureka
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.hostname}:${spring.application.instance_id:${random.value}}
+
