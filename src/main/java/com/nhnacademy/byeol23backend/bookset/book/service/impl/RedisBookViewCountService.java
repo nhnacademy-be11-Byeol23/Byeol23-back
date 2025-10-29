@@ -21,16 +21,9 @@ public class RedisBookViewCountService implements BookViewCountService {
     public void increaseViewCount(Long bookId, String viewerId) {
         Boolean isFirstViewed = stringRedisTemplate.opsForValue().setIfAbsent(generateBookViewedKey(bookId, viewerId), "1", Duration.ofHours(1));
         if(Boolean.TRUE.equals(isFirstViewed)) {
-            Long increment = stringRedisTemplate.opsForValue().increment(generateBookViewCountKey(bookId));
-            log.info("도서 번호:{} 조회수 {}", bookId, increment);
+            stringRedisTemplate.opsForValue().increment(generateBookViewCountKey(bookId));
+            log.info("도서 번호:{} 조회수 증가", bookId);
         }
-    }
-
-    @Override
-    public long getViewCount(Long bookId) {
-        return Optional.ofNullable(stringRedisTemplate.opsForValue().get(generateBookViewCountKey(bookId)))
-                .map(Long::parseLong)
-                .orElse(0L);
     }
 
     private String generateBookViewedKey(Long bookId, String viewerId) {

@@ -62,4 +62,7 @@ public class Book {
 	//고책임님 피드백 이후 바뀐 ERD를 적용하여 작성하였습니다.
 	@Column(name = "is_deleted", nullable = false)
 	private boolean isDeleted;
+
+    @Column(name = "view_count", columnDefinition = "BIGINT DEFAULT 0")
+    private long viewCount;
 }
