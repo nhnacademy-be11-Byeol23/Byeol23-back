@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.orderset.order.service.impl;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -15,19 +16,23 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.byeol23backend.bookset.book.domain.dto.BookOrderInfoResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.Order;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCreateResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderDetailResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderInfoResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareResponse;
 import com.nhnacademy.byeol23backend.orderset.order.exception.OrderNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.order.repository.OrderRepository;
+import com.nhnacademy.byeol23backend.orderset.order.repository.OrderSpecifications;
 import com.nhnacademy.byeol23backend.orderset.order.service.OrderService;
 import com.nhnacademy.byeol23backend.orderset.payment.domain.Payment;
 import com.nhnacademy.byeol23backend.orderset.payment.exception.PaymentNotFoundException;
@@ -75,22 +80,6 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
-	public List<OrderInfoResponse> getAllOrders() {
-		List<Order> orderList = orderRepository.findAll();
-
-		return orderList.stream()
-			.map(order -> new OrderInfoResponse(
-				order.getOrderNumber(),
-				order.getOrderedAt(),
-				order.getReceiver(),
-				order.getActualOrderPrice(),
-				order.getOrderStatus()
-			))
-			.collect(Collectors.toList());
-	}
-
-	@Override
 	@Transactional
 	public HttpResponse cancelOrder(String orderNumber, OrderCancelRequest request) throws
 		IOException,
@@ -117,6 +106,41 @@ public class OrderServiceImpl implements OrderService {
 		order.setOrderStatus("주문 취소");
 
 		return HttpClient.newHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
+	}
+
+	@Override
+	public OrderDetailResponse getOrderByOrderNumber(String orderNumber) {
+		Order order = orderRepository.findOrderByOrderNumber(orderNumber)
+			.orElseThrow(() -> new OrderNotFoundException("해당 주문 번호를 찾을 수 없습니다.: " + orderNumber));
+
+		List<BookOrderInfoResponse> bookOrderInfoResponses = List.of(
+			new BookOrderInfoResponse("찍히지 않습니다 3", 1, new BigDecimal("5850")),
+			new BookOrderInfoResponse("푸른 상자 20", 1, new BigDecimal("5400")),
+			new BookOrderInfoResponse("별이삼샵 11", 1, new BigDecimal("14400"))
+		);
+
+		return new OrderDetailResponse(order.getOrderNumber(), order.getOrderedAt(), order.getOrderStatus(),
+			order.getActualOrderPrice(),
+			order.getReceiver(), order.getReceiverPhone(), order.getReceiverAddress(), order.getReceiverAddressDetail(),
+			order.getPostCode(), bookOrderInfoResponses);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<OrderInfoResponse> searchOrders(String status, String orderNumber, String receiver) {
+		Specification<Order> spec = Specification.where(OrderSpecifications.statusEquals(status))
+			.and(OrderSpecifications.orderNumberContains(orderNumber))
+			.and(OrderSpecifications.receiverContains(receiver));
+
+		List<Order> orderPage = orderRepository.findAll(spec);
+
+		return orderPage.stream()
+			.map(order -> new OrderInfoResponse(order.getOrderNumber(),
+				order.getOrderedAt(),
+				order.getReceiver(),
+				order.getActualOrderPrice(),
+				order.getOrderStatus()))
+			.collect(Collectors.toList());
 	}
 
 	private String getAuthorizations() {
