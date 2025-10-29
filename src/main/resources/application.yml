@@ -1,0 +1,55 @@
+server:
+  port: 10332
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+
+spring:
+  application:
+    name: byeol23-backend
+  jpa:
+    open-in-view: false
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        highlight_sql: true
+        auto_quote_keyword: true
+    hibernate:
+      ddl-auto: create
+
+#  datasource:
+#    type: com.zaxxer.hikari.HikariDataSource
+#    dbcp2:
+#      test-on-borrow: true
+#      validation-query: SELECT 1
+
+#?? ? prod? ????
+  profiles:
+    active: dev
+
+logging:
+  level:
+    root: info
+    com.nhnacademy.exam: DEBUG
+    org.hibernate.orm.jdbc.bind: trace
+    org.springframework.transaction.interceptor: trace
+    org.apache.commons.dbcp2: DEBUG
+
+tossPayment:
+  secretKey: test_sk_26DlbXAaV0wkDZNmNMJ43qY50Q9R
+
+eureka:
+  client:
+    healthcheck:
+      enabled: true
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://127.0.0.1:10338/dashboard/eureka
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.hostname}:${spring.application.instance_id:${random.value}}
+

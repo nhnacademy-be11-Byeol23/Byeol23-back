@@ -1,7 +1,14 @@
 package com.nhnacademy.byeol23backend.orderset.order.repository;
 
-import com.nhnacademy.byeol23backend.orderset.order.domain.Order;
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
 
-public interface OrderRepository extends JpaRepository<Order, Long> {
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
+import com.nhnacademy.byeol23backend.orderset.order.domain.Order;
+
+public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
+	Optional<Order> findOrderByOrderNumber(String orderNumber);
+
+	boolean existsByOrderNumber(String orderNumber);
 }
