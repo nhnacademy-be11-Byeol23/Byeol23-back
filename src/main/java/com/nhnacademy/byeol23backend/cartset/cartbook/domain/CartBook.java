@@ -12,9 +12,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Table(name = "cart_book")
+@Table(name = "cart_books")
+@Getter
 public class CartBook {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,13 +25,16 @@ public class CartBook {
 	private Long cartBookId;
 
 	@Column(name = "quantity", nullable = false)
+	@Setter
 	private int quantity;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "book_id", nullable = false)
+	@Setter
 	private Book book;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "cart_id", nullable = false)
+	@Setter
 	private Cart cart;
 }
