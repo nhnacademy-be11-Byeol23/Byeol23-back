@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCreateResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderDetailResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderInfoResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareResponse;
@@ -15,7 +16,10 @@ public interface OrderService {
 
 	OrderCreateResponse updateOrderStatus(String orderNumber);
 
-	List<OrderInfoResponse> getAllOrders();
-
 	HttpResponse cancelOrder(String orderNumber, OrderCancelRequest request) throws IOException, InterruptedException;
+
+	OrderDetailResponse getOrderByOrderNumber(String orderNumber);
+
+	List<OrderInfoResponse> searchOrders(String status, String orderNumber, String receiver);
+
 }
