@@ -20,11 +20,11 @@ spring:
     hibernate:
       ddl-auto: create
 
-  datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    dbcp2:
-      test-on-borrow: true
-      validation-query: SELECT 1
+#  datasource:
+#    type: com.zaxxer.hikari.HikariDataSource
+#    dbcp2:
+#      test-on-borrow: true
+#      validation-query: SELECT 1
 
 #?? ? prod? ????
   profiles:
@@ -48,7 +48,7 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://127.0.0.1:10338/eureka
+      defaultZone: http://127.0.0.1:10338/dashboard/eureka
   instance:
     prefer-ip-address: true
     instance-id: ${spring.cloud.client.hostname}:${spring.application.instance_id:${random.value}}
