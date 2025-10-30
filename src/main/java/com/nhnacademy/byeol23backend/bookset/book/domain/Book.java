@@ -3,6 +3,8 @@ package com.nhnacademy.byeol23backend.bookset.book.domain;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import org.hibernate.annotations.SQLDelete;
+
 import com.nhnacademy.byeol23backend.bookset.publisher.domain.Publisher;
 
 import jakarta.persistence.Column;
@@ -12,28 +14,33 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "books")
+@NoArgsConstructor
+@SQLDelete(sql = "update ") //사용법 확인해 볼 것
 public class Book {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "book_id")
+	@Column(name = "book_id")  // book_book_id
 	private Long bookId;
 
 	@Column(name = "book_name", length = 200, nullable = false)
 	private String bookName;
 
 	@Column(name = "toc")
+	@Lob
 	private String toc;
 
-	@Column(name = "description")
+	@Column(name = "description", columnDefinition = "text")
 	private String description;
 
 	@Column(name = "regular_price", nullable = false, precision = 10)

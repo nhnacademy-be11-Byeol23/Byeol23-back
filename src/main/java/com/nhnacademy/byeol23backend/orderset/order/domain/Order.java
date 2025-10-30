@@ -83,7 +83,7 @@ public class Order {
 	private Coupon coupon;
 
 	public Order(String orderNumber, BigDecimal totalBookPrice, BigDecimal actualOrderPrice, LocalDateTime orderedAt,
-		String orderStatus, LocalDate deliverySentDate, String receiver, String postCode, String receiverAddress,
+		String orderStatus, LocalDate deliveryDesiredDate, String receiver, String postCode, String receiverAddress,
 		String receiverAddressDetail,
 		String receiverPhone) {
 		this.orderNumber = orderNumber;
@@ -91,7 +91,7 @@ public class Order {
 		this.actualOrderPrice = actualOrderPrice;
 		this.orderedAt = orderedAt;
 		this.orderStatus = orderStatus;
-		this.deliverySentDate = deliverySentDate;
+		this.deliveryDesiredDate = deliveryDesiredDate;
 		this.receiver = receiver;
 		this.postCode = postCode;
 		this.receiverAddress = receiverAddress;

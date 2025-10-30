@@ -30,6 +30,7 @@ import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderDetailRespon
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderInfoResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.PointOrderResponse;
 import com.nhnacademy.byeol23backend.orderset.order.exception.OrderNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.order.repository.OrderRepository;
 import com.nhnacademy.byeol23backend.orderset.order.repository.OrderSpecifications;
@@ -42,12 +43,16 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class OrderServiceImpl implements OrderService {
 	private final OrderRepository orderRepository;
 	private final PaymentRepository paymentRepository;
 	private final ObjectMapper objectMapper;
 	@Value("${tossPayment.secretKey}")
 	private String secretKey;
+	private static final String ORDER_STATUS_WAITING = "대기";
+	private static final String ORDER_STATUS_PAYMENT_COMPLETED = "결제 완료";
+	private static final String PAYMENT_METHOD_POINT = "포인트 결제";
 
 	@Override
 	@Transactional
@@ -57,8 +62,9 @@ public class OrderServiceImpl implements OrderService {
 		String orderId = timeStamp + randomPart;
 
 		Order order = new Order(orderId, request.totalBookPrice(), request.actualOrderPrice(),
-			LocalDateTime.now(), "대기", LocalDateTime.now().plusDays(3).toLocalDate(), request.receiver(),
-			request.postCode(), request.receiverAddress(), request.receiverAddressDetail(), request.receiverPhone());
+			LocalDateTime.now(), ORDER_STATUS_WAITING, request.deliveryArrivedDate(),
+			request.receiver(), request.postCode(), request.receiverAddress(),
+			request.receiverAddressDetail(), request.receiverPhone());
 
 		orderRepository.save(order);
 
@@ -71,7 +77,7 @@ public class OrderServiceImpl implements OrderService {
 		Order order = orderRepository.findOrderByOrderNumber(orderNumber)
 			.orElseThrow(() -> new OrderNotFoundException("해당 주문 번호를 찾을 수 없습니다.: " + orderNumber));
 
-		order.setOrderStatus("결제 완료");
+		order.setOrderStatus(ORDER_STATUS_PAYMENT_COMPLETED);
 
 		return new OrderCreateResponse(orderNumber, order.getTotalBookPrice(), order.getActualOrderPrice(),
 			order.getOrderedAt(), order.getOrderStatus(), order.getDeliveryArrivedDate(), order.getReceiver(),
@@ -126,7 +132,6 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
 	public List<OrderInfoResponse> searchOrders(String status, String orderNumber, String receiver) {
 		Specification<Order> spec = Specification.where(OrderSpecifications.statusEquals(status))
 			.and(OrderSpecifications.orderNumberContains(orderNumber))
@@ -141,6 +146,17 @@ public class OrderServiceImpl implements OrderService {
 				order.getActualOrderPrice(),
 				order.getOrderStatus()))
 			.collect(Collectors.toList());
+	}
+
+	@Override
+	@Transactional
+	public PointOrderResponse createOrderWithPoints(String orderNumber) {
+		Order order = orderRepository.findOrderByOrderNumber(orderNumber)
+			.orElseThrow(() -> new OrderNotFoundException("해당 주문을 찾을 수 없습니다: " + orderNumber));
+
+		order.setOrderStatus(ORDER_STATUS_PAYMENT_COMPLETED);
+
+		return new PointOrderResponse(order.getOrderNumber(), order.getTotalBookPrice(), PAYMENT_METHOD_POINT);
 	}
 
 	private String getAuthorizations() {
