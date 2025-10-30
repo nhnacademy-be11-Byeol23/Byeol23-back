@@ -1,5 +1,7 @@
 package com.nhnacademy.byeol23backend.bookset.book.service.impl;
 
+import com.nhnacademy.byeol23backend.bookset.book.event.ViewCountIncreaseEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,7 @@ public class BookServiceImpl implements BookService {
 
 	private final BookRepository bookRepository;
 	private final PublisherRepository publisherRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
 	@Override
 	@Transactional
@@ -62,7 +65,15 @@ public class BookServiceImpl implements BookService {
 		return toResponse(book);
 	}
 
-	@Override
+    @Override
+    public BookResponse getBookAndIncreaseViewCount(Long bookId, String viewerId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new BookNotFoundException("존재하지 않는 도서입니다: " + bookId));
+        eventPublisher.publishEvent(new ViewCountIncreaseEvent(bookId, viewerId));
+        return toResponse(book);
+    }
+
+    @Override
 	@Transactional
 	public BookResponse updateBook(Long bookId, BookUpdateRequest updateRequest) {
 		Book book = bookRepository.findById(bookId)

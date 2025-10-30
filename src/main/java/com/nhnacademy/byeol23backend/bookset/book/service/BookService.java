@@ -9,5 +9,7 @@ public interface BookService {
 
 	BookResponse getBook(Long bookId);
 
+    BookResponse getBookAndIncreaseViewCount(Long bookId, String viewerId);
+
 	BookResponse updateBook(Long bookId, BookUpdateRequest updateRequest);
 }
