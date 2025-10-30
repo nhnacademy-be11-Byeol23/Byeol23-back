@@ -85,11 +85,11 @@ public class BookServiceImpl implements BookService {
 		book.setBookStatus(updateRequest.bookStatus());
 		book.setStock(updateRequest.stock());
 		book.setPublisher(publisher);
-		book.setDeleted(updateRequest.isDeleted());
-		Book updatedBook = bookRepository.save(book);
-		log.info("도서 정보가 수정되었습니다. ID: {}", updatedBook.getBookId());
+		book.setDeleted(updateRequest.isDeleted()); // 수정에서는 삭제할 필요가 없음
+		// Book updatedBook = bookRepository.save(book);
+		// log.info("도서 정보가 수정되었습니다. ID: {}", updatedBook.getBookId());
 
-		return toResponse(updatedBook);
+		return toResponse(book);
 	}
 
 	private BookResponse toResponse(Book book) {

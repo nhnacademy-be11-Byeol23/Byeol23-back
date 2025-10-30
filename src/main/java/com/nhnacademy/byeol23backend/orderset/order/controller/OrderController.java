@@ -21,6 +21,7 @@ import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderDetailRespon
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderInfoResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.PointOrderResponse;
 import com.nhnacademy.byeol23backend.orderset.order.service.OrderService;
 
 import lombok.RequiredArgsConstructor;
@@ -71,6 +72,13 @@ public class OrderController {
 		List<OrderInfoResponse> responses = orderService.searchOrders(status, orderNumber, receiver);
 
 		return ResponseEntity.ok(responses);
+	}
+
+	@PostMapping("/points")
+	ResponseEntity<PointOrderResponse> saveOrderWithPoints(@RequestParam String orderNumber) {
+		PointOrderResponse response = orderService.createOrderWithPoints(orderNumber);
+		URI uri = URI.create("/api/orders/points/" + response.orderNumber());
+		return ResponseEntity.created(uri).body(response);
 	}
 
 }

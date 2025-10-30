@@ -31,8 +31,8 @@ public class BookController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
-	@GetMapping("/{bookId}")
-	public ResponseEntity<BookResponse> getBook(@PathVariable("bookId") Long bookId) {
+	@GetMapping("/{book-id}")
+	public ResponseEntity<BookResponse> getBook(@PathVariable("book-id") Long bookId) {
 		BookResponse response = bookService.getBook(bookId);
 		return ResponseEntity.ok(response);
 	}
