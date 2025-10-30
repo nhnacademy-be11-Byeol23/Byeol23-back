@@ -9,8 +9,8 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 
 @Entity
-@Table(name = "publishers")
 @Getter
+@Table(name = "publishers")
 public class Publisher {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
