@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "tag")
+@Table(name = "tags")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Tag {
