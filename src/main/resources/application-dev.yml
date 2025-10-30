@@ -29,5 +29,10 @@ spring:
     console:
       enabled: true
       path: /h2-console
+
 jwt:
   public-key: ${JWT_PUBLIC_KEY}
+
+eureka:
+  client:
+    enabled: false
