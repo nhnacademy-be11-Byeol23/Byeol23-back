@@ -48,6 +48,7 @@ public class Member {
 	@Column(name = "email", nullable = false, length = 50)
 	private String email;
 
+	//todo ZoneDate
 	@Setter
 	@Column(name = "birth_date", nullable = false)
 	private LocalDate birthday;
