@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.memberset.member.service.impl;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberResponseDto;
@@ -8,7 +9,6 @@ import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundEx
 import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
 import com.nhnacademy.byeol23backend.memberset.member.service.MemberService;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,6 +25,7 @@ public class MemberServiceImpl implements MemberService {
 	 * @return memberCreateResponseDto
 	 */
 	@Override
+	@Transactional
 	public MemberResponseDto createMember(Member member) {
 		Member newMember = memberRepository.save(member);
 		log.info("멤버 생성을 완료했습니다.{}", member.toString());
@@ -55,6 +56,7 @@ public class MemberServiceImpl implements MemberService {
 	 * @return member
 	 */
 	@Override
+	@Transactional(readOnly = true)
 	public MemberResponseDto getMember(Long memberId) {
 		Member target = findMemberById(memberId);
 
