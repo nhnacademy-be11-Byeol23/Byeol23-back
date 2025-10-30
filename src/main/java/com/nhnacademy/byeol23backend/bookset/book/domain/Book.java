@@ -67,6 +67,9 @@ public class Book {
 
 	@Column(name = "is_deleted", nullable = false)
 	private boolean isDeleted;
+  
+  @Column(name = "view_count", columnDefinition = "BIGINT DEFAULT 0")
+    private long viewCount;
 
 	public void createBook(BookCreateRequest request, Publisher publisher) {
 		this.bookName = request.bookName();

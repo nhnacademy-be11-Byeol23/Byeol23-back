@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import com.nhnacademy.byeol23backend.bookset.book.annotation.ViewerId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -37,9 +38,9 @@ public class BookController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
-	@GetMapping("/{book-id}")
-	public ResponseEntity<BookResponse> getBook(@PathVariable("book-id") Long bookId) {
-		BookResponse response = bookService.getBook(bookId);
+	@GetMapping("/{bookId}")
+	public ResponseEntity<BookResponse> getBook(@PathVariable("bookId") Long bookId, @ViewerId String viewerId) {
+		BookResponse response = bookService.getBookAndIncreaseViewCount(bookId, viewerId);
 		return ResponseEntity.ok(response);
 	}
 
