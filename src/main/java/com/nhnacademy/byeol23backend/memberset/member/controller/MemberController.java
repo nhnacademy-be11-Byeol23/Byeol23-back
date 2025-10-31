@@ -31,7 +31,7 @@ public class MemberController implements MemberApi{
 	}
 
 	@GetMapping("/{member-id}")
-	public ResponseEntity<MemberResponseDto> getMember(@PathVariable Long memberId) {
+	public ResponseEntity<MemberResponseDto> getMember(@PathVariable(value = "member-id") Long memberId) {
 		return ResponseEntity.ok(memberService.getMember(memberId));
 	}
 
@@ -41,13 +41,14 @@ public class MemberController implements MemberApi{
 	 * @return ResponseEntity&lt;void&gt; NoContent&lt;204&gt; HTTP 응답 반환
 	 */
 	@DeleteMapping("/{member-id}")
-	public ResponseEntity<Void> deleteMember(@PathVariable Long memberId) {
+	public ResponseEntity<Void> deleteMember(@PathVariable(value = "member-id") Long memberId) {
 		memberService.deleteMember(memberId);
 		return ResponseEntity.noContent().build();
 	}
 
 	@PutMapping("/{member-id}")
-	public ResponseEntity<MemberResponseDto> updateMember(@PathVariable Long memberId, @RequestBody Member member) {
+	public ResponseEntity<MemberResponseDto> updateMember(@PathVariable(value = "member-id") Long memberId,
+		@RequestBody Member member) {
 		memberService.updateMember(member);
 		MemberResponseDto updatedMember = memberService.getMember(memberId);
 		return ResponseEntity.ok(updatedMember);
