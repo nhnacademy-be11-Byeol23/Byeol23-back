@@ -2,11 +2,9 @@ package com.nhnacademy.byeol23backend.bookset.book.domain;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.hibernate.annotations.SQLDelete;
-
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookCreateRequest;
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.publisher.domain.Publisher;
 
 import jakarta.persistence.Column;
@@ -17,11 +15,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
+@Setter
 @Entity
 @Table(name = "books")
 @NoArgsConstructor
@@ -67,7 +67,7 @@ public class Book {
 
 	@Column(name = "is_deleted", nullable = false)
 	private boolean isDeleted;
-  
+
   @Column(name = "view_count", columnDefinition = "BIGINT DEFAULT 0")
     private long viewCount;
 
@@ -98,4 +98,7 @@ public class Book {
 		this.stock = request.stock();
 		this.publisher = publisher;
 	}
+
+	@OneToMany(mappedBy = "book", fetch = FetchType.LAZY, orphanRemoval = true)
+	private List<BookImage> bookImageUrls = new ArrayList<>();
 }
