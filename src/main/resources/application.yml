@@ -20,20 +20,12 @@ spring:
     hibernate:
       ddl-auto: create
 
-#  datasource:
-#    type: com.zaxxer.hikari.HikariDataSource
-#    dbcp2:
-#      test-on-borrow: true
-#      validation-query: SELECT 1
-
-#?? ? prod? ????
   profiles:
     active: dev
 
 logging:
   level:
     root: info
-    com.nhnacademy.exam: DEBUG
     org.hibernate.orm.jdbc.bind: trace
     org.springframework.transaction.interceptor: trace
     org.apache.commons.dbcp2: DEBUG

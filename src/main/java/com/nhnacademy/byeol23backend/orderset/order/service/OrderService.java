@@ -10,6 +10,7 @@ import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderDetailRespon
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderInfoResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.PointOrderResponse;
 
 public interface OrderService {
 	OrderPrepareResponse prepareOrder(OrderPrepareRequest request);
@@ -22,4 +23,5 @@ public interface OrderService {
 
 	List<OrderInfoResponse> searchOrders(String status, String orderNumber, String receiver);
 
+	PointOrderResponse createOrderWithPoints(String orderNumber);
 }

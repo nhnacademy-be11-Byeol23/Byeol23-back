@@ -1,19 +1,20 @@
 package com.nhnacademy.byeol23backend.cartset.cart.domain;
 
+import com.nhnacademy.byeol23backend.cartset.cartbook.domain.CartBook;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "carts")
+@Getter
+@NoArgsConstructor
 public class Cart {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +22,10 @@ public class Cart {
 	private Long cartId;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "member_id")
+	@JoinColumn(name = "member_id", nullable = false)
+	@Setter
 	private Member member;
 
+	@OneToMany(mappedBy = "cart")
+	private List<CartBook> cartBooks = new ArrayList<>();
 }
