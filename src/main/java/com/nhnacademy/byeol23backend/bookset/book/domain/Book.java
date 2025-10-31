@@ -5,6 +5,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookCreateRequest;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookUpdateRequest;
+import com.nhnacademy.byeol23backend.bookset.bookimage.domain.BookImage;
 import com.nhnacademy.byeol23backend.bookset.publisher.domain.Publisher;
 
 import jakarta.persistence.Column;
@@ -19,6 +22,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
 
 @Getter
 @Setter
