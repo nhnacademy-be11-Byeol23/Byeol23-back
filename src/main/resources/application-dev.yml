@@ -9,10 +9,10 @@ spring:
     password:
   data:
     redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-      password: ${REDIS_PASSWORD}
-      database: ${REDIS_DATABASE}
+      host: ${REDIS_HOST:s4.java21.net}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:*N2vya7H@muDTwdNMR!}
+      database: ${REDIS_DATABASE:321}
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -31,7 +31,7 @@ spring:
       path: /h2-console
 
 jwt:
-  public-key: ${JWT_PUBLIC_KEY}
+  public-key: dummyData
 
 #eureka:
 #  client:
