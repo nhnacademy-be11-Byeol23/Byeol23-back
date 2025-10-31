@@ -20,13 +20,13 @@ spring:
     hibernate:
       ddl-auto: create
 
-#  datasource:
-#    type: com.zaxxer.hikari.HikariDataSource
-#    dbcp2:
-#      test-on-borrow: true
-#      validation-query: SELECT 1
+  #  datasource:
+  #    type: com.zaxxer.hikari.HikariDataSource
+  #    dbcp2:
+  #      test-on-borrow: true
+  #      validation-query: SELECT 1
 
-#?? ? prod? ????
+  #?? ? prod? ????
   profiles:
     active: dev
 
