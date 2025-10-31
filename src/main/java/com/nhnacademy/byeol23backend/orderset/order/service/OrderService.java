@@ -1,9 +1,27 @@
 package com.nhnacademy.byeol23backend.orderset.order.service;
 
+import java.io.IOException;
+import java.net.http.HttpResponse;
+import java.util.List;
+
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelRequest;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCreateResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderDetailResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderInfoResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.PointOrderResponse;
 
 public interface OrderService {
 	OrderPrepareResponse prepareOrder(OrderPrepareRequest request);
 
+	OrderCreateResponse updateOrderStatus(String orderNumber);
+
+	HttpResponse cancelOrder(String orderNumber, OrderCancelRequest request) throws IOException, InterruptedException;
+
+	OrderDetailResponse getOrderByOrderNumber(String orderNumber);
+
+	List<OrderInfoResponse> searchOrders(String status, String orderNumber, String receiver);
+
+	PointOrderResponse createOrderWithPoints(String orderNumber);
 }

@@ -1,13 +1,20 @@
 package com.nhnacademy.byeol23backend.bookset.book.controller;
 
+import java.util.List;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import com.nhnacademy.byeol23backend.bookset.book.annotation.ViewerId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookCreateRequest;
@@ -32,15 +39,30 @@ public class BookController {
 	}
 
 	@GetMapping("/{bookId}")
-	public ResponseEntity<BookResponse> getBook(@PathVariable("bookId") Long bookId) {
-		BookResponse response = bookService.getBook(bookId);
+	public ResponseEntity<BookResponse> getBook(@PathVariable("bookId") Long bookId, @ViewerId String viewerId) {
+		BookResponse response = bookService.getBookAndIncreaseViewCount(bookId, viewerId);
 		return ResponseEntity.ok(response);
 	}
 
-	@PutMapping("/{bookId}")
-	public ResponseEntity<BookResponse> updateBook(@PathVariable("bookId") Long bookId,
+	@PutMapping("/{book-id}")
+	public ResponseEntity<BookResponse> updateBook(@PathVariable("book-id") Long bookId,
 		@Valid @RequestBody BookUpdateRequest updateRequest) {
 		BookResponse response = bookService.updateBook(bookId, updateRequest);
 		return ResponseEntity.ok(response);
+	}
+
+	@DeleteMapping("/{book-id}")
+	public ResponseEntity<Void> deleteBook(@PathVariable("book-id") Long bookId) {
+		bookService.deleteBook(bookId);
+		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping
+	public ResponseEntity<List<BookResponse>> getBooks(@RequestParam(defaultValue = "0") int pageNo,
+		@RequestParam(defaultValue = "10") int pageSize
+	) {
+		Pageable pageable = PageRequest.of(pageNo, pageSize);
+		List<BookResponse> books = bookService.getBooks(pageable);
+		return ResponseEntity.ok(books);
 	}
 }

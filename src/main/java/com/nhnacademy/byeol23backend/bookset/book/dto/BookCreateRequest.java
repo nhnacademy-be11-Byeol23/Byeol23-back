@@ -14,8 +14,7 @@ public record BookCreateRequest(
 	boolean isPack,
 	String bookStatus,
 	Integer stock,
-	Long publisherId,
-	boolean isDeleted
+	Long publisherId
 ) {
 }
 
