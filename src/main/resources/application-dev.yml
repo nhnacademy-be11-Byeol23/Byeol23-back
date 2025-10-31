@@ -33,6 +33,6 @@ spring:
 jwt:
   public-key: ${JWT_PUBLIC_KEY}
 
-eureka:
-  client:
-    enabled: false
+#eureka:
+#  client:
+#    enabled: false

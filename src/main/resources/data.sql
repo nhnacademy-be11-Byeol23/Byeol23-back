@@ -131,15 +131,15 @@ values ('일반', 100000, 1),
        ('로얄', 200000, 2);
 
 -- 주소 테스트 데이터
-insert into addresses(post_code, address_info, address_detail, address_extra, address_alias, is_default, member_id)
-values ('12345', '대전광역시 유성구 대학로 99', '정보화본부 1306호', 'N1 건물', '정보화 본부', true, 1);
+-- insert into addresses(post_code, address_info, address_detail, address_extra, address_alias, is_default, member_id)
+-- values ('12345', '대전광역시 유성구 대학로 99', '정보화본부 1306호', 'N1 건물', '정보화 본부', true, 1);
 
 
 -- carts
 insert into carts(member_id)
 values (1);
 
-insert into cart_book(quantity, book_id, cart_id)
+insert into cart_books(quantity, book_id, cart_id)
 values (150, 1, 1);
 
 
