@@ -1,9 +1,9 @@
 package com.nhnacademy.byeol23backend.orderset.delivery.service.impl;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.nhnacademy.byeol23backend.orderset.delivery.domain.DeliveryPolicy;
@@ -22,16 +22,14 @@ public class DeliveryPolicyServiceImpl implements DeliveryPolicyService {
 	private final DeliveryPolicyRepository deliveryPolicyRepository;
 
 	@Override
-	public List<DeliveryPolicyInfoResponse> getDeliveryPolicies() {
-		List<DeliveryPolicy> deliveryPolicies = deliveryPolicyRepository.findAll();
-		return deliveryPolicies.stream()
-			.map(deliveryPolicy -> new DeliveryPolicyInfoResponse(
-				deliveryPolicy.getFreeDeliveryCondition(),
-				deliveryPolicy.getDeliveryFee(),
-				deliveryPolicy.getChangedAt()
-			))
-			.collect(Collectors.toList());
+	public Page<DeliveryPolicyInfoResponse> getDeliveryPolicies(Pageable pageable) {
+		Page<DeliveryPolicy> deliveryPoliciesPage = deliveryPolicyRepository.findAll(pageable);
 
+		return deliveryPoliciesPage.map(deliveryPolicy -> new DeliveryPolicyInfoResponse(
+			deliveryPolicy.getFreeDeliveryCondition(),
+			deliveryPolicy.getDeliveryFee(),
+			deliveryPolicy.getChangedAt()
+		));
 	}
 
 	@Override
