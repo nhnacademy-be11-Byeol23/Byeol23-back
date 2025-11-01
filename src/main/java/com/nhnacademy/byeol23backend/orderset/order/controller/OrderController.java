@@ -1,12 +1,12 @@
 package com.nhnacademy.byeol23backend.orderset.order.controller;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpResponse;
-import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -16,14 +16,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelRequest;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCreateResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderDetailResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderInfoResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderSearchCondition;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.PointOrderResponse;
 import com.nhnacademy.byeol23backend.orderset.order.service.OrderService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -33,43 +36,39 @@ public class OrderController {
 	private final OrderService orderService;
 
 	@PostMapping
-	public ResponseEntity<OrderPrepareResponse> createOrder(@RequestBody OrderPrepareRequest request) {
+	public ResponseEntity<OrderPrepareResponse> prepareOrder(@Valid @RequestBody OrderPrepareRequest request) {
 		OrderPrepareResponse response = orderService.prepareOrder(request);
 		URI uri = URI.create("/api/orders/" + response.orderNumber());
 		return ResponseEntity.created(uri).body(response);
 	}
 
-	@PutMapping
+	@PutMapping // 상대 값이 없다
 	public ResponseEntity<OrderCreateResponse> updateOrderStatus(@RequestParam("orderNumber") String orderNumber) {
 		OrderCreateResponse response = orderService.updateOrderStatus(orderNumber);
 		return ResponseEntity.ok(response);
 	}
 
-	@PostMapping("/{orderNumber}")
-	public ResponseEntity<String> cancelOrder(@PathVariable String orderNumber,
-		@RequestBody OrderCancelRequest request) {
-		try {
-			HttpResponse<String> response = orderService.cancelOrder(orderNumber, request);
-			return ResponseEntity.status(response.statusCode()).body(response.body());
-		} catch (IOException | InterruptedException e) {
-			throw new RuntimeException(e);
-		}
+	@PostMapping("/{order-number}")
+	public ResponseEntity<OrderCancelResponse> cancelOrder(@PathVariable(name = "order-number") String orderNumber,
+		@Valid @RequestBody OrderCancelRequest request) {
+		OrderCancelResponse response = orderService.cancelOrder(orderNumber, request);
+		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("/{orderNumber}")
-	public ResponseEntity<OrderDetailResponse> getOrderByOrderNumber(@PathVariable String orderNumber) {
+	@GetMapping("/{order-number}")
+	public ResponseEntity<OrderDetailResponse> getOrderByOrderNumber(
+		@PathVariable(name = "order-number") String orderNumber) {
 		OrderDetailResponse response = orderService.getOrderByOrderNumber(orderNumber);
 
 		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping
-	public ResponseEntity<List<OrderInfoResponse>> searchOrders(
-		@RequestParam(name = "status", required = false) String status,
-		@RequestParam(name = "orderNumber", required = false) String orderNumber,
-		@RequestParam(name = "receiver", required = false) String receiver) {
+	public ResponseEntity<Page<OrderInfoResponse>> searchOrders(
+		@ModelAttribute OrderSearchCondition orderSearchCondition,
+		Pageable pageable) {
 
-		List<OrderInfoResponse> responses = orderService.searchOrders(status, orderNumber, receiver);
+		Page<OrderInfoResponse> responses = orderService.searchOrders(orderSearchCondition, pageable);
 
 		return ResponseEntity.ok(responses);
 	}
