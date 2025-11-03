@@ -17,9 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCreateResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderDetailResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderInfoResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.PointOrderResponse;
 import com.nhnacademy.byeol23backend.orderset.order.service.OrderService;
 
 import lombok.RequiredArgsConstructor;
@@ -43,11 +45,6 @@ public class OrderController {
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping
-	public List<OrderInfoResponse> getAllOrders() {
-		return orderService.getAllOrders();
-	}
-
 	@PostMapping("/{orderNumber}")
 	public ResponseEntity<String> cancelOrder(@PathVariable String orderNumber,
 		@RequestBody OrderCancelRequest request) {
@@ -57,6 +54,31 @@ public class OrderController {
 		} catch (IOException | InterruptedException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@GetMapping("/{orderNumber}")
+	public ResponseEntity<OrderDetailResponse> getOrderByOrderNumber(@PathVariable String orderNumber) {
+		OrderDetailResponse response = orderService.getOrderByOrderNumber(orderNumber);
+
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping
+	public ResponseEntity<List<OrderInfoResponse>> searchOrders(
+		@RequestParam(name = "status", required = false) String status,
+		@RequestParam(name = "orderNumber", required = false) String orderNumber,
+		@RequestParam(name = "receiver", required = false) String receiver) {
+
+		List<OrderInfoResponse> responses = orderService.searchOrders(status, orderNumber, receiver);
+
+		return ResponseEntity.ok(responses);
+	}
+
+	@PostMapping("/points")
+	ResponseEntity<PointOrderResponse> saveOrderWithPoints(@RequestParam String orderNumber) {
+		PointOrderResponse response = orderService.createOrderWithPoints(orderNumber);
+		URI uri = URI.create("/api/orders/points/" + response.orderNumber());
+		return ResponseEntity.created(uri).body(response);
 	}
 
 }
