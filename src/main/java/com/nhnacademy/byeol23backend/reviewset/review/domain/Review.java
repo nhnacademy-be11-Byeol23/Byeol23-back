@@ -2,10 +2,16 @@ package com.nhnacademy.byeol23backend.reviewset.review.domain;
 
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.orderset.orderdetail.domain.OrderDetail;
+import com.nhnacademy.byeol23backend.reviewset.reviewImage.domain.ReviewImage;
+
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+@Getter
 @Entity
 @Table(name = "reviews")
 public class Review {
@@ -34,5 +40,8 @@ public class Review {
     @JoinColumn(name = "order_detail_id", nullable = false)
     @OneToOne(fetch = FetchType.LAZY)
     private OrderDetail orderDetail;
+
+	@OneToMany(mappedBy = "review", fetch = FetchType.LAZY, orphanRemoval = true)
+	private List<ReviewImage> reviewImageUrls = new ArrayList<>();
 
 }
