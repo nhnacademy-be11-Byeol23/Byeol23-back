@@ -8,9 +8,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "coupon_policy")
+@NoArgsConstructor
 public class CouponPolicy {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,4 +37,11 @@ public class CouponPolicy {
 	@Column(name = "is_active", nullable = false)
 	private Boolean isActive;
 
+	public CouponPolicy(String couponName, Long criterionPrice, Integer discountRate, BigDecimal discountLimit, BigDecimal discountAmount) {
+		this.couponName = couponName;
+		this.criterionPrice = criterionPrice;
+		this.discountRate = discountRate;
+		this.discountLimit = discountLimit;
+		this.discountAmount = discountAmount;
+	}
 }
