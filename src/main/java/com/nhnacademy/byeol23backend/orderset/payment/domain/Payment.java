@@ -14,9 +14,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "payments")
+@NoArgsConstructor
+@Getter
 public class Payment {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,8 +36,8 @@ public class Payment {
 	@Column(name = "payment_method", nullable = false, length = 10)
 	private String paymentMethod;
 
-	@Column(name = "total_price", nullable = false, precision = 10)
-	private BigDecimal totalPrice;
+	@Column(name = "total_amount", nullable = false, precision = 10)
+	private BigDecimal totalAmount;
 
 	private LocalDateTime paymentRequestAt;
 
@@ -42,4 +46,15 @@ public class Payment {
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "order_id", nullable = false)
 	private Order order;
+
+	public Payment(String paymentKey, String orderName, String paymentMethod, BigDecimal totalPrice,
+		LocalDateTime paymentRequestAt, LocalDateTime paymentApprovedAt, Order order) {
+		this.paymentKey = paymentKey;
+		this.orderName = orderName;
+		this.paymentMethod = paymentMethod;
+		this.totalAmount = totalPrice;
+		this.paymentRequestAt = paymentRequestAt;
+		this.paymentApprovedAt = paymentApprovedAt;
+		this.order = order;
+	}
 }

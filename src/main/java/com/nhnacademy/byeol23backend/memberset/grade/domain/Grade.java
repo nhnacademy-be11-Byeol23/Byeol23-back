@@ -21,6 +21,8 @@ public class Grade {
 	private String gradeName;
 
 	@Column(name = "criterion_price", nullable = false, precision = 10)
-	private BigDecimal criterion_price;
+	private BigDecimal criterionPrice;
 
+	@Column(name = "point_rate", nullable = false)
+	private int pointRate;
 }

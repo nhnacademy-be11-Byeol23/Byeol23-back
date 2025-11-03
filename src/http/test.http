@@ -1,23 +1,21 @@
-### GET request to example server
-GET http://localhost:8080/api/contributors/1
-
-### post
-POST http://localhost:8080/api/contributors
+POST http://localhost:8080/api/tags
 Content-Type: application/json
 
 {
-  "name": "Hyungwoo Ro",
-  "role": "author"
+  "tagName": "tag"
 }
 
-### PUT
-PUT http://localhost:8080/api/contributors/1
+### Update
+
+PUT http://localhost:8080/api/tags/1
 Content-Type: application/json
 
 {
-  "name": "Yuhyeon Choi",
-  "role": "author"
+  "tagName": "나는야 귀요미 노형우"
 }
 
-### DELETE
-DELETE http://localhost:8080/api/contributors/1
+### Delete
+DELETE http://localhost:8080/api/tags/1
+
+### Get
+GET http://localhost:8080/api/tags/1
