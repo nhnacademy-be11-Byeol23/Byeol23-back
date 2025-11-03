@@ -4,7 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.nhnacademy.byeol23backend.image.ImageService;
+import com.nhnacademy.byeol23backend.image.dto.ImageUrlProjection;
+import com.nhnacademy.byeol23backend.image.service.ImageService;
 import com.nhnacademy.byeol23backend.reviewset.review.domain.Review;
 import com.nhnacademy.byeol23backend.reviewset.review.repository.ReviewRepository;
 import com.nhnacademy.byeol23backend.reviewset.reviewImage.domain.ReviewImage;
@@ -21,17 +22,17 @@ public class ReviewImageServiceImpl implements ImageService {
 	@Override
 	public String saveImageUrl(Long Id, String imageUrl) {
 		Review review = reviewRepository.findById(Id)
-			.orElseThrow(() -> new IllegalArgumentException("해당 리뷰를 찾을 수 없습니다. 리뷰 id: " + Id));
+			.orElseThrow(() -> new IllegalArgumentException("해당 리뷰를 찾을 수 없습니다. 리뷰 imageId: " + Id));
 		ReviewImage image = reviewImageRepository.save(new ReviewImage(review, imageUrl));
 		return image.toString();
 	}
 
 	@Override
-	public List<String> getImageUrlsById(Long Id) {
-		Review review = reviewRepository.findWithImageById(Id)
-			.orElseThrow(() -> new IllegalArgumentException("해당 리뷰를 찾을 수 없습니다. 리뷰 id: " + Id));
-		return review.getReviewImageUrls().stream()
-			.map(ReviewImage::getReviewImageUrl)
-			.toList();
+	public List<ImageUrlProjection> getImageUrlsById(Long Id) {
+		return reviewImageRepository.findUrlsAndIdsByReviewId(Id);
+	}
+	@Override
+	public void deleteImageUrlsById(Long Id) {
+		reviewImageRepository.deleteById(Id);
 	}
 }
