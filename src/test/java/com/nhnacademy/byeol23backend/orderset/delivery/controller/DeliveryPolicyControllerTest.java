@@ -101,7 +101,7 @@ class DeliveryPolicyControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(createRequest))) // 1. 요청 본문(Body)에 JSON 전송
 			.andExpect(status().isCreated()) // 2. HTTP 201 Created 상태 검증
-			.andExpect(header().string("Location", "/api/delivery-policies/1")) // 3. Location 헤더 검증
+			.andExpect(header().string("Location", "/api/delivery-policies/current")) // 3. Location 헤더 검증
 			.andExpect(jsonPath("$.deliveryPolicyId").value(1L)); // 4. 응답 본문(JSON) 검증
 	}
 

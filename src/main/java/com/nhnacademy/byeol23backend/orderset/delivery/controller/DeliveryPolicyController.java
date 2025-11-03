@@ -34,7 +34,7 @@ public class DeliveryPolicyController {
 	public ResponseEntity<DeliveryPolicyCreateResponse> createDeliveryPolicy(
 		@RequestBody DeliveryPolicyCreateRequest request) {
 		DeliveryPolicyCreateResponse response = deliveryPolicyService.createDeliveryPolicy(request);
-		URI uri = URI.create("/api/delivery-policies/" + response.deliveryPolicyId());
+		URI uri = URI.create("/api/delivery-policies/current");
 		return ResponseEntity.created(uri).body(response);
 	}
 
