@@ -1,8 +1,9 @@
 package com.nhnacademy.byeol23backend.orderset.delivery.controller;
 
 import java.net.URI;
-import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,8 +25,8 @@ public class DeliveryPolicyController {
 	private final DeliveryPolicyService deliveryPolicyService;
 
 	@GetMapping
-	public ResponseEntity<List<DeliveryPolicyInfoResponse>> getDeliveryPolicies() {
-		List<DeliveryPolicyInfoResponse> responses = deliveryPolicyService.getDeliveryPolicies();
+	public ResponseEntity<Page<DeliveryPolicyInfoResponse>> getDeliveryPolicies(Pageable pageable) {
+		Page<DeliveryPolicyInfoResponse> responses = deliveryPolicyService.getDeliveryPolicies(pageable);
 		return ResponseEntity.ok(responses);
 	}
 
@@ -33,7 +34,7 @@ public class DeliveryPolicyController {
 	public ResponseEntity<DeliveryPolicyCreateResponse> createDeliveryPolicy(
 		@RequestBody DeliveryPolicyCreateRequest request) {
 		DeliveryPolicyCreateResponse response = deliveryPolicyService.createDeliveryPolicy(request);
-		URI uri = URI.create("/api/delivery-policies/" + response.deliveryPolicyId());
+		URI uri = URI.create("/api/delivery-policies/current");
 		return ResponseEntity.created(uri).body(response);
 	}
 
