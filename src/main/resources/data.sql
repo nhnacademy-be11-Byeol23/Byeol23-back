@@ -76,23 +76,25 @@ VALUES (1, 1, '2025-11-22', '2025-03-11', '2025-10-29 11:11:11');
 
 
 -- 배송 정책 테스트 데이터
-insert into delivery_policy(free_delivery_condition, delivery_fee, changed_at, is_active)
-values (30000, 3000, '2025-10-24 10:05:30', true),
-       (50000, 2000, '2024-10-22 09:12:11', false);
+insert into delivery_policy(free_delivery_condition, delivery_fee, changed_at)
+values (30000, 3000, '2025-10-24 10:05:30'),
+       (50000, 2000, '2024-10-22 09:12:11');
 
 
 -- orders
 INSERT INTO orders(member_id, order_number, total_book_price, actual_order_price, ordered_at, order_status,
                    delivery_sent_date, delivery_arrived_date, delivery_desired_date, receiver, post_code,
-                   receiver_address, receiver_address_detail, receiver_phone, delivery_policy_id)
+                   receiver_address, receiver_address_detail, receiver_phone, receiver_address_extra,
+                   delivery_policy_id)
 VALUES (1, 251234567890, 37500, 21000, '2025-10-29 11:11:11', '대기', '2025-11-01', '2025-11-02', '2025-11-03', '최유현',
-        30098, '보람로 96', '2005동 201호', '01012345678', 1);
+        30098, '보람로 96', '2005동 201호', '01012345678', '(주소)', 1);
 
 INSERT INTO orders(member_id, order_number, total_book_price, actual_order_price, ordered_at, order_status,
                    delivery_sent_date, delivery_arrived_date, delivery_desired_date, receiver, post_code,
-                   receiver_address, receiver_address_detail, receiver_phone, delivery_policy_id)
+                   receiver_address, receiver_address_detail, receiver_phone, receiver_address_extra,
+                   delivery_policy_id)
 VALUES (1, 123456789012, 50000, 40000, '2025-10-29 11:11:11', '대기', '2025-11-01', '2025-11-02', '2025-11-03', '노형우',
-        12345, '보람로 78', '1234동 890호', '01009876543', 1);
+        12345, '보람로 78', '1234동 890호', '01009876543', '(주우우소)', 1);
 
 INSERT INTO packaging(packaging_name, packaging_img, packaging_price)
 VALUES ('test packaging', 'test packaging url from minio', 2000);

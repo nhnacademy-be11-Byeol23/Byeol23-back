@@ -9,7 +9,8 @@ import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
 import com.nhnacademy.byeol23backend.bookset.bookimage.domain.BookImage;
 import com.nhnacademy.byeol23backend.bookset.bookimage.repository.BookImageRepository;
-import com.nhnacademy.byeol23backend.image.ImageService;
+import com.nhnacademy.byeol23backend.image.dto.ImageUrlProjection;
+import com.nhnacademy.byeol23backend.image.service.ImageService;
 
 import lombok.AllArgsConstructor;
 
@@ -21,17 +22,19 @@ public class BookImageServiceImpl implements ImageService {
 
 	@Override
 	public String saveImageUrl(Long bookId, String imageUrl) {
-		Book book = bookRepository.findById(bookId).orElseThrow(() -> new IllegalArgumentException("해당 도서를 찾을 수 없습니다. 도서 id: " + bookId));
+		Book book = bookRepository.findById(bookId).orElseThrow(() -> new IllegalArgumentException("해당 도서를 찾을 수 없습니다. 도서 imageId: " + bookId));
 		BookImage bookImage = new BookImage(book, imageUrl);
 		BookImage img = bookImageRepository.save(bookImage);
 		return img.toString();
 	}
 
 	@Override
-	public List<String> getImageUrlsById(Long bookId) {
-		Book book = bookRepository.findBookWithImagesById(bookId).orElseThrow(() -> new IllegalArgumentException("해당 도서를 찾을 수 없습니다. 도서 id: " + bookId));
-		return book.getBookImageUrls().stream()
-			.map(BookImage::getBookImageUrl)
-			.collect(Collectors.toList());
+	public List<ImageUrlProjection> getImageUrlsById(Long bookId) {
+		return bookImageRepository.findUrlsAndIdsByBookId(bookId);
+	}
+
+	@Override
+	public void deleteImageUrlsById(Long bookId) {
+		bookImageRepository.deleteById(bookId);
 	}
 }
