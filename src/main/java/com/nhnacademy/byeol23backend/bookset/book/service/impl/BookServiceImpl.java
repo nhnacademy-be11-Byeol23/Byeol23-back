@@ -71,11 +71,16 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
+	@Transactional
 	public void deleteBook(Long bookId) {
-		bookRepository.deleteById(bookId);
+		Book book = bookRepository.findById(bookId)
+			.orElseThrow(() -> new BookNotFoundException("존재하지 않는 도서입니다: " + bookId));
+		bookRepository.delete(book);
+		log.info("도서가 삭제 처리되었습니다. ID: {}", bookId);
 	}
 
 	@Override
+	@Transactional
 	public List<BookResponse> getBooks(Pageable pageable) {
 		return bookRepository.findAll().stream()
 			.map(this::toResponse)
