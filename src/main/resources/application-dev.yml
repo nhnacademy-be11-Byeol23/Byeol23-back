@@ -15,7 +15,7 @@ spring:
       database: ${REDIS_DATABASE:321}
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
     defer-datasource-initialization: true
   quartz:
     job-store-type: memory
