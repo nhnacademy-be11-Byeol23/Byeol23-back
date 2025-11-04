@@ -10,5 +10,5 @@ public interface ImageService {
 	//id로 이미지 url 조회
 	List<ImageUrlProjection> getImageUrlsById(Long Id);
 
-	void deleteImageUrlsById(Long Id);
+	String deleteImageUrlsById(Long Id);
 }

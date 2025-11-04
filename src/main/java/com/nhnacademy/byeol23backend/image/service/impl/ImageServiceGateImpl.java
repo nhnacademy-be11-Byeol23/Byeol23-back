@@ -62,10 +62,10 @@ public class ImageServiceGateImpl implements ImageServiceGate {
 	}
 
 	@Override
-	public void deleteImageUrlsById(
+	public String deleteImageUrlsById(
 		Long Id,
 		ImageDomain imageDomain
 	) {
-		getBookImageService(imageDomain).deleteImageUrlsById(Id);
+		return getBookImageService(imageDomain).deleteImageUrlsById(Id);
 	}
 }

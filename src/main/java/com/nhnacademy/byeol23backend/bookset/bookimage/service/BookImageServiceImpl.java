@@ -34,7 +34,11 @@ public class BookImageServiceImpl implements ImageService {
 	}
 
 	@Override
-	public void deleteImageUrlsById(Long bookId) {
+	public String deleteImageUrlsById(Long bookId) {
+		String url = (bookImageRepository.findById(bookId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 도서 이미지를 찾을 수 없습니다. 도서 imageId: " + bookId)))
+			.getBookImageUrl();
 		bookImageRepository.deleteById(bookId);
+		return url;
 	}
 }

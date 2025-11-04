@@ -32,7 +32,11 @@ public class ReviewImageServiceImpl implements ImageService {
 		return reviewImageRepository.findUrlsAndIdsByReviewId(Id);
 	}
 	@Override
-	public void deleteImageUrlsById(Long Id) {
+	public String deleteImageUrlsById(Long Id) {
+		String url = (reviewImageRepository.findById(Id)
+			.orElseThrow(() -> new IllegalArgumentException("해당 리뷰 이미지를 찾을 수 없습니다. 리뷰 imageId: " + Id)))
+			.getReviewImageUrl();
 		reviewImageRepository.deleteById(Id);
+		return url;
 	}
 }
