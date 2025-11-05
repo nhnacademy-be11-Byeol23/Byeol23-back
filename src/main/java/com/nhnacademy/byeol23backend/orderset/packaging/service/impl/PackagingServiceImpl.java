@@ -23,7 +23,7 @@ public class PackagingServiceImpl implements PackagingService, ImageService {
 	public String saveImageUrl(Long Id, String imageUrl) {
 		Packaging packaging = packagingRepository.findById(Id)
 			.orElseThrow(() -> new IllegalArgumentException("해당 포장재를 찾을 수 없습니다. 포장재 imageId: " + Id));
-		packaging.setPackagingImg(imageUrl);
+		packaging.setPackagingImgUrl(imageUrl);
 		packagingRepository.save(packaging);
 		return packaging.toString();
 	}
@@ -32,7 +32,7 @@ public class PackagingServiceImpl implements PackagingService, ImageService {
 	public List<ImageUrlProjection> getImageUrlsById(Long Id) {
 		String url = packagingRepository.findById(Id)
 			.orElseThrow(() -> new IllegalArgumentException("해당 포장재를 찾을 수 없습니다. 포장재 imageId: " + Id))
-			.getPackagingImg();
+			.getPackagingImgUrl();
 		List<ImageUrlProjection> imageUrlProjections = new ArrayList<>();
 		imageUrlProjections.add(new ImageUrlProjection(Id, url));
 		return imageUrlProjections;
@@ -43,8 +43,9 @@ public class PackagingServiceImpl implements PackagingService, ImageService {
 	public String deleteImageUrlsById(Long Id) {
 		Packaging packaging = packagingRepository.findById(Id)
 			.orElseThrow(() -> new IllegalArgumentException("해당 포장재를 찾을 수 없습니다. 포장재 imageId: " + Id));
-		String url = packaging.getPackagingImg();
-		packaging.setPackagingImg(null);
+		packaging.setPackagingImgUrl(null);
+		String url = packaging.getPackagingImgUrl();
+		packaging.setPackagingImgUrl(null);
 		packagingRepository.save(packaging);
 		return url;
 	}
