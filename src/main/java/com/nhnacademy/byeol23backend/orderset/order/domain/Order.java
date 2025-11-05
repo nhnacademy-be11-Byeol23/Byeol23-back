@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.nhnacademy.byeol23backend.couponset.coupon.domain.Coupon;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.orderset.delivery.domain.DeliveryPolicy;
 
