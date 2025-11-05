@@ -79,9 +79,9 @@ public class Order {
 	@JoinColumn(name = "delivery_policy_id", nullable = false) // 값 들어가는지 확인하기 위해 잠시 nullable 하도록 처리
 	private DeliveryPolicy deliveryPolicy;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "coupon_id")
-	private Coupon coupon;
+//	@ManyToOne(fetch = FetchType.LAZY)
+//	@JoinColumn(name = "coupon_id")
+//	private Coupon coupon;
 
 	private Order(String orderNumber, BigDecimal totalBookPrice, BigDecimal actualOrderPrice, LocalDateTime orderedAt,
 		String orderStatus, LocalDate deliveryDesiredDate, String receiver, String postCode, String receiverAddress,

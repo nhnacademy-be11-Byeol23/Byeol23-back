@@ -27,7 +27,4 @@ public class RefundPolicy {
 	private String comment;
 
 	private LocalDateTime changedAt;
-
-	@Column(name = "is_active", nullable = false)
-	private Boolean isActive;
 }

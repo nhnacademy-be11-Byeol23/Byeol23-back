@@ -26,3 +26,4 @@ public class Grade {
 	@Column(name = "point_rate", nullable = false)
 	private int pointRate;
 }
+
