@@ -43,7 +43,7 @@ public class Book {
 	@Column(name = "book_name", length = 200, nullable = false)
 	private String bookName;
 
-	@Column(name = "toc")
+	@Column(name = "toc", columnDefinition = "text")
 	private String toc;
 
 	@Column(name = "description", columnDefinition = "text")

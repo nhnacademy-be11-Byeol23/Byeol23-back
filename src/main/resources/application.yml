@@ -21,7 +21,7 @@ spring:
       ddl-auto: validate
 
   profiles:
-    active: dev
+    active: dbTest
 
 logging:
   level:

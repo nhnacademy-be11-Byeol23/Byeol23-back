@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public record CouponPolicyInfoResponse(
         String policyName,
-        Long criterionPrice,
+        BigDecimal criterionPrice,
         Integer discountRate,
         BigDecimal discountLimit,
         BigDecimal discountAmount
