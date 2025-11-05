@@ -43,7 +43,7 @@ public class ReviewImageServiceImpl implements ImageService {
 	}
 
 	@Override
-	public ImageDomain getImageDomain() {
-		return ImageDomain.REVIEW;
+	public boolean isSupportedDomain(ImageDomain imageDomain) {
+		return imageDomain == ImageDomain.REVIEW;
 	}
 }

@@ -6,43 +6,36 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.nhnacademy.byeol23backend.bookset.bookimage.service.BookImageServiceImpl;
 import com.nhnacademy.byeol23backend.image.domain.ImageDomain;
 import com.nhnacademy.byeol23backend.image.dto.ImageUrlProjection;
 import com.nhnacademy.byeol23backend.image.service.ImageService;
 import com.nhnacademy.byeol23backend.image.service.ImageServiceGate;
-
-import lombok.RequiredArgsConstructor;
+import com.nhnacademy.byeol23backend.orderset.packaging.service.impl.PackagingServiceImpl;
+import com.nhnacademy.byeol23backend.reviewset.reviewImage.service.ReviewImageServiceImpl;
 
 @Service
-@RequiredArgsConstructor
 public class ImageServiceGateImpl implements ImageServiceGate {
-	// private final ImageService bookImageService;
-	// private final ImageService packagingService;
-	// private final ImageService reviewImageService;
-	// public ImageServiceGateImpl(
-	// 	BookImageServiceImpl bookImageServiceImpl,
-	// 	PackagingServiceImpl packagingImageServiceImpl,
-	// 	ReviewImageServiceImpl reviewImageServiceImpl
-	// ) {
-	// 	this.bookImageService = bookImageServiceImpl;
-	// 	this.packagingService = packagingImageServiceImpl;
-	// 	this.reviewImageService = reviewImageServiceImpl;
-	// }
 	private final List<ImageService> imageServices;
-
+	public ImageServiceGateImpl(
+		BookImageServiceImpl bookImageServiceImpl,
+		PackagingServiceImpl packagingImageServiceImpl,
+		ReviewImageServiceImpl reviewImageServiceImpl
+	) {
+		this.imageServices = List.of(
+			bookImageServiceImpl,
+			packagingImageServiceImpl,
+			reviewImageServiceImpl
+		);
+	}
 	//domain에 따라 서비스 게이트가 적절한 서비스로 라우팅
 	private ImageService getBookImageService(
 		ImageDomain imageDomain
 	) {
-		return imageServices.stream().filter(
-				imageService -> imageService.getImageDomain().equals(imageDomain))
-			.findFirst().orElseThrow(() -> new IllegalArgumentException()); //적당한 exception
-
-		// return switch (imageDomain) {
-		// 	case BOOK -> bookImageService;
-		// 	case PACKAGING -> packagingService;
-		// 	case REVIEW -> reviewImageService;
-		// };
+		return imageServices.stream()
+			.filter(service -> service.isSupportedDomain(imageDomain))
+			.findFirst()
+			.orElseThrow(() -> new IllegalArgumentException("지원하지 않는 이미지 도메인입니다: " + imageDomain));
 	}
 
 	@Override

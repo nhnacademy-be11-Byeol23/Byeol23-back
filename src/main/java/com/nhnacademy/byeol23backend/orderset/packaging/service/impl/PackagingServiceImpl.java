@@ -3,15 +3,14 @@ package com.nhnacademy.byeol23backend.orderset.packaging.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.nhnacademy.byeol23backend.image.domain.ImageDomain;
 import com.nhnacademy.byeol23backend.image.dto.ImageUrlProjection;
 import com.nhnacademy.byeol23backend.image.service.ImageService;
 import com.nhnacademy.byeol23backend.orderset.packaging.domain.Packaging;
 import com.nhnacademy.byeol23backend.orderset.packaging.repository.PackagingRepository;
 import com.nhnacademy.byeol23backend.orderset.packaging.service.PackagingService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.AllArgsConstructor;
 
@@ -51,7 +50,7 @@ public class PackagingServiceImpl implements PackagingService, ImageService {
 	}
 
 	@Override
-	public ImageDomain getImageDomain() {
-		return ImageDomain.PACKAGING;
+	public boolean isSupportedDomain(ImageDomain imageDomain) {
+		return imageDomain == ImageDomain.PACKAGING;
 	}
 }

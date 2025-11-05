@@ -2,6 +2,7 @@ package com.nhnacademy.byeol23backend.image.service;
 
 import java.util.List;
 
+import com.nhnacademy.byeol23backend.image.domain.ImageDomain;
 import com.nhnacademy.byeol23backend.image.dto.ImageUrlProjection;
 
 public interface ImageService {
@@ -11,4 +12,5 @@ public interface ImageService {
 	List<ImageUrlProjection> getImageUrlsById(Long Id);
 
 	String deleteImageUrlsById(Long Id);
+	boolean isSupportedDomain(ImageDomain imageDomain);
 }

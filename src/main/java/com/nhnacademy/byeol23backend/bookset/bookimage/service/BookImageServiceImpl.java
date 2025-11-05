@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.bookset.bookimage.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -44,7 +45,7 @@ public class BookImageServiceImpl implements ImageService {
 	}
 
 	@Override
-	public ImageDomain getImageDomain() {
-		return ImageDomain.BOOK;
+	public boolean isSupportedDomain(ImageDomain imageDomain) {
+		return imageDomain == ImageDomain.BOOK;
 	}
 }
