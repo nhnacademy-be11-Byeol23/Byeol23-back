@@ -16,6 +16,7 @@ import com.nhnacademy.byeol23backend.orderset.delivery.domain.DeliveryPolicy;
 import com.nhnacademy.byeol23backend.orderset.delivery.exception.DeliveryPolicyNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.delivery.repository.DeliveryPolicyRepository;
 import com.nhnacademy.byeol23backend.orderset.order.domain.Order;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderBulkUpdateRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCreateResponse;
@@ -73,11 +74,11 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	@Transactional
-	public OrderCreateResponse updateOrderStatus(String orderNumber) {
+	public OrderCreateResponse updateOrderStatus(String orderNumber, String orderStatus) {
 		Order order = orderRepository.findOrderByOrderNumber(orderNumber)
 			.orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND_MESSAGE + orderNumber));
 
-		order.updateOrderStatus(ORDER_STATUS_PAYMENT_COMPLETED);
+		order.updateOrderStatus(orderStatus);
 
 		return new OrderCreateResponse(orderNumber, order.getTotalBookPrice(), order.getActualOrderPrice(),
 			order.getOrderedAt(), order.getOrderStatus(), order.getReceiver(),
@@ -136,6 +137,16 @@ public class OrderServiceImpl implements OrderService {
 		order.updateOrderStatus(ORDER_STATUS_PAYMENT_COMPLETED);
 
 		return new PointOrderResponse(order.getOrderNumber(), order.getTotalBookPrice(), PAYMENT_METHOD_POINT);
+	}
+
+	@Override
+	@Transactional
+	public void updateBulkOrderStatus(OrderBulkUpdateRequest request) {
+		List<Order> ordersToUpdate = orderRepository.findAllByOrderNumberIn(request.orderNumberLists());
+
+		for (Order order : ordersToUpdate) {
+			order.updateOrderStatus(request.status());
+		}
 	}
 
 	@Transactional
