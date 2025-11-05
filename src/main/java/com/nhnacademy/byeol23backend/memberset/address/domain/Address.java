@@ -13,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "addresses")
@@ -22,9 +23,7 @@ public class Address {
 	@Column(name = "address_id")
 	private Long addressId;
 
-	@Min(1000)
-	@Max(63999)
-	@Column(name = "post_code", nullable = false, length = 5)
+	@Pattern(regexp = "^\\d{5}$", message = "우편번호는 5자리 숫자여야 합니다.")
 	private String postCode;
 
 	@Column(name = "address_info", nullable = false, length = 50)

@@ -39,7 +39,7 @@ public class AddressController {
 	// @RequestMember
 	// public ResponseEntity<List<AddressResponse>> getAddresses() {
 	// 	Map<String, Object> claims = RequestMemberContext.getDetails();
-	// 	com.nhnacademy.byeol23backend.memberset.address.controller.Member member = null;
+	// 	com.nhnacademy.byeol23backendbackend.memberset.address.controller.Member member = null;
 	// 	try {
 	// 		member = authService.getMemberById(((Number)claims.get("memberId")).longValue());
 	// 		if (member == null) {

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 public record MemberUpdateRequest(
 	String memberName,
+	String nickname,
 	String phoneNumber,
 	String email,
 	LocalDate birthDate

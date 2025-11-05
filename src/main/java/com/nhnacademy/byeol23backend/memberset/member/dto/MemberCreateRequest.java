@@ -1,6 +1,5 @@
 package com.nhnacademy.byeol23backend.memberset.member.dto;
 
-
 import java.time.LocalDate;
 
 import com.nhnacademy.byeol23backend.memberset.member.domain.RegistrationSource;
@@ -12,6 +11,18 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+/**
+ * 회원가입 요청 DTO
+ * @param loginId
+ * @param loginPassword
+ * @param memberName
+ * @param nickname
+ * @param phoneNumber
+ * @param email
+ * @param birthdate
+ * @param memberRole
+ * @param joinedFrom
+ */
 public record MemberCreateRequest(
 	@NotBlank(message = "로그인 ID는 필수 입력 값입니다.")
 	@Size(min = 5, max = 20, message = "로그인 ID는 5자 이상 20자 이하로 입력해야 합니다.")
@@ -50,6 +61,7 @@ public record MemberCreateRequest(
 	LocalDate birthdate,
 
 	Role memberRole,
+
 	RegistrationSource joinedFrom
 ) {
 }

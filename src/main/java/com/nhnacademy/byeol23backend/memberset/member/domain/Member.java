@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.nhnacademy.byeol23backend.memberset.grade.domain.Grade;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateRequest;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateRequest;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -101,22 +103,20 @@ public class Member {
 		this.joinedFrom = joinedFrom;
 	}
 
-	@Override
-	public String toString() {
-		return "아이디: " + this.loginId
-			+ "이름: " + this.memberName
-			+ "닉네임: " + this.nickname;
+	public void updateMemberInfo(MemberUpdateRequest request) {
+		if(request.memberName() != null) this.memberName = request.memberName();
+		if(request.nickname() != null) this.nickname = request.nickname();
+		if(request.phoneNumber() != null) this.phoneNumber = request.phoneNumber();
+		if(request.email() != null) this.email = request.email();
+		if(request.birthDate() != null) this.birthDate = request.birthDate();
 	}
 
-	public Member update(Member member) {
-		this.loginId = member.getLoginId();
-		this.memberName = member.getMemberName();
-		this.nickname = member.getNickname();
-		this.phoneNumber = member.getPhoneNumber();
-		this.email = member.getEmail();
-		this.birthDate = member.getBirthDate();
-		this.status = member.getStatus();
-		this.currentPoint = member.getCurrentPoint();
-		return member;
+	public void updatePassword(String newPassword) {
+		this.loginPassword = newPassword;
 	}
+
+	public void updateStatus(Status st) {
+		this.status = st;
+	}
+
 }

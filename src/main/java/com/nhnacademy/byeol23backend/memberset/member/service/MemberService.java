@@ -1,14 +1,12 @@
 package com.nhnacademy.byeol23backend.memberset.member.service;
 
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberMyPageResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.*;
 
 public interface MemberService {
     MemberCreateResponse createMember(MemberCreateRequest request);
-    MemberUpdateResponse updateMember(MemberUpdateRequest request);
     MemberMyPageResponse getMember(Long memberId);
+    MemberUpdateResponse updateMember(Long memberId, MemberUpdateRequest request);
+    MemberPasswordUpdateResponse updateMemberPassword(Long memberId, MemberPasswordUpdateRequest request);
+    void reactivateMember(Long memberId);
     void deleteMember(Long memberId);
 }
