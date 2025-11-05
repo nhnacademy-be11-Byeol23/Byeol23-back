@@ -22,10 +22,10 @@ public class BookCategory {
 	private Long bookCategoryId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "book_id")
+	@JoinColumn(name = "book_id", nullable = false)
 	private Book book;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "category_id")
+	@JoinColumn(name = "category_id", nullable = false)
 	private Category category;
 }

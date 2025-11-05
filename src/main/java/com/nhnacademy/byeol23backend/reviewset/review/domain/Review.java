@@ -5,6 +5,8 @@ import com.nhnacademy.byeol23backend.orderset.orderdetail.domain.OrderDetail;
 import com.nhnacademy.byeol23backend.reviewset.reviewImage.domain.ReviewImage;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -20,14 +22,16 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reviewId;
 
-    @Column(name = "review_rate")
+    @Min(1)
+    @Max(5)
+    @Column(name = "review_rate", columnDefinition = "tinyint(1)")
     private Integer reviewRate;
 
-    @Column(name = "review_content")
+    @Column(name = "review_content", columnDefinition = "text")
     private String reviewContent;
 
-    @Column(name = "review_image")
-    private String reviewImage;
+//    @Column(name = "review_image")
+//    private String reviewImage;
 
     private LocalDateTime createdAt;
 
