@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.byeol23backend.orderset.refundpolicy.domain.RefundPolicy;
 import com.nhnacademy.byeol23backend.orderset.refundpolicy.domain.dto.RefundPolicyCreateRequest;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class RefundPolicyServiceImpl implements RefundPolicyService {
 	private final RefundPolicyRepository refundPolicyRepository;
 
@@ -34,6 +36,7 @@ public class RefundPolicyServiceImpl implements RefundPolicyService {
 	}
 
 	@Override
+	@Transactional
 	public RefundPolicyCreateResponse createRefundPolicy(RefundPolicyCreateRequest refundPolicyCreateRequest) {
 		LocalDateTime now = LocalDateTime.now();
 		RefundPolicy refundPolicy = RefundPolicy.of(refundPolicyCreateRequest.refundPolicyName(),
