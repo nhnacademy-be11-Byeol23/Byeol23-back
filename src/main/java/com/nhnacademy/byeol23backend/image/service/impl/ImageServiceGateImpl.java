@@ -17,16 +17,8 @@ import com.nhnacademy.byeol23backend.reviewset.reviewImage.service.ReviewImageSe
 @Service
 public class ImageServiceGateImpl implements ImageServiceGate {
 	private final List<ImageService> imageServices;
-	public ImageServiceGateImpl(
-		BookImageServiceImpl bookImageServiceImpl,
-		PackagingServiceImpl packagingImageServiceImpl,
-		ReviewImageServiceImpl reviewImageServiceImpl
-	) {
-		this.imageServices = List.of(
-			bookImageServiceImpl,
-			packagingImageServiceImpl,
-			reviewImageServiceImpl
-		);
+	public ImageServiceGateImpl(List<ImageService> imageServices) {
+		this.imageServices = imageServices;
 	}
 	//domain에 따라 서비스 게이트가 적절한 서비스로 라우팅
 	private ImageService getBookImageService(
