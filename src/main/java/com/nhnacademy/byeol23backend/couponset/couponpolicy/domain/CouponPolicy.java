@@ -36,7 +36,7 @@ public class CouponPolicy {
 	@Column(name = "discount_amount", precision = 10)
 	private BigDecimal discountAmount;
 
-	@Column(name = "is_active", nullable = false, columnDefinition = "tinyint")
+	@Column(name = "is_active", nullable = false, columnDefinition = "tinyint(1)")
 	private Boolean isActive;
 
 	public CouponPolicy(String couponName, Long criterionPrice, Integer discountRate, BigDecimal discountLimit,
