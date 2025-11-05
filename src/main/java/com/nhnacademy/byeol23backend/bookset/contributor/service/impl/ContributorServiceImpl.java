@@ -56,16 +56,16 @@ public class ContributorServiceImpl implements ContributorService {
 	@Transactional
 	public ContributorUpdateResponse updateContributor(Long contributorId, ContributorUpdateRequest request) {
 		if (request == null) throw new IllegalArgumentException("request is null");
-		if (request.name() == null || request.name().isBlank()) {
+		if (request.contributorName() == null || request.contributorName().isBlank()) {
 			throw new IllegalArgumentException("name is required");
 		}
-		if (request.role() == null) {
+		if (request.contributorRole() == null) {
 			throw new IllegalArgumentException("contributorRole is required");
 		}
 
 		Contributor contributor = contributorRepository.findById(contributorId).orElseThrow(() -> new ContributorNotFound("해당 기여자 없음: " + contributorId));
-		contributor.setContributorName(request.name());
-		contributor.setContributorRole(request.role());
+		contributor.setContributorName(request.contributorName());
+		contributor.setContributorRole(request.contributorRole());
 		return new ContributorUpdateResponse(contributor);
 	}
 
