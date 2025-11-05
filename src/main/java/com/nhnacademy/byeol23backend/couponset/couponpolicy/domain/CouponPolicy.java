@@ -21,11 +21,11 @@ public class CouponPolicy {
 	@Column(name = "coupon_policy_id")
 	private Long couponPolicyId;
 
-	@Column(name = "coupon_name", nullable = false)
-	private String couponName;
+	@Column(name = "coupon_policy_name", nullable = false, length = 30)
+	private String couponPolicyName;
 
-	@Column(name = "criterion_price", nullable = false)
-	private Long criterionPrice;
+	@Column(name = "criterion_price", nullable = false, precision = 10)
+	private BigDecimal criterionPrice;
 
 	@Column(name = "discount_rate")
 	private Integer discountRate;
@@ -39,9 +39,9 @@ public class CouponPolicy {
 	@Column(name = "is_active", nullable = false, columnDefinition = "tinyint(1)")
 	private Boolean isActive;
 
-	public CouponPolicy(String couponName, Long criterionPrice, Integer discountRate, BigDecimal discountLimit,
+	public CouponPolicy(String couponPolicyName, BigDecimal criterionPrice, Integer discountRate, BigDecimal discountLimit,
 		BigDecimal discountAmount) {
-		this.couponName = couponName;
+		this.couponPolicyName = couponPolicyName;
 		this.criterionPrice = criterionPrice;
 		this.discountRate = discountRate;
 		this.discountLimit = discountLimit;

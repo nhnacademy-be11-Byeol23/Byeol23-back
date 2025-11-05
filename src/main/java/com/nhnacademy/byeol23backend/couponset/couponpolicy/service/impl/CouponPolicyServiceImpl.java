@@ -34,7 +34,7 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
 
         return couponPolicies.stream()
                 .map(couponPolicy -> new CouponPolicyInfoResponse(
-                        couponPolicy.getCouponName(),
+                        couponPolicy.getCouponPolicyName(),
                         couponPolicy.getCriterionPrice(),
                         couponPolicy.getDiscountRate(),
                         couponPolicy.getDiscountLimit(),

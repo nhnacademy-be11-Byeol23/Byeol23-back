@@ -18,7 +18,8 @@ import java.time.LocalDateTime;
 public class PointHistories {
     @Id
     @Column(name = "point_history_id")
-    private Integer pointHistoryId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long pointHistoryId;
 
     @Column(name = "point_amount", precision = 10, nullable = false)
     private BigDecimal pointAmount;

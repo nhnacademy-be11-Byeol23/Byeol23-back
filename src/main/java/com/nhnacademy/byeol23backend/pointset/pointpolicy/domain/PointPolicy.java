@@ -1,9 +1,6 @@
 package com.nhnacademy.byeol23backend.pointset.pointpolicy.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
@@ -12,7 +9,8 @@ import java.time.LocalDateTime;
 public class PointPolicy {
     @Id
     @Column(name = "point_policy_id")
-    private Integer pointPolicyId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long pointPolicyId;
 
     @Column(name = "point_policy_type", nullable = false, length = 20)
     private String pointPolicyType;

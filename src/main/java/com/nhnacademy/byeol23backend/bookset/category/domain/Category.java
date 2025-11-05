@@ -37,7 +37,7 @@ public class Category {
     @Column(name = "path_id")
     private String pathId;
 
-    @Column(name = "path_name")
+    @Column(name = "path_name", length = 1024)
     private String pathName;
 
 	@OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
