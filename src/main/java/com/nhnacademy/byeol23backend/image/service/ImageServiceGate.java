@@ -10,5 +10,5 @@ public interface ImageServiceGate {
 	//id로 이미지 url 조회
 	Map<Long, String> getImageUrlsById(Long Id, ImageDomain imageDomain);
 
-	void deleteImageUrlsById(Long Id, ImageDomain imageDomain);
+	String deleteImageUrlsById(Long Id, ImageDomain imageDomain);
 }

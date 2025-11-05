@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.bookset.bookimage.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -35,12 +36,16 @@ public class BookImageServiceImpl implements ImageService {
 	}
 
 	@Override
-	public void deleteImageUrlsById(Long bookId) {
+	public String deleteImageUrlsById(Long bookId) {
+		String url = (bookImageRepository.findById(bookId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 도서 이미지를 찾을 수 없습니다. 도서 imageId: " + bookId)))
+			.getBookImageUrl();
 		bookImageRepository.deleteById(bookId);
+		return url;
 	}
 
 	@Override
-	public ImageDomain getImageDomain() {
-		return ImageDomain.BOOK;
+	public boolean isSupportedDomain(ImageDomain imageDomain) {
+		return imageDomain == ImageDomain.BOOK;
 	}
 }

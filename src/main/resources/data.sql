@@ -35,12 +35,12 @@ VALUES ('민음사'),
 
 -- book
 INSERT INTO books(book_name, toc, `description`, regular_price, sale_price, isbn, publish_date, is_pack, book_status,
-                  stock, publisher_id, is_deleted)
+                  stock, publisher_id, is_deleted, view_count)
 VALUES ('８월에 만나요', '1장, 2장, 3장, 4장, 5장, 6장', '결혼한 지 스물일곱 해가 된 평범한 주부 아나 막달레나 바흐는 ......', 16000, 15990, 1234567890123,
-        '2024-11-22', 1, '판매중', 12, 1, 0);
+        '2024-11-22', 1, '판매중', 12, 1, 0, 10);
 
 INSERT INTO book_contributor(book_id, contributor_id)
-VALUES (1, 4);
+VALUES (2, 4);
 
 INSERT INTO book_tag(book_id, tag_id)
 VALUES (1, 1);
@@ -100,8 +100,8 @@ INSERT INTO packaging(packaging_name, packaging_img, packaging_price)
 VALUES ('test packaging', 'test packaging url from minio', 2000);
 
 INSERT INTO order_details(quantity, order_price, book_id, packaging_id, order_id)
-VALUES (3, 42000, 1, 1, 1),
-       (1, 19000, 1, 1, 2);
+VALUES (3, 42000, 2, 1, 3),
+       (1, 19000, 2, 1, 4);
 
 INSERT INTO reviews(review_rate, review_content, created_at, revised_at, member_id, order_detail_id)
 VALUES (5, '책이 맛있고 사장님이 친절해요.', '2025-10-01 11:11:11', '2025-10-03 11:11:11', 1, 1),
@@ -148,5 +148,3 @@ values (150, 1, 1);
 -- likes
 insert into likes(member_id, book_id)
 values (1, 1);
-
-

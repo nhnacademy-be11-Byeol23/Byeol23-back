@@ -2,7 +2,7 @@ package com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.dto;
 
 import java.math.BigDecimal;
 
-public record CouponPolicyCreateRequest(
+public record CouponPolicyInfoResponse(
         String policyName,
         BigDecimal criterionPrice,
         Integer discountRate,
