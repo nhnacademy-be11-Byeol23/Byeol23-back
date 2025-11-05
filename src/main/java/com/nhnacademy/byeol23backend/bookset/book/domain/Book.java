@@ -5,6 +5,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookCreateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.bookimage.domain.BookImage;
@@ -23,7 +26,6 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.SQLDelete;
 
 @Getter
 @Setter
@@ -31,6 +33,7 @@ import org.hibernate.annotations.SQLDelete;
 @Table(name = "books")
 @NoArgsConstructor
 @SQLDelete(sql = "update books set is_deleted = true where book_id = ?")
+@Where(clause = "is_deleted = false")
 public class Book {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,7 +60,7 @@ public class Book {
 
 	private LocalDate publishDate;
 
-	@Column(name = "is_pack", nullable = false)
+	@Column(name = "is_pack", nullable = false, columnDefinition = "tinyint")
 	private boolean isPack;
 
 	@Column(name = "book_status", nullable = false, length = 10)
@@ -70,11 +73,11 @@ public class Book {
 	@JoinColumn(name = "publisher_id", nullable = false)
 	private Publisher publisher;
 
-	@Column(name = "is_deleted", nullable = false)
+	@Column(name = "is_deleted", nullable = false, columnDefinition = "tinyint")
 	private boolean isDeleted;
 
-  @Column(name = "view_count", columnDefinition = "BIGINT DEFAULT 0")
-    private long viewCount;
+	@Column(name = "view_count", columnDefinition = "BIGINT DEFAULT 0")
+	private long viewCount;
 
 	public void createBook(BookCreateRequest request, Publisher publisher) {
 		this.bookName = request.bookName();
