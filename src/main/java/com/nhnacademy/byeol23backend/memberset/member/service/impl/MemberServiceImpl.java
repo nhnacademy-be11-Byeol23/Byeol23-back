@@ -4,7 +4,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberResponseDto;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateRequest;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateRequest;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateResponse;
 import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
 import com.nhnacademy.byeol23backend.memberset.member.service.MemberService;
@@ -20,33 +23,33 @@ public class MemberServiceImpl implements MemberService {
 
 	/**
 	 * 회원을 저장하는 함수
-	 *
-	 * @param member
 	 * @return memberCreateResponseDto
 	 */
 	@Override
 	@Transactional
-	public MemberResponseDto createMember(Member member) {
-		Member newMember = memberRepository.save(member);
-		log.info("멤버 생성을 완료했습니다.{}", member.toString());
-		return new MemberResponseDto(newMember);
+	public MemberCreateResponse createMember(MemberCreateRequest request) {
+		Member newMember = Member.create(request.loginId(), request.loginPassword(), request.memberName(),
+			request.nickname(), request.phoneNumber(), request.email(), request.birthdate(), request.memberRole(), request.joinedFrom());
+
+		memberRepository.save(newMember);
+
+		log.info("멤버 생성을 완료했습니다.{}", newMember.toString());
+		return new MemberCreateResponse();
 	}
 
 	/**
 	 * 회원 정보를 수정하는 함수
-	 *
-	 * @param member
 	 * @return void
 	 */
 	@Override
 	@Transactional
-	public MemberResponseDto updateMember(Member member) {
+	public MemberUpdateResponse updateMember(MemberUpdateRequest request) {
 		long memberId = member.getMemberId();
 		Member oldMember = findMemberById(memberId);
 		Member newMember = oldMember.update(member);
 
 		log.info("{}를 업데이트 했습니다.", memberId);
-		return new MemberResponseDto(newMember);
+		return new MemberUpdateResponse();
 	}
 
 	/**

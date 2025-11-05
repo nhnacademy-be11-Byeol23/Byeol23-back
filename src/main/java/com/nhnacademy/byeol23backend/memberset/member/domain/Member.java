@@ -44,10 +44,9 @@ public class Member {
 	@Column(name = "email", nullable = false, length = 50)
 	private String email;
 
-	//todo ZoneDate
 	@Setter
 	@Column(name = "birth_date", nullable = false)
-	private LocalDate birthday;
+	private LocalDate birthDate;
 
 	@Setter
 	@Column(name = "latest_logined_at")
@@ -57,24 +56,50 @@ public class Member {
 	private LocalDateTime joinedAt;
 
 	@Setter
+	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false, length = 10)
-	private String status;
+	private Status status;
 
 	@Setter
 	@Column(name = "current_point", nullable = false, precision = 10)
 	private BigDecimal currentPoint;
 
 	@Setter
+	@Enumerated(EnumType.STRING)
 	@Column(name = "member_role", nullable = false, length = 10)
-	private String memberRole;
+	private Role memberRole;
 
+	@Enumerated(EnumType.STRING)
 	@Column(name = "joined_from", nullable = false, length = 50)
-	private String joinedFrom;
+	private RegistrationSource joinedFrom;
 
 	@Setter
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "grade_id", nullable = false)
 	private Grade grade;
+
+	public static Member create(String loginId, String loginPassword, String memberName, String nickname,
+		String phoneNumber, String email, LocalDate birthDate, Role memberRole, RegistrationSource joinedFrom) {
+		return new Member(loginId, loginPassword, memberName, nickname, phoneNumber, email, birthDate,
+			LocalDateTime.now(), Status.ACTIVE, BigDecimal.ZERO, memberRole, joinedFrom);
+	}
+
+	private Member(String loginId, String loginPassword, String memberName, String nickname,
+		String phoneNumber, String email, LocalDate birthDate, LocalDateTime joinedAt, Status status,
+		BigDecimal currentPoint, Role memberRole, RegistrationSource joinedFrom){
+		this.loginId = loginId;
+		this.loginPassword = loginPassword;
+		this.memberName = memberName;
+		this.nickname = nickname;
+		this.phoneNumber = phoneNumber;
+		this.email = email;
+		this.birthDate = birthDate;
+		this.joinedAt = joinedAt;
+		this.status = status;
+		this.currentPoint = currentPoint;
+		this.memberRole = memberRole;
+		this.joinedFrom = joinedFrom;
+	}
 
 	@Override
 	public String toString() {
@@ -89,7 +114,7 @@ public class Member {
 		this.nickname = member.getNickname();
 		this.phoneNumber = member.getPhoneNumber();
 		this.email = member.getEmail();
-		this.birthday = member.getBirthday();
+		this.birthDate = member.getBirthDate();
 		this.status = member.getStatus();
 		this.currentPoint = member.getCurrentPoint();
 		return member;

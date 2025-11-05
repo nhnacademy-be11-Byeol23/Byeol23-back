@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberResponseDto;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateRequest;
 import com.nhnacademy.byeol23backend.memberset.member.service.MemberService;
 
 import lombok.RequiredArgsConstructor;
@@ -20,12 +20,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/members")
-public class MemberController {
+public class MemberController implements MemberApi{
 	private final MemberService memberService;
 
 	@PostMapping("/register")
-	public ResponseEntity<MemberResponseDto> createMember(@RequestBody Member member) {
-		MemberResponseDto createdMember = memberService.createMember(member);
+	public ResponseEntity<MemberResponseDto> createMember(@RequestBody MemberCreateRequest request) {
+		MemberResponseDto createdMember = memberService.createMember(request);
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(createdMember);
 	}
