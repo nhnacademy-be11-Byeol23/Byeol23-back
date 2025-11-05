@@ -1,5 +1,8 @@
 package com.nhnacademy.byeol23backend.bookset.contributor.service;
 
+import org.springframework.data.domain.Page;
+
+import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.AllContributorResponse;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorCreateRequest;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorCreateResponse;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorInfoResponse;
@@ -11,4 +14,5 @@ public interface ContributorService {
 	public ContributorCreateResponse createContributor(ContributorCreateRequest request);
 	public void deleteContributorByContributorId(Long contributorId);
 	public ContributorUpdateResponse updateContributor(Long contributorId, ContributorUpdateRequest request);
+	public Page<AllContributorResponse> getAllContributors(int page, int size);
 }

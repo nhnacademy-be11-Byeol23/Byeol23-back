@@ -2,6 +2,7 @@ package com.nhnacademy.byeol23backend.bookset.contributor.controller;
 
 import java.net.URI;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,8 +11,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.AllContributorResponse;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorCreateRequest;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorCreateResponse;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorInfoResponse;
@@ -19,9 +22,6 @@ import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorU
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorUpdateResponse;
 import com.nhnacademy.byeol23backend.bookset.contributor.service.ContributorService;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -50,9 +50,15 @@ public class ContributorController {
 	}
 
 	@PutMapping("/{contributorId}")
-	public ResponseEntity<ContributorUpdateResponse> updateContributorByContributorId(@PathVariable Long contributorId, @RequestBody ContributorUpdateRequest request){
+	public ResponseEntity<ContributorUpdateResponse> updateContributor(@PathVariable Long contributorId, @RequestBody ContributorUpdateRequest request){
 		ContributorUpdateResponse response = contributorService.updateContributor(contributorId, request);
 		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping
+	public ResponseEntity<Page<AllContributorResponse>> getAllContributors(@RequestParam(value = "page") int page, @RequestParam(value = "size") int size){
+		Page<AllContributorResponse> contributors = contributorService.getAllContributors(page, size);
+		return ResponseEntity.ok(contributors);
 	}
 
 }

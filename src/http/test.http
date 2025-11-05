@@ -18,4 +18,13 @@ Content-Type: application/json
 DELETE http://localhost:8080/api/tags/1
 
 ### Get
-GET http://localhost:8080/api/tags/1
+GET http://localhost:10333/api/contributors?page=0&size=3
+
+### Post
+POST http://localhost:10333/api/contributors
+Content-Type: application/json
+
+{
+  "contributorName": "노형우",
+  "contributorRole": "author"
+}

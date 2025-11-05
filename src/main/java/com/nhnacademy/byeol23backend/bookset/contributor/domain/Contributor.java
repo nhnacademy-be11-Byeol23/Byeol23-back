@@ -4,6 +4,8 @@ import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorC
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -18,24 +20,32 @@ import lombok.Setter;
 @Table(name = "contributors")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Getter
 public class Contributor {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "contributor_id")
+	@Getter
 	private Long contributorId;
 
 	@Column(name = "contributor_name", nullable = false, length = 20)
 	@Setter
+	@Getter
 	private String contributorName;
 
+	@Enumerated(EnumType.STRING)
 	@Column(name = "contributor_role", nullable = false, length = 10)
-	@Setter
-	private String contributorRole;
+	private ContributorRole contributorRole;
 
 	public Contributor(ContributorCreateRequest contributorCreateRequest){
-		this.contributorName = contributorCreateRequest.name();
-		this.contributorRole = contributorCreateRequest.role();
+		this.contributorName = contributorCreateRequest.contributorName();
+		this.contributorRole = contributorCreateRequest.contributorRole();
 	}
 
+	public void setContributorRole(String contributorRole) {
+		this.contributorRole = ContributorRole.from(contributorRole);
+	}
+
+	public String getContributorRole(){
+		return this.contributorRole.getLabel();
+	}
 }

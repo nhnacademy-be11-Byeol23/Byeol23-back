@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.bookset.contributor.service.impl;
 
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.Contributor;
+import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.AllContributorResponse;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorCreateRequest;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorCreateResponse;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorInfoResponse;
@@ -9,12 +10,13 @@ import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorU
 import com.nhnacademy.byeol23backend.bookset.contributor.exception.ContributorNotFound;
 import com.nhnacademy.byeol23backend.bookset.contributor.repository.ContributorRepository;
 import com.nhnacademy.byeol23backend.bookset.contributor.service.ContributorService;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -33,11 +35,11 @@ public class ContributorServiceImpl implements ContributorService {
 	@Override
 	public ContributorCreateResponse createContributor(ContributorCreateRequest request) {
 		if (request == null) throw new IllegalArgumentException("request is null");
-		if (request.name() == null || request.name().isBlank()) {
+		if (request.contributorName() == null || request.contributorName().isBlank()) {
 			throw new IllegalArgumentException("name is required");
 		}
-		if (request.role() == null) {
-			throw new IllegalArgumentException("role is required");
+		if (request.contributorRole() == null) {
+			throw new IllegalArgumentException("contributorRole is required");
 		}
 
 		Contributor contributor = new Contributor(request);
@@ -58,12 +60,18 @@ public class ContributorServiceImpl implements ContributorService {
 			throw new IllegalArgumentException("name is required");
 		}
 		if (request.role() == null) {
-			throw new IllegalArgumentException("role is required");
+			throw new IllegalArgumentException("contributorRole is required");
 		}
 
 		Contributor contributor = contributorRepository.findById(contributorId).orElseThrow(() -> new ContributorNotFound("해당 기여자 없음: " + contributorId));
 		contributor.setContributorName(request.name());
 		contributor.setContributorRole(request.role());
 		return new ContributorUpdateResponse(contributor);
+	}
+
+	@Override
+	public Page<AllContributorResponse> getAllContributors(int page, int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		return contributorRepository.findAll(pageable).map(AllContributorResponse::new);
 	}
 }
