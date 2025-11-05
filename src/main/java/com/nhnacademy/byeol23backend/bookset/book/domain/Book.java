@@ -109,4 +109,8 @@ public class Book {
 
 	@OneToMany(mappedBy = "book", fetch = FetchType.LAZY, orphanRemoval = true)
 	private List<BookImage> bookImageUrls = new ArrayList<>();
+
+	public void updateQuantity(Integer quantity) {
+		this.stock -= quantity;
+	}
 }

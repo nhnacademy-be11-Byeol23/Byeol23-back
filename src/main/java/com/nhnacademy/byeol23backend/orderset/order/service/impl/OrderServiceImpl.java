@@ -1,6 +1,5 @@
 package com.nhnacademy.byeol23backend.orderset.order.service.impl;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -11,7 +10,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import com.nhnacademy.byeol23backend.bookset.book.domain.dto.BookOrderInfoResponse;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookInfoRequest;
+import com.nhnacademy.byeol23backend.bookset.book.exception.BookNotFoundException;
+import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
 import com.nhnacademy.byeol23backend.orderset.delivery.domain.DeliveryPolicy;
 import com.nhnacademy.byeol23backend.orderset.delivery.exception.DeliveryPolicyNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.delivery.repository.DeliveryPolicyRepository;
@@ -28,6 +31,8 @@ import com.nhnacademy.byeol23backend.orderset.order.domain.dto.PointOrderRespons
 import com.nhnacademy.byeol23backend.orderset.order.exception.OrderNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.order.repository.OrderRepository;
 import com.nhnacademy.byeol23backend.orderset.order.service.OrderService;
+import com.nhnacademy.byeol23backend.orderset.orderdetail.domain.OrderDetail;
+import com.nhnacademy.byeol23backend.orderset.orderdetail.repository.OrderDetailRepository;
 import com.nhnacademy.byeol23backend.orderset.payment.domain.Payment;
 import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentCancelRequest;
 import com.nhnacademy.byeol23backend.orderset.payment.exception.PaymentNotFoundException;
@@ -41,6 +46,8 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class OrderServiceImpl implements OrderService {
 	private final OrderRepository orderRepository;
+	private final OrderDetailRepository orderDetailRepository;
+	private final BookRepository bookRepository;
 	private final PaymentRepository paymentRepository;
 	private final PaymentService paymentService;
 	private final DeliveryPolicyRepository deliveryPolicyRepository;
@@ -67,6 +74,16 @@ public class OrderServiceImpl implements OrderService {
 			request.receiverPhone(), currentDeliveryPolicy);
 
 		orderRepository.save(order);
+
+		for (BookInfoRequest bookInfoRequest : request.bookInfoRequestList()) {
+			Book book = bookRepository.findById(bookInfoRequest.bookId())
+				.orElseThrow(() -> new BookNotFoundException("해당 아이디의 도서가 존재하지 않습니다.: " + bookInfoRequest.bookId()));
+
+			OrderDetail orderDetail = OrderDetail.of(bookInfoRequest.quantity(), book.getSalePrice(),
+				book, null, order);
+
+			orderDetailRepository.save(orderDetail);
+		}
 
 		return new OrderPrepareResponse(order.getOrderNumber(), order.getActualOrderPrice(), order.getReceiver());
 	}
@@ -108,11 +125,9 @@ public class OrderServiceImpl implements OrderService {
 		Order order = orderRepository.findOrderByOrderNumber(orderNumber)
 			.orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND_MESSAGE + orderNumber));
 
-		List<BookOrderInfoResponse> bookOrderInfoResponses = List.of(
-			new BookOrderInfoResponse("찍히지 않습니다 3", 1, new BigDecimal("5850")),
-			new BookOrderInfoResponse("푸른 상자 20", 1, new BigDecimal("5400")),
-			new BookOrderInfoResponse("별이삼샵 11", 1, new BigDecimal("14400"))
-		);
+		List<OrderDetail> orderDetails = orderDetailRepository.findAllByOrderWithBook(order);
+
+		List<BookOrderInfoResponse> bookOrderInfoResponses = mapOrderDetailsToInfoResponses(orderDetails);
 
 		return new OrderDetailResponse(order.getOrderNumber(), order.getOrderedAt(), order.getOrderStatus(),
 			order.getActualOrderPrice(),
@@ -144,6 +159,17 @@ public class OrderServiceImpl implements OrderService {
 			.orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND_MESSAGE + orderId));
 
 		order.updateOrderStatus(ORDER_STATUS_ORDER_CANCELED);
+	}
+
+	@Transactional(readOnly = true)
+	protected List<BookOrderInfoResponse> mapOrderDetailsToInfoResponses(List<OrderDetail> orderDetails) {
+		return orderDetails.stream()
+			.map(orderDetail -> new BookOrderInfoResponse(
+				orderDetail.getBook().getBookName(),
+				orderDetail.getQuantity(),
+				orderDetail.getOrderPrice()
+			))
+			.toList();
 	}
 
 }
