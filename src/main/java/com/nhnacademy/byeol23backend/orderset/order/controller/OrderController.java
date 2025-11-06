@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderBulkUpdateRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCreateResponse;
@@ -42,9 +43,10 @@ public class OrderController {
 		return ResponseEntity.created(uri).body(response);
 	}
 
-	@PutMapping // 상대 값이 없다
-	public ResponseEntity<OrderCreateResponse> updateOrderStatus(@RequestParam("orderNumber") String orderNumber) {
-		OrderCreateResponse response = orderService.updateOrderStatus(orderNumber);
+	@PutMapping
+	public ResponseEntity<OrderCreateResponse> updateOrderStatus(@RequestParam("orderNumber") String orderNumber,
+		@RequestParam String orderStatus) {
+		OrderCreateResponse response = orderService.updateOrderStatus(orderNumber, orderStatus);
 		return ResponseEntity.ok(response);
 	}
 
@@ -74,10 +76,16 @@ public class OrderController {
 	}
 
 	@PostMapping("/points")
-	ResponseEntity<PointOrderResponse> saveOrderWithPoints(@RequestParam String orderNumber) {
+	public ResponseEntity<PointOrderResponse> saveOrderWithPoints(@RequestParam String orderNumber) {
 		PointOrderResponse response = orderService.createOrderWithPoints(orderNumber);
 		URI uri = URI.create("/api/orders/points/" + response.orderNumber());
 		return ResponseEntity.created(uri).body(response);
+	}
+
+	@PostMapping("/bulk-status")
+	public ResponseEntity<Void> updateBulkOrderStatus(@RequestBody OrderBulkUpdateRequest request) {
+		orderService.updateBulkOrderStatus(request);
+		return ResponseEntity.ok().build();
 	}
 
 }

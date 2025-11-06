@@ -1,11 +1,17 @@
 package com.nhnacademy.byeol23backend.orderset.payment.service.impl;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.nhnacademy.byeol23backend.bookset.book.exception.BookStockNotEnoughException;
+import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
 import com.nhnacademy.byeol23backend.orderset.order.domain.Order;
 import com.nhnacademy.byeol23backend.orderset.order.exception.OrderNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.order.repository.OrderRepository;
+import com.nhnacademy.byeol23backend.orderset.orderdetail.domain.OrderDetail;
+import com.nhnacademy.byeol23backend.orderset.orderdetail.repository.OrderDetailRepository;
 import com.nhnacademy.byeol23backend.orderset.payment.domain.Payment;
 import com.nhnacademy.byeol23backend.orderset.payment.domain.PaymentProvider;
 import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentCancelRequest;
@@ -26,6 +32,8 @@ public class PaymentServiceImpl implements PaymentService {
 	private final PaymentFacade paymentFacade;
 	private final PaymentRepository paymentRepository;
 	private final OrderRepository orderRepository;
+	private final OrderDetailRepository orderDetailRepository;
+	private final BookRepository bookRepository;
 	private static final String ORDER_NOT_FOUND_MESSAGE = "해당 주문을 찾을 수 없습니다.: ";
 
 	@Override
@@ -38,6 +46,17 @@ public class PaymentServiceImpl implements PaymentService {
 			paymentParamRequest);
 
 		order.updateOrderStatus("결제 완료");
+
+		List<OrderDetail> orderDetails = orderDetailRepository.findAllByOrderWithBook(order);
+
+		for (OrderDetail orderDetail : orderDetails) {
+			int updatedRows = bookRepository.decreaseBookStock(orderDetail.getBook().getBookId(),
+				orderDetail.getQuantity());
+
+			if (updatedRows == 0) {
+				throw new BookStockNotEnoughException("재고 차감 실패 : " + orderDetail.getBook().getBookId());
+			}
+		}
 
 		return new PaymentResultResponse(confirmResponse.paymentKey(), confirmResponse.orderId(),
 			confirmResponse.orderName(),
