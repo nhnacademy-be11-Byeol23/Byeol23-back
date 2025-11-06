@@ -1,8 +1,9 @@
 package com.nhnacademy.byeol23backend.bookset.book.service.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
@@ -101,28 +102,43 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
 	public List<BookResponse> getBooks(Pageable pageable) {
-		//전체 도서 조회
-		List<Book> books = bookRepository.findAll();
-		if (books.isEmpty()) {
-			return List.of();
+		List<Book> bookList = bookRepository.findAll();
+		if (bookList.isEmpty()) {
+			return new ArrayList<>();
 		}
-		List<Long> bookIds = books.stream()
-			.map(Book::getBookId)
-			.toList();
-		//도서에 대한 카테고리정보 조회
-		List<BookCategory> bookCategories = bookCategoryRepository.findByBookIdsWithCategory(bookIds);
 
-		Map<Long, List<Category>> categoriesByBookId = bookCategories.stream()
-			.collect(Collectors.groupingBy(
-				bc -> bc.getBook().getBookId(),
-				Collectors.mapping(BookCategory::getCategory, Collectors.toList())
-			));
+		List<Long> bookIdList = new ArrayList<>();
+		for (Book bookItem : bookList) {
+			Long bookId = bookItem.getBookId();
+			bookIdList.add(bookId);
+		}
+		List<BookCategory> bookCategoryList = bookCategoryRepository.findByBookIdsWithCategory(bookIdList);
+		Map<Long, List<Category>> bookIdToCategoryListMap = new HashMap<>();
 
-		return books.stream()
-			.map(book -> toResponse(book, categoriesByBookId.getOrDefault(book.getBookId(), List.of())))
-			.toList();
+		for (BookCategory bookCategoryItem : bookCategoryList) {
+			Book bookFromCategory = bookCategoryItem.getBook();
+			Long bookIdFromCategory = bookFromCategory.getBookId();
+			Category categoryFromBookCategory = bookCategoryItem.getCategory();
+			if (!bookIdToCategoryListMap.containsKey(bookIdFromCategory)) {
+				List<Category> newCategoryList = new ArrayList<>();
+				bookIdToCategoryListMap.put(bookIdFromCategory, newCategoryList);
+			}
+			List<Category> existingCategoryList = bookIdToCategoryListMap.get(bookIdFromCategory);
+			existingCategoryList.add(categoryFromBookCategory);
+		}
+
+		List<BookResponse> bookResponseList = new ArrayList<>();
+
+		for (Book bookItem : bookList) {
+			Long currentBookId = bookItem.getBookId();
+			List<Category> categoryListForBook = bookIdToCategoryListMap.getOrDefault(currentBookId, new ArrayList<>());
+
+			BookResponse bookResponse = toResponse(bookItem, categoryListForBook);
+			bookResponseList.add(bookResponse);
+		}
+		log.info("도서 조회가 완료되었습니다.");
+		return bookResponseList;
 	}
 
 	private BookResponse toResponse(Book book, List<Category> categories) {
