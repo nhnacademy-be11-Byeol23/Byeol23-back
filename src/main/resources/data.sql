@@ -39,6 +39,7 @@ INSERT INTO books(book_name, toc, `description`, regular_price, sale_price, isbn
 VALUES ('８월에 만나요', '1장, 2장, 3장, 4장, 5장, 6장', '결혼한 지 스물일곱 해가 된 평범한 주부 아나 막달레나 바흐는 ......', 16000, 15990, 1234567890123,
         '2024-11-22', 1, '판매중', 12, 1, 0, 10);
 
+select * from books;
 INSERT INTO book_contributor(book_id, contributor_id)
 VALUES (2, 4);
 
@@ -96,7 +97,7 @@ INSERT INTO orders(member_id, order_number, total_book_price, actual_order_price
 VALUES (1, 123456789012, 50000, 40000, '2025-10-29 11:11:11', '대기', '2025-11-01', '2025-11-03', '노형우',
         12345, '보람로 78', '1234동 890호', '01009876543', '(주우우소)', 1);
 
-INSERT INTO packaging(packaging_name, packaging_img, packaging_price)
+INSERT INTO packaging(packaging_name, packaging_image_url, packaging_price)
 VALUES ('test packaging', 'test packaging url from minio', 2000);
 
 INSERT INTO order_details(quantity, order_price, book_id, packaging_id, order_id)
