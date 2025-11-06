@@ -26,11 +26,11 @@ public class Refund {
 	private Long refundId;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "order_id", nullable = false)
+	@JoinColumn(name = "order_id")
 	private Order order;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "refund_policy_id", nullable = false)
+	@JoinColumn(name = "refund_policy_id")
 	private RefundPolicy refundPolicy;
 
 	private LocalDateTime refundedAt;

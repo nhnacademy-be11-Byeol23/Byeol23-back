@@ -22,11 +22,11 @@ public class BookContributor {
 	private Long bookContributorId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "book_id", nullable = false)
+	@JoinColumn(name = "book_id")
 	private Book book;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "contributor_id", nullable = false)
+	@JoinColumn(name = "contributor_id")
 	private Contributor contributor;
 
 }
