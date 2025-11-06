@@ -2,6 +2,7 @@ package com.nhnacademy.byeol23backend.memberset.member.dto;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.nhnacademy.byeol23backend.memberset.member.domain.RegistrationSource;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Role;
 
@@ -55,10 +56,9 @@ public record MemberCreateRequest(
 	@Schema(description = "이메일", example = "wsfa1223@gmail.com")
 	String email,
 
-	@NotBlank(message = "생년월일은 필수 입력 값입니다.")
-	@Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "생년월일은 YYYY-MM-DD 형식으로 입력해야 합니다.")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	@Schema(description = "생년월일", example = "1990-12-01")
-	LocalDate birthdate,
+	LocalDate birthDate,
 
 	Role memberRole,
 

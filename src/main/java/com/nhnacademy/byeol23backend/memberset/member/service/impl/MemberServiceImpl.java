@@ -1,5 +1,7 @@
 package com.nhnacademy.byeol23backend.memberset.member.service.impl;
 
+import com.nhnacademy.byeol23backend.memberset.grade.domain.Grade;
+import com.nhnacademy.byeol23backend.memberset.grade.repository.GradeRepository;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Status;
 import com.nhnacademy.byeol23backend.memberset.member.dto.*;
 import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateEmailException;
@@ -24,6 +26,7 @@ public class MemberServiceImpl implements MemberService {
 
 	private final MemberRepository memberRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final GradeRepository gradeRepository;
 
 	/**
 	 * 회원을 저장하는 함수
@@ -33,6 +36,9 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	@Transactional
 	public MemberCreateResponse createMember(MemberCreateRequest request) {
+
+		createValidation(request.loginId(), request.nickname(), request.phoneNumber(), request.email());
+
 		Member newMember = Member.create(
 				request.loginId(),
 				passwordEncoder.encode(request.loginPassword()),
@@ -40,19 +46,11 @@ public class MemberServiceImpl implements MemberService {
 				request.nickname(),
 				request.phoneNumber(),
 				request.email(),
-				request.birthdate(),
+				request.birthDate(),
 				request.memberRole(),
-				request.joinedFrom()
+				request.joinedFrom(),
+				gradeRepository.findByGradeName("일반")
 		);
-
-		//validation
-		if(request.email() != null && memberRepository.existsByEmail(request.email())) {
-			throw new DuplicateEmailException("이미 사용 중인 이메일입니다.");
-		}
-
-		if(request.phoneNumber() != null && memberRepository.existsByPhoneNumber(request.phoneNumber())) {
-			throw new DuplicatePhoneNumberException("이미 사용 중인 휴대전화입니다.");
-		}
 
 		memberRepository.save(newMember);
 		log.info("멤버 생성을 완료했습니다. {}", newMember.getMemberId());
@@ -96,15 +94,7 @@ public class MemberServiceImpl implements MemberService {
 	public MemberUpdateResponse updateMember(Long memberId, MemberUpdateRequest request) {
 		Member oldMember = findMemberById(memberId);
 
-		//validation
-		if(request.email() != null &&
-				memberRepository.existsByEmailAndMemberIdNot(request.email(), memberId)) {
-			throw new DuplicateEmailException("이미 사용 중인 이메일입니다.");
-		}
-		if(request.phoneNumber() != null &&
-				memberRepository.existsByPhoneNumberAndMemberIdNot(request.phoneNumber(), memberId)) {
-			throw new DuplicatePhoneNumberException("이미 사용 중인 휴대전화입니다.");
-		}
+		updateValidation(request.nickname(), request.phoneNumber(), request.email(), oldMember.getMemberId());
 
 		oldMember.updateMemberInfo(request);
 
@@ -161,5 +151,40 @@ public class MemberServiceImpl implements MemberService {
 	private Member findMemberById(Long memberId) {
 		return memberRepository.findById(memberId)
 			.orElseThrow(() -> new MemberNotFoundException(memberId + "에 해당하는 멤버를 찾을 수 없습니다."));
+	}
+
+	private void createValidation(String loginId, String nickname, String phoneNumber, String email) {
+		if(loginId != null && memberRepository.existsByLoginId(loginId)) {
+			throw new DuplicateEmailException("이미 사용 중인 아이디입니다.");
+		}
+
+		if(nickname != null && memberRepository.existsByNickname(nickname)) {
+			throw new DuplicateEmailException("이미 사용 중인 닉네임입니다.");
+		}
+
+		if(email != null && memberRepository.existsByEmail(email)) {
+			throw new DuplicateEmailException("이미 사용 중인 이메일입니다.");
+		}
+
+		if(phoneNumber != null && memberRepository.existsByPhoneNumber(phoneNumber)) {
+			throw new DuplicatePhoneNumberException("이미 사용 중인 휴대전화입니다.");
+		}
+	}
+
+	private void updateValidation(String nickname, String phoneNumber, String email, Long memberId) {
+
+		if(nickname != null &&
+			memberRepository.existsByPhoneNumberAndMemberIdNot(nickname, memberId)) {
+			throw new DuplicatePhoneNumberException("이미 사용 중인 닉네임입니다.");
+		}
+
+		if(email != null &&
+			memberRepository.existsByEmailAndMemberIdNot(email, memberId)) {
+			throw new DuplicateEmailException("이미 사용 중인 이메일입니다.");
+		}
+		if(phoneNumber != null &&
+			memberRepository.existsByPhoneNumberAndMemberIdNot(phoneNumber, memberId)) {
+			throw new DuplicatePhoneNumberException("이미 사용 중인 휴대전화입니다.");
+		}
 	}
 }

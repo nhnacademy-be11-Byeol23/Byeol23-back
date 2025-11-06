@@ -23,7 +23,7 @@ public class Member {
 	private Long memberId;
 
 	@Setter
-	@Column(name = "login_id", nullable = false, length = 20)
+	@Column(name = "login_id", nullable = false, length = 20, unique = true)
 	private String loginId;
 
 	@Setter
@@ -35,7 +35,7 @@ public class Member {
 	private String memberName;
 
 	@Setter
-	@Column(name = "nickname", nullable = false, length = 50)
+	@Column(name = "nickname", nullable = false, length = 50, unique = true)
 	private String nickname;
 
 	@Setter
@@ -43,7 +43,7 @@ public class Member {
 	private String phoneNumber;
 
 	@Setter
-	@Column(name = "email", nullable = false, length = 50)
+	@Column(name = "email", nullable = false, length = 50, unique = true)
 	private String email;
 
 	@Setter
@@ -81,14 +81,14 @@ public class Member {
 	private Grade grade;
 
 	public static Member create(String loginId, String loginPassword, String memberName, String nickname,
-		String phoneNumber, String email, LocalDate birthDate, Role memberRole, RegistrationSource joinedFrom) {
+		String phoneNumber, String email, LocalDate birthDate, Role memberRole, RegistrationSource joinedFrom, Grade grade) {
 		return new Member(loginId, loginPassword, memberName, nickname, phoneNumber, email, birthDate,
-			LocalDateTime.now(), Status.ACTIVE, BigDecimal.ZERO, memberRole, joinedFrom);
+			LocalDateTime.now(), Status.ACTIVE, BigDecimal.ZERO, memberRole, joinedFrom, grade);
 	}
 
 	private Member(String loginId, String loginPassword, String memberName, String nickname,
 		String phoneNumber, String email, LocalDate birthDate, LocalDateTime joinedAt, Status status,
-		BigDecimal currentPoint, Role memberRole, RegistrationSource joinedFrom){
+		BigDecimal currentPoint, Role memberRole, RegistrationSource joinedFrom, Grade grade){
 		this.loginId = loginId;
 		this.loginPassword = loginPassword;
 		this.memberName = memberName;
@@ -101,6 +101,7 @@ public class Member {
 		this.currentPoint = currentPoint;
 		this.memberRole = memberRole;
 		this.joinedFrom = joinedFrom;
+		this.grade = grade;
 	}
 
 	public void updateMemberInfo(MemberUpdateRequest request) {
