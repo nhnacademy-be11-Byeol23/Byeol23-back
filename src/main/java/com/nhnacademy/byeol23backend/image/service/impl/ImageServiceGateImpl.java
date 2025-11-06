@@ -16,20 +16,28 @@ import com.nhnacademy.byeol23backend.reviewset.reviewImage.service.ReviewImageSe
 
 @Service
 public class ImageServiceGateImpl implements ImageServiceGate {
-	private final List<ImageService> imageServices;
-	public ImageServiceGateImpl(List<ImageService> imageServices) {
-		this.imageServices = imageServices;
+	private final ImageService bookImageService;
+	private final ImageService packagingService;
+	private final ImageService reviewImageService;
+	public ImageServiceGateImpl(
+		BookImageServiceImpl bookImageServiceImpl,
+		PackagingServiceImpl packagingImageServiceImpl,
+		ReviewImageServiceImpl reviewImageServiceImpl
+	) {
+		this.bookImageService = bookImageServiceImpl;
+		this.packagingService = packagingImageServiceImpl;
+		this.reviewImageService = reviewImageServiceImpl;
 	}
 	//domain에 따라 서비스 게이트가 적절한 서비스로 라우팅
 	private ImageService getBookImageService(
 		ImageDomain imageDomain
 	) {
-		return imageServices.stream()
-			.filter(service -> service.isSupportedDomain(imageDomain))
-			.findFirst()
-			.orElseThrow(() -> new IllegalArgumentException("지원하지 않는 이미지 도메인입니다: " + imageDomain));
+		return switch (imageDomain) {
+			case BOOK -> bookImageService;
+			case PACKAGING -> packagingService;
+			case REVIEW -> reviewImageService;
+		};
 	}
-
 	@Override
 	public String saveImageUrl(
 		Long Id,
@@ -54,10 +62,10 @@ public class ImageServiceGateImpl implements ImageServiceGate {
 	}
 
 	@Override
-	public String deleteImageUrlsById(
+	public void deleteImageUrlsById(
 		Long Id,
 		ImageDomain imageDomain
 	) {
-		return getBookImageService(imageDomain).deleteImageUrlsById(Id);
+		getBookImageService(imageDomain).deleteImageUrlsById(Id);
 	}
 }

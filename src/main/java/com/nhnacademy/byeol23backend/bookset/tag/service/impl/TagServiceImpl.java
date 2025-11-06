@@ -1,7 +1,6 @@
 package com.nhnacademy.byeol23backend.bookset.tag.service.impl;
 
 import com.nhnacademy.byeol23backend.bookset.tag.domain.Tag;
-import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.AllTagsInfoResponse;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.TagCreateRequest;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.TagCreateResponse;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.TagInfoResponse;
@@ -10,9 +9,6 @@ import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.TagUpdateResponse;
 import com.nhnacademy.byeol23backend.bookset.tag.exception.TagNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.tag.repository.TagRepository;
 import com.nhnacademy.byeol23backend.bookset.tag.service.TagService;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
@@ -39,7 +35,7 @@ public class TagServiceImpl implements TagService {
 	@Override
 	@Transactional
 	public void deleteTagByTagId(Long tagId) {
-		Tag tag = tagRepository.findTagByTagId(tagId)
+		Tag tag = tagRepository.findByTagId(tagId)
 			.orElseThrow(() -> new TagNotFoundException("해당 아이디 태그를 찾을 수 없습니다: " + tagId));
 		tagRepository.deleteTagByTagId(tagId);
 	}
@@ -50,10 +46,5 @@ public class TagServiceImpl implements TagService {
 		tag.setTagName(request.tagName());
 		tagRepository.save(tag);
 		return new TagUpdateResponse(tag);
-	}
-
-	@Override
-	public Page<AllTagsInfoResponse> getAllTags(Pageable pageable) {
-		return tagRepository.findAll(pageable).map(AllTagsInfoResponse::new);
 	}
 }

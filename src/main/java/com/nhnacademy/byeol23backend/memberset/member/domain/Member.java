@@ -4,8 +4,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import com.nhnacademy.byeol23backend.memberset.grade.domain.Grade;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,7 +41,7 @@ public class Member {
 	private String nickname;
 
 	@Setter
-	@Column(name = "phone_number", nullable = false, length = 11, unique = true)
+	@Column(name = "phone_number", nullable = false, length = 11)
 	private String phoneNumber;
 
 	@Setter
@@ -72,9 +76,8 @@ public class Member {
 	private String joinedFrom;
 
 	@Setter
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "grade_id", nullable = false)
-	private Grade grade;
+	@Column(name = "grade_id", nullable = false)
+	private Long gradeId;
 
 	@Override
 	public String toString() {

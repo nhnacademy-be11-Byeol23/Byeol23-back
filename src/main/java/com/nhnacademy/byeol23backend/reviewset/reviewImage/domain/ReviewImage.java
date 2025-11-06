@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "review_images")
+@Table(name = "review_image")
 @NoArgsConstructor
 @Getter
 public class ReviewImage {
@@ -25,10 +25,10 @@ public class ReviewImage {
 	private Long reviewImageId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "review_id", nullable = false)
+	@JoinColumn(name = "review_id")
 	private Review review;
 
-	@Column(name = "review_image_url", nullable = false)
+	@Column(name = "review_image_url")
 	private String reviewImageUrl;
 
 	public ReviewImage(Review review, String reviewImageUrl) {
