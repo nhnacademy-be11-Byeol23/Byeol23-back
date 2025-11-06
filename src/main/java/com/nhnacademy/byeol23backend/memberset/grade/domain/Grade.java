@@ -23,6 +23,7 @@ public class Grade {
 	@Column(name = "criterion_price", nullable = false, precision = 10)
 	private BigDecimal criterionPrice;
 
-	@Column(name = "point_rate", nullable = false)
-	private int pointRate;
+	@Column(name = "point_rate", nullable = false, precision = 5, scale = 2)
+	private BigDecimal pointRate;
 }
+
