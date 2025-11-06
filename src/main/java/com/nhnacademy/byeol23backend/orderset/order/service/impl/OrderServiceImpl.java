@@ -142,11 +142,7 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	@Transactional
 	public void updateBulkOrderStatus(OrderBulkUpdateRequest request) {
-		List<Order> ordersToUpdate = orderRepository.findAllByOrderNumberIn(request.orderNumberLists());
-
-		for (Order order : ordersToUpdate) {
-			order.updateOrderStatus(request.status());
-		}
+		orderRepository.updateOrderStatusByOrderNumbers(request.orderNumberLists(), request.status());
 	}
 
 	@Transactional
