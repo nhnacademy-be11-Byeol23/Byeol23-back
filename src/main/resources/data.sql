@@ -35,12 +35,12 @@ VALUES ('민음사'),
 
 -- book
 INSERT INTO books(book_name, toc, `description`, regular_price, sale_price, isbn, publish_date, is_pack, book_status,
-                  stock, publisher_id, is_deleted)
+                  stock, publisher_id, is_deleted, view_count)
 VALUES ('８월에 만나요', '1장, 2장, 3장, 4장, 5장, 6장', '결혼한 지 스물일곱 해가 된 평범한 주부 아나 막달레나 바흐는 ......', 16000, 15990, 1234567890123,
-        '2024-11-22', 1, '판매중', 12, 1, 0);
+        '2024-11-22', 1, '판매중', 12, 1, 0, 10);
 
 INSERT INTO book_contributor(book_id, contributor_id)
-VALUES (1, 4);
+VALUES (2, 4);
 
 INSERT INTO book_tag(book_id, tag_id)
 VALUES (1, 1);
@@ -83,25 +83,25 @@ values (30000, 3000, '2025-10-24 10:05:30'),
 
 -- orders
 INSERT INTO orders(member_id, order_number, total_book_price, actual_order_price, ordered_at, order_status,
-                   delivery_sent_date, delivery_arrived_date, delivery_desired_date, receiver, post_code,
+                   delivery_sent_date, delivery_desired_date, receiver, post_code,
                    receiver_address, receiver_address_detail, receiver_phone, receiver_address_extra,
                    delivery_policy_id)
-VALUES (1, 251234567890, 37500, 21000, '2025-10-29 11:11:11', '대기', '2025-11-01', '2025-11-02', '2025-11-03', '최유현',
+VALUES (1, 251234567890, 37500, 21000, '2025-10-29 11:11:11', '대기', '2025-11-01', '2025-11-03', '최유현',
         30098, '보람로 96', '2005동 201호', '01012345678', '(주소)', 1);
 
 INSERT INTO orders(member_id, order_number, total_book_price, actual_order_price, ordered_at, order_status,
-                   delivery_sent_date, delivery_arrived_date, delivery_desired_date, receiver, post_code,
+                   delivery_sent_date, delivery_desired_date, receiver, post_code,
                    receiver_address, receiver_address_detail, receiver_phone, receiver_address_extra,
                    delivery_policy_id)
-VALUES (1, 123456789012, 50000, 40000, '2025-10-29 11:11:11', '대기', '2025-11-01', '2025-11-02', '2025-11-03', '노형우',
+VALUES (1, 123456789012, 50000, 40000, '2025-10-29 11:11:11', '대기', '2025-11-01', '2025-11-03', '노형우',
         12345, '보람로 78', '1234동 890호', '01009876543', '(주우우소)', 1);
 
 INSERT INTO packaging(packaging_name, packaging_img, packaging_price)
 VALUES ('test packaging', 'test packaging url from minio', 2000);
 
 INSERT INTO order_details(quantity, order_price, book_id, packaging_id, order_id)
-VALUES (3, 42000, 1, 1, 1),
-       (1, 19000, 1, 1, 2);
+VALUES (3, 42000, 2, 1, 3),
+       (1, 19000, 2, 1, 4);
 
 INSERT INTO reviews(review_rate, review_content, created_at, revised_at, member_id, order_detail_id)
 VALUES (5, '책이 맛있고 사장님이 친절해요.', '2025-10-01 11:11:11', '2025-10-03 11:11:11', 1, 1),
@@ -113,8 +113,8 @@ values ('review image url from minio 1', 1),
 
 
 -- refunds
-insert into refund_policy(refund_policy_name, refund_condition, `comment`, changed_at, is_active)
-values ('반품 정책 이름 1', '반품 조건 1', '반품 정책 변경 사유 1', '2020-11-11 11:11:11', 1);
+insert into refund_policy(refund_policy_name, refund_condition, `comment`, changed_at)
+values ('반품 정책 이름 1', '반품 조건 1', '반품 정책 변경 사유 1', '2020-11-11 11:11:11');
 
 
 insert into refunds(order_id, refund_policy_id, refunded_at, refund_reason, refund_quantity, refund_price, refund_fee)
