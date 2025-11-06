@@ -7,13 +7,18 @@ import com.nhnacademy.byeol23backend.cartset.cart.repository.CartRepository;
 import com.nhnacademy.byeol23backend.cartset.cart.service.CartService;
 import com.nhnacademy.byeol23backend.cartset.cartbook.domain.CartBook;
 import com.nhnacademy.byeol23backend.cartset.cartbook.domain.dto.CartBookResponse;
+import com.nhnacademy.byeol23backend.image.domain.ImageDomain;
+import com.nhnacademy.byeol23backend.image.service.ImageServiceGate;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
+import com.nhnacademy.byeol23backend.orderset.delivery.domain.dto.DeliveryPolicyInfoResponse;
+import com.nhnacademy.byeol23backend.orderset.delivery.service.DeliveryPolicyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +26,8 @@ import java.util.List;
 public class CartServiceImpl implements CartService {
 
     private final CartRepository cartRepository;
+    private final ImageServiceGate imageServiceGate;
+    private final DeliveryPolicyService deliveryPolicyService;
 
     @Override
     public void createCart(Member member) {
@@ -43,17 +50,31 @@ public class CartServiceImpl implements CartService {
         List<CartBookResponse> bookResponses = new ArrayList<>();
 
         for (CartBook cb: cart.getCartBooks()) {
+
+            Map<Long, String> imageUrls = imageServiceGate.getImageUrlsById(cb.getBook().getBookId(), ImageDomain.BOOK);
+            String imageUrl = imageUrls.values().stream().findFirst().orElse(null);
+
             CartBookResponse response = new CartBookResponse(
                     cb.getCartBookId(),
                     cb.getBook().getBookId(),
                     cb.getBook().getBookName(),
                     cb.getBook().getSalePrice(),
-                    cb.getQuantity()
+                    cb.getBook().getRegularPrice(),
+                    cb.getQuantity(),
+                    imageUrl
             );
             bookResponses.add(response);
         }
 
-        return new CartResponse(cart.getCartId(), bookResponses);
+        // 배송비 정책 조회
+        DeliveryPolicyInfoResponse deliveryPolicy = deliveryPolicyService.getCurrentDeliveryPolicy();
+
+        return new CartResponse(
+                cart.getCartId(), 
+                bookResponses,
+                deliveryPolicy.deliveryFee(),
+                deliveryPolicy.freeDeliveryCondition()
+        );
     }
 
 }
