@@ -32,8 +32,8 @@ import lombok.RequiredArgsConstructor;
 public class PublisherController {
 	private final PublisherService publisherService;
 
-	@GetMapping("/{publisherId}")
-	public ResponseEntity<PublisherInfoResponse> getPublisherByPublisherId(@PathVariable Long publisherId){
+	@GetMapping("/{publisher-id}")
+	public ResponseEntity<PublisherInfoResponse> getPublisherByPublisherId(@PathVariable(name = "publisher-id") Long publisherId){
 		PublisherInfoResponse response = publisherService.getPublisherByPublisherId(publisherId);
 		return ResponseEntity.ok(response);
 	}
@@ -48,14 +48,14 @@ public class PublisherController {
 	}
 
 
-	@DeleteMapping("/{publisherId}")
-	public ResponseEntity<Void> deletePublisherByPublisherId(@PathVariable Long publisherId) {
+	@DeleteMapping("/{publisher-id}")
+	public ResponseEntity<Void> deletePublisherByPublisherId(@PathVariable(name = "publisher-id") Long publisherId) {
 		publisherService.deletePublisherByPublisherId(publisherId);
 		return ResponseEntity.noContent().build();
 	}
 
-	@PutMapping("/{publisherId}")
-	public ResponseEntity<PublisherUpdateResponse> updatePublisherByPublisherId(@PathVariable Long publisherId, @RequestBody PublisherUpdateRequest publisherRequestDto) {
+	@PutMapping("/{publisher-id}")
+	public ResponseEntity<PublisherUpdateResponse> updatePublisherByPublisherId(@PathVariable(name = "publisher-id") Long publisherId, @RequestBody PublisherUpdateRequest publisherRequestDto) {
 		PublisherUpdateResponse response = publisherService.updatePublisherByPublisherId(publisherId, publisherRequestDto);
 		return ResponseEntity.ok(response);
 	}
