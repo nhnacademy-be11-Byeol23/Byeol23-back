@@ -14,7 +14,6 @@ import lombok.Setter;
 @Entity
 @Getter
 @Table(name = "publishers")
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Publisher {
 	@Id
