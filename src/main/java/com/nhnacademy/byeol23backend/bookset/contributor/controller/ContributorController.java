@@ -30,8 +30,8 @@ import lombok.RequiredArgsConstructor;
 public class ContributorController {
 	private final ContributorService contributorService;
 
-	@GetMapping("/{contributorId}")
-	public ResponseEntity<ContributorInfoResponse> getContributorByContributorId(@PathVariable Long contributorId){
+	@GetMapping("/{contributor-id}")
+	public ResponseEntity<ContributorInfoResponse> getContributorByContributorId(@PathVariable(name = "contributor-id") Long contributorId){
 		ContributorInfoResponse response = contributorService.getContributorByContributorId(contributorId);
 		return ResponseEntity.ok().body(response);
 	}
@@ -43,14 +43,14 @@ public class ContributorController {
 		return ResponseEntity.created(uri).body(response);
 	}
 
-	@DeleteMapping("/{contributorId}")
-	public ResponseEntity<Void> deleteContributorByContributorId(@PathVariable Long contributorId){
+	@DeleteMapping("/{contributor-id}")
+	public ResponseEntity<Void> deleteContributorByContributorId(@PathVariable(name = "contributor-id") Long contributorId){
 		contributorService.deleteContributorByContributorId(contributorId);
 		return ResponseEntity.noContent().build();
 	}
 
-	@PutMapping("/{contributorId}")
-	public ResponseEntity<ContributorUpdateResponse> updateContributor(@PathVariable Long contributorId, @RequestBody ContributorUpdateRequest request){
+	@PutMapping("/{contributor-id}")
+	public ResponseEntity<ContributorUpdateResponse> updateContributor(@PathVariable(name = "contributor-id") Long contributorId, @RequestBody ContributorUpdateRequest request){
 		ContributorUpdateResponse response = contributorService.updateContributor(contributorId, request);
 		return ResponseEntity.ok(response);
 	}
