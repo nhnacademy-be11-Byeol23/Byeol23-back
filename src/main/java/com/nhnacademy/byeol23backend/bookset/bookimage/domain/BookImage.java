@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "book_image")
+@Table(name = "book_images")
 @NoArgsConstructor
 @Getter
 public class BookImage {
@@ -28,10 +28,10 @@ public class BookImage {
 	@JoinColumn(name = "book_id", nullable = false)
 	private Book book;
 
-	@Column(name = "book_image_url")
+	@Column(name = "book_image_url", nullable = false)
 	private String bookImageUrl;
 
-	public  BookImage(Book book, String bookImageUrl) {
+	public BookImage(Book book, String bookImageUrl) {
 		this.book = book;
 		this.bookImageUrl = bookImageUrl;
 	}
