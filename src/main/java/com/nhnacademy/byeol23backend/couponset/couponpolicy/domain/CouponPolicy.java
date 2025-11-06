@@ -36,11 +36,12 @@ public class CouponPolicy {
 	@Column(name = "discount_amount", precision = 10)
 	private BigDecimal discountAmount;
 
-	@Column(name = "is_active", nullable = false)
+	@Column(name = "is_active", nullable = false, columnDefinition = "tinyint(1)")
 	private Boolean isActive;
 
-	public CouponPolicy(String couponName, Long criterionPrice, Integer discountRate, BigDecimal discountLimit, BigDecimal discountAmount) {
-		this.couponName = couponName;
+	public CouponPolicy(String couponPolicyName, BigDecimal criterionPrice, Integer discountRate, BigDecimal discountLimit,
+		BigDecimal discountAmount) {
+		this.couponPolicyName = couponPolicyName;
 		this.criterionPrice = criterionPrice;
 		this.discountRate = discountRate;
 		this.discountLimit = discountLimit;

@@ -31,7 +31,7 @@ public class BookImage {
 	@Column(name = "book_image_url", nullable = false)
 	private String bookImageUrl;
 
-	public  BookImage(Book book, String bookImageUrl) {
+	public BookImage(Book book, String bookImageUrl) {
 		this.book = book;
 		this.bookImageUrl = bookImageUrl;
 	}

@@ -81,7 +81,7 @@ public class OrderServiceImpl implements OrderService {
 		order.updateOrderStatus(orderStatus);
 
 		return new OrderCreateResponse(orderNumber, order.getTotalBookPrice(), order.getActualOrderPrice(),
-			order.getOrderedAt(), order.getOrderStatus(), order.getDeliveryArrivedDate(), order.getReceiver(),
+			order.getOrderedAt(), order.getOrderStatus(), order.getReceiver(),
 			order.getPostCode(), order.getReceiverAddress(), order.getReceiverAddressDetail(),
 			order.getReceiverPhone());
 	}

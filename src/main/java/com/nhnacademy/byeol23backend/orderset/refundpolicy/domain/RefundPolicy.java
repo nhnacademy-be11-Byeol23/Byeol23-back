@@ -8,9 +8,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @Table(name = "refund_policy")
+@NoArgsConstructor
 public class RefundPolicy {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,11 +27,20 @@ public class RefundPolicy {
 	@Column(name = "refund_condition", nullable = false, length = 20)
 	private String refundCondition;
 
-	@Column(name = "comment", nullable = false)
+	@Column(name = "comment", nullable = false, columnDefinition = "text")
 	private String comment;
 
 	private LocalDateTime changedAt;
 
-	@Column(name = "is_active", nullable = false)
-	private Boolean isActive;
+	private RefundPolicy(String refundPolicyName, String refundCondition, String comment, LocalDateTime changedAt) {
+		this.refundPolicyName = refundPolicyName;
+		this.refundCondition = refundCondition;
+		this.comment = comment;
+		this.changedAt = changedAt;
+	}
+
+	public static RefundPolicy of(String refundPolicyName, String refundCondition, String comment,
+		LocalDateTime changedAt) {
+		return new RefundPolicy(refundPolicyName, refundCondition, comment, changedAt);
+	}
 }

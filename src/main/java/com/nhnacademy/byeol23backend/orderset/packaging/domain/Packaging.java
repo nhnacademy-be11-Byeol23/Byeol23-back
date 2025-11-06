@@ -27,7 +27,6 @@ public class Packaging {
 	@Column(name = "packaging_image_url")
 	private String packagingImgUrl;
 
-
 	@Column(name = "packaging_price", nullable = false, precision = 10)
 	private BigDecimal packagingPrice;
 }
