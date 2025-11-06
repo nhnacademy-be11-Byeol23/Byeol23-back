@@ -11,6 +11,10 @@ import com.nhnacademy.byeol23backend.bookset.publisher.domain.dto.PublisherUpdat
 import com.nhnacademy.byeol23backend.bookset.publisher.exception.PublisherNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.publisher.repository.PublisherRepository;
 import com.nhnacademy.byeol23backend.bookset.publisher.service.PublisherService;
+import com.nhnacademy.byeol23backend.bookset.publisher.domain.dto.AllPublishersInfoResponse;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
@@ -49,5 +53,10 @@ public class PublisherServiceImpl implements PublisherService {
 		publisher.setPublisherName(request.publisherName());
 		publisherRepository.save(publisher);
 		return new PublisherUpdateResponse(publisher);
+	}
+
+	@Override
+	public Page<AllPublishersInfoResponse> getAllPublishers(Pageable pageable) {
+		return publisherRepository.findAll(pageable).map(AllPublishersInfoResponse::new);
 	}
 }
