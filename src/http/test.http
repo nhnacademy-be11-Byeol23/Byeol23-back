@@ -1,30 +1,23 @@
-POST http://localhost:8080/api/tags
+### GET request to example server
+GET http://localhost:8080/api/contributors/1
+
+### post
+POST http://localhost:8080/api/contributors
 Content-Type: application/json
 
 {
-  "tagName": "tag"
+  "name": "Hyungwoo Ro",
+  "role": "author"
 }
 
-### Update
-
-PUT http://localhost:8080/api/tags/1
+### PUT
+PUT http://localhost:8080/api/contributors/1
 Content-Type: application/json
 
 {
-  "tagName": "나는야 귀요미 노형우"
+  "name": "Yuhyeon Choi",
+  "role": "author"
 }
 
-### Delete
-DELETE http://localhost:8080/api/tags/1
-
-### Get
-GET http://localhost:10333/api/contributors?page=0&size=3
-
-### Post
-POST http://localhost:10333/api/contributors
-Content-Type: application/json
-
-{
-  "contributorName": "노형우",
-  "contributorRole": "author"
-}
+### DELETE
+DELETE http://localhost:8080/api/contributors/1
