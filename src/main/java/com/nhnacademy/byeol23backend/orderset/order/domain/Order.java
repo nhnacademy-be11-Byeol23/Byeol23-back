@@ -49,6 +49,8 @@ public class Order {
 
 	private LocalDate deliverySentDate; //배송 시작 날짜
 
+	private LocalDate deliveryArrivedDate; //배송 수령 날짜
+
 	private LocalDate deliveryDesiredDate; //배송 희망 날짜
 
 	@Column(name = "receiver", nullable = false, length = 10)
@@ -63,10 +65,10 @@ public class Order {
 	@Column(name = "receiver_address_detail", nullable = false, length = 30)
 	private String receiverAddressDetail;
 
-	@Column(name = "receiver_address_extra", length = 30)
+	@Column(name = "receiver_address_extra", nullable = false, length = 30)
 	private String receiverAddressExtra;
 
-	@Column(name = "receiver_phone", nullable = false, length = 11)
+	@Column(name = "receiver_phone", nullable = false, length = 11) //- 때문에 11자리 -> 13자리로 변경,
 	private String receiverPhone;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -74,8 +76,12 @@ public class Order {
 	private Member member;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "delivery_policy_id", nullable = false)
+	@JoinColumn(name = "delivery_policy_id", nullable = false) // 값 들어가는지 확인하기 위해 잠시 nullable 하도록 처리
 	private DeliveryPolicy deliveryPolicy;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "coupon_id")
+	private Coupon coupon;
 
 	private Order(String orderNumber, BigDecimal totalBookPrice, BigDecimal actualOrderPrice, LocalDateTime orderedAt,
 		String orderStatus, LocalDate deliveryDesiredDate, String receiver, String postCode, String receiverAddress,
