@@ -2,7 +2,15 @@ package com.nhnacademy.byeol23backend.bookset.book.domain;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookCreateRequest;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookUpdateRequest;
+import com.nhnacademy.byeol23backend.bookset.bookimage.domain.BookImage;
 import com.nhnacademy.byeol23backend.bookset.publisher.domain.Publisher;
 
 import jakarta.persistence.Column;
@@ -13,14 +21,19 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "books")
+@NoArgsConstructor
+@SQLDelete(sql = "update books set is_deleted = true where book_id = ?")
+@Where(clause = "is_deleted = false")
 public class Book {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,10 +43,10 @@ public class Book {
 	@Column(name = "book_name", length = 200, nullable = false)
 	private String bookName;
 
-	@Column(name = "toc")
+	@Column(name = "toc", columnDefinition = "text")
 	private String toc;
 
-	@Column(name = "description")
+	@Column(name = "description", columnDefinition = "text")
 	private String description;
 
 	@Column(name = "regular_price", nullable = false, precision = 10)
@@ -47,7 +60,7 @@ public class Book {
 
 	private LocalDate publishDate;
 
-	@Column(name = "is_pack", nullable = false)
+	@Column(name = "is_pack", nullable = false, columnDefinition = "tinyint")
 	private boolean isPack;
 
 	@Column(name = "book_status", nullable = false, length = 10)
@@ -59,7 +72,41 @@ public class Book {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "publisher_id", nullable = false)
 	private Publisher publisher;
-	//고책임님 피드백 이후 바뀐 ERD를 적용하여 작성하였습니다.
-	@Column(name = "is_deleted", nullable = false)
+
+	@Column(name = "is_deleted", nullable = false, columnDefinition = "tinyint")
 	private boolean isDeleted;
+
+	@Column(name = "view_count", columnDefinition = "BIGINT DEFAULT 0")
+	private long viewCount;
+
+	public void createBook(BookCreateRequest request, Publisher publisher) {
+		this.bookName = request.bookName();
+		this.toc = request.toc();
+		this.description = request.description();
+		this.regularPrice = request.regularPrice();
+		this.salePrice = request.salePrice();
+		this.isbn = request.isbn();
+		this.publishDate = request.publishDate();
+		this.isPack = request.isPack();
+		this.bookStatus = request.bookStatus();
+		this.stock = request.stock();
+		this.publisher = publisher;
+		this.isDeleted = false;
+	}
+
+	public void updateBook(BookUpdateRequest request, Publisher publisher) {
+		this.bookName = request.bookName();
+		this.toc = request.toc();
+		this.description = request.description();
+		this.regularPrice = request.regularPrice();
+		this.salePrice = request.salePrice();
+		this.publishDate = request.publishDate();
+		this.isPack = request.isPack();
+		this.bookStatus = request.bookStatus();
+		this.stock = request.stock();
+		this.publisher = publisher;
+	}
+
+	@OneToMany(mappedBy = "book", fetch = FetchType.LAZY, orphanRemoval = true)
+	private List<BookImage> bookImageUrls = new ArrayList<>();
 }

@@ -1,48 +1,63 @@
 package com.nhnacademy.byeol23backend.orderset.order.service.impl;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
+import com.nhnacademy.byeol23backend.bookset.book.domain.dto.BookOrderInfoResponse;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookInfoRequest;
+import com.nhnacademy.byeol23backend.bookset.book.exception.BookNotFoundException;
+import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
+import com.nhnacademy.byeol23backend.orderset.delivery.domain.DeliveryPolicy;
+import com.nhnacademy.byeol23backend.orderset.delivery.exception.DeliveryPolicyNotFoundException;
+import com.nhnacademy.byeol23backend.orderset.delivery.repository.DeliveryPolicyRepository;
 import com.nhnacademy.byeol23backend.orderset.order.domain.Order;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderBulkUpdateRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelRequest;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCreateResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderDetailResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderInfoResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderSearchCondition;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.PointOrderResponse;
 import com.nhnacademy.byeol23backend.orderset.order.exception.OrderNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.order.repository.OrderRepository;
 import com.nhnacademy.byeol23backend.orderset.order.service.OrderService;
+import com.nhnacademy.byeol23backend.orderset.orderdetail.domain.OrderDetail;
+import com.nhnacademy.byeol23backend.orderset.orderdetail.repository.OrderDetailRepository;
 import com.nhnacademy.byeol23backend.orderset.payment.domain.Payment;
+import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentCancelRequest;
 import com.nhnacademy.byeol23backend.orderset.payment.exception.PaymentNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.payment.repository.PaymentRepository;
+import com.nhnacademy.byeol23backend.orderset.payment.service.PaymentService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class OrderServiceImpl implements OrderService {
 	private final OrderRepository orderRepository;
+	private final OrderDetailRepository orderDetailRepository;
+	private final BookRepository bookRepository;
 	private final PaymentRepository paymentRepository;
-	private final ObjectMapper objectMapper;
-	@Value("${tossPayment.secretKey}")
-	private String secretKey;
+	private final PaymentService paymentService;
+	private final DeliveryPolicyRepository deliveryPolicyRepository;
+	private static final String ORDER_STATUS_PAYMENT_COMPLETED = "결제 완료";
+	private static final String ORDER_STATUS_ORDER_CANCELED = "주문 취소";
+	private static final String PAYMENT_METHOD_POINT = "포인트 결제";
+	private static final String ORDER_NOT_FOUND_MESSAGE = "해당 주문 번호를 찾을 수 없습니다.: ";
+	private static final String PAYMENT_NOT_FOUND_MESSAGE = "해당 결제를 찾을 수 없습니다.: ";
+	private static final String DELIVERY_POLICY_NOT_FOUND_MESSAGE = "현재 배송 정책을 찾을 수 없습니다.";
 
 	@Override
 	@Transactional
@@ -51,78 +66,117 @@ public class OrderServiceImpl implements OrderService {
 		String randomPart = String.format("%06d", new Random().nextInt(1_000_000));
 		String orderId = timeStamp + randomPart;
 
-		Order order = new Order(orderId, request.totalBookPrice(), request.actualOrderPrice(),
-			LocalDateTime.now(), "대기", LocalDateTime.now().plusDays(3).toLocalDate(), request.receiver(),
-			request.postCode(), request.receiverAddress(), request.receiverAddressDetail(), request.receiverPhone());
+		DeliveryPolicy currentDeliveryPolicy = deliveryPolicyRepository.findFirstByOrderByChangedAtDesc()
+			.orElseThrow(() -> new DeliveryPolicyNotFoundException(DELIVERY_POLICY_NOT_FOUND_MESSAGE));
+
+		Order order = Order.of(orderId, request.totalBookPrice(), request.actualOrderPrice(),
+			request.deliveryArrivedDate(), request.receiver(), request.postCode(),
+			request.receiverAddress(), request.receiverAddressDetail(), request.receiverAddressExtra(),
+			request.receiverPhone(), currentDeliveryPolicy);
 
 		orderRepository.save(order);
+
+		for (BookInfoRequest bookInfoRequest : request.bookInfoRequestList()) {
+			Book book = bookRepository.findById(bookInfoRequest.bookId())
+				.orElseThrow(() -> new BookNotFoundException("해당 아이디의 도서가 존재하지 않습니다.: " + bookInfoRequest.bookId()));
+
+			OrderDetail orderDetail = OrderDetail.of(bookInfoRequest.quantity(), book.getSalePrice(),
+				book, null, order);
+
+			orderDetailRepository.save(orderDetail);
+		}
 
 		return new OrderPrepareResponse(order.getOrderNumber(), order.getActualOrderPrice(), order.getReceiver());
 	}
 
 	@Override
 	@Transactional
-	public OrderCreateResponse updateOrderStatus(String orderNumber) {
+	public OrderCreateResponse updateOrderStatus(String orderNumber, String orderStatus) {
 		Order order = orderRepository.findOrderByOrderNumber(orderNumber)
-			.orElseThrow(() -> new OrderNotFoundException("해당 주문 번호를 찾을 수 없습니다.: " + orderNumber));
+			.orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND_MESSAGE + orderNumber));
 
-		order.setOrderStatus("결제 완료");
+		order.updateOrderStatus(orderStatus);
 
 		return new OrderCreateResponse(orderNumber, order.getTotalBookPrice(), order.getActualOrderPrice(),
-			order.getOrderedAt(), order.getOrderStatus(), order.getDeliveryArrivedDate(), order.getReceiver(),
+			order.getOrderedAt(), order.getOrderStatus(), order.getReceiver(),
 			order.getPostCode(), order.getReceiverAddress(), order.getReceiverAddressDetail(),
 			order.getReceiverPhone());
 	}
 
 	@Override
-	@Transactional(readOnly = true)
-	public List<OrderInfoResponse> getAllOrders() {
-		List<Order> orderList = orderRepository.findAll();
+	@Transactional
+	public OrderCancelResponse cancelOrder(String orderNumber, OrderCancelRequest request) {
+		Order order = orderRepository.findOrderByOrderNumber(orderNumber)
+			.orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND_MESSAGE + orderNumber));
+		Payment payment = paymentRepository.findPaymentByOrder(order)
+			.orElseThrow(() -> new PaymentNotFoundException(PAYMENT_NOT_FOUND_MESSAGE + order.getOrderNumber()));
 
-		return orderList.stream()
-			.map(order -> new OrderInfoResponse(
-				order.getOrderNumber(),
-				order.getOrderedAt(),
-				order.getReceiver(),
-				order.getActualOrderPrice(),
-				order.getOrderStatus()
-			))
-			.collect(Collectors.toList());
+		PaymentCancelRequest paymentCancelRequest = new PaymentCancelRequest(request.cancelReason(),
+			payment.getPaymentKey());
+
+		paymentService.cancelPayment(paymentCancelRequest);
+
+		updateOrderStatusToCanceled(order.getOrderId());
+
+		return new OrderCancelResponse(order.getOrderNumber(), order.getActualOrderPrice(), order.getOrderStatus());
+	}
+
+	@Override
+	public OrderDetailResponse getOrderByOrderNumber(String orderNumber) {
+		Order order = orderRepository.findOrderByOrderNumber(orderNumber)
+			.orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND_MESSAGE + orderNumber));
+
+		List<OrderDetail> orderDetails = orderDetailRepository.findAllByOrderWithBook(order);
+
+		List<BookOrderInfoResponse> bookOrderInfoResponses = mapOrderDetailsToInfoResponses(orderDetails);
+
+		return new OrderDetailResponse(order.getOrderNumber(), order.getOrderedAt(), order.getOrderStatus(),
+			order.getActualOrderPrice(),
+			order.getReceiver(), order.getReceiverPhone(), order.getReceiverAddress(), order.getReceiverAddressDetail(),
+			order.getPostCode(), bookOrderInfoResponses);
+	}
+
+	@Override
+	public Page<OrderInfoResponse> searchOrders(OrderSearchCondition orderSearchCondition, Pageable pageable) {
+		Page<OrderInfoResponse> resultPage = orderRepository.searchOrders(orderSearchCondition, pageable);
+
+		return resultPage;
 	}
 
 	@Override
 	@Transactional
-	public HttpResponse cancelOrder(String orderNumber, OrderCancelRequest request) throws
-		IOException,
-		InterruptedException {
+	public PointOrderResponse createOrderWithPoints(String orderNumber) {
 		Order order = orderRepository.findOrderByOrderNumber(orderNumber)
-			.orElseThrow(() -> new OrderNotFoundException("해당 주문 번호를 찾을 수 없습니다.: " + orderNumber));
-		Payment payment = paymentRepository.findPaymentByOrder(order)
-			.orElseThrow(() -> new PaymentNotFoundException("해당 결제를 찾을 수 없습니다." + order.getOrderNumber()));
+			.orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND_MESSAGE + orderNumber));
 
-		JsonNode requestObj = objectMapper.createObjectNode()
-			.put("cancelReason", request.cancelReason());
+		order.updateOrderStatus(ORDER_STATUS_PAYMENT_COMPLETED);
 
-		String requestBody = objectMapper.writeValueAsString(requestObj);
-
-		HttpRequest httpRequest = HttpRequest.newBuilder()
-			.uri(
-				URI.create("https://api.tosspayments.com/v1/payments/" + payment.getPaymentKey() + "/cancel")
-			)
-			.header("Authorization", getAuthorizations())
-			.header("Content-Type", "application/json")
-			.method("POST", HttpRequest.BodyPublishers.ofString(requestBody))
-			.build();
-
-		order.setOrderStatus("주문 취소");
-
-		return HttpClient.newHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
+		return new PointOrderResponse(order.getOrderNumber(), order.getTotalBookPrice(), PAYMENT_METHOD_POINT);
 	}
 
-	private String getAuthorizations() {
-		String originalKey = secretKey + ":";
-		String encodedKey = Base64.getEncoder().encodeToString(originalKey.getBytes(StandardCharsets.UTF_8));
-		return "Basic " + encodedKey;
+	@Override
+	@Transactional
+	public void updateBulkOrderStatus(OrderBulkUpdateRequest request) {
+		orderRepository.updateOrderStatusByOrderNumbers(request.orderNumberLists(), request.status());
+	}
+
+	@Transactional
+	public void updateOrderStatusToCanceled(Long orderId) {
+		Order order = orderRepository.findById(orderId)
+			.orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND_MESSAGE + orderId));
+
+		order.updateOrderStatus(ORDER_STATUS_ORDER_CANCELED);
+	}
+
+	@Transactional(readOnly = true)
+	protected List<BookOrderInfoResponse> mapOrderDetailsToInfoResponses(List<OrderDetail> orderDetails) {
+		return orderDetails.stream()
+			.map(orderDetail -> new BookOrderInfoResponse(
+				orderDetail.getBook().getBookName(),
+				orderDetail.getQuantity(),
+				orderDetail.getOrderPrice()
+			))
+			.toList();
 	}
 
 }

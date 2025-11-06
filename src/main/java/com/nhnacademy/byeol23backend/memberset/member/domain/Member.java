@@ -4,69 +4,77 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.nhnacademy.byeol23backend.memberset.grade.domain.Grade;
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "members")
 @Getter
-@Setter
+@NoArgsConstructor
 public class Member {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "member_id")
 	private Long memberId;
 
+	@Setter
 	@Column(name = "login_id", nullable = false, length = 20)
 	private String loginId;
 
+	@Setter
 	@Column(name = "login_password", nullable = false)
 	private String loginPassword;
 
+	@Setter
 	@Column(name = "member_name", nullable = false, length = 50)
 	private String memberName;
 
+	@Setter
 	@Column(name = "nickname", nullable = false, length = 50)
 	private String nickname;
 
-	@Column(name = "phone_number", nullable = false, length = 11)
+	@Setter
+	@Column(name = "phone_number", nullable = false, length = 11, unique = true)
 	private String phoneNumber;
 
+	@Setter
 	@Column(name = "email", nullable = false, length = 50)
 	private String email;
 
+	//todo ZoneDate
+	@Setter
 	@Column(name = "birth_date", nullable = false)
 	private LocalDate birthday;
 
+	@Setter
 	@Column(name = "latest_logined_at")
 	private LocalDateTime latestLoginAt;
 
 	@Column(name = "joined_at", nullable = false)
 	private LocalDateTime joinedAt;
 
+	@Setter
 	@Column(name = "status", nullable = false, length = 10)
 	private String status;
 
+	@Setter
 	@Column(name = "current_point", nullable = false, precision = 10)
 	private BigDecimal currentPoint;
 
+	@Setter
 	@Column(name = "member_role", nullable = false, length = 10)
 	private String memberRole;
-	
+
 	@Column(name = "joined_from", nullable = false, length = 50)
 	private String joinedFrom;
 
-	@Column(name = "grade_id", nullable = false)
-	private Long gradeId;
-
-	@Column(name = "refresh_token")
-	private String refreshToken;
+	@Setter
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "grade_id", nullable = false)
+	private Grade grade;
 
 	@Override
 	public String toString() {
@@ -85,9 +93,5 @@ public class Member {
 		this.status = member.getStatus();
 		this.currentPoint = member.getCurrentPoint();
 		return member;
-	}
-
-	public void updatePassword(String newPassword) {
-		this.loginPassword = newPassword;
 	}
 }

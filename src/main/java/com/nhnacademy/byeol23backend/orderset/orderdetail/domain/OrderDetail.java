@@ -15,9 +15,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @Table(name = "order_details")
+@NoArgsConstructor
 public class OrderDetail {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,10 +39,25 @@ public class OrderDetail {
 	private Book book;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "packaging_id", nullable = false)
+	@JoinColumn(name = "packaging_id")
 	private Packaging packaging;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "order_id", nullable = false)
 	private Order order;
+
+	private OrderDetail(Integer quantity, BigDecimal orderPrice,
+		Book book, Packaging packaging, Order order) {
+		this.quantity = quantity;
+		this.orderPrice = orderPrice;
+		this.book = book;
+		this.packaging = packaging;
+		this.order = order;
+	}
+
+	public static OrderDetail of(Integer quantity, BigDecimal orderPrice,
+		Book book, Packaging packaging, Order order) {
+		return new OrderDetail(quantity, orderPrice, book, packaging, order);
+	}
+
 }

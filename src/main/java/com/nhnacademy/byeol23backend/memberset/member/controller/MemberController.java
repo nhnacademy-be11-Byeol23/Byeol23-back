@@ -30,23 +30,28 @@ public class MemberController {
 			.body(createdMember);
 	}
 
-	@GetMapping("/{memberId}")
+	@GetMapping("/{member-id}")
 	public ResponseEntity<MemberResponseDto> getMember(@PathVariable Long memberId) {
 		return ResponseEntity.ok(memberService.getMember(memberId));
 	}
 
-	@DeleteMapping("/{memberId}")
+	/**
+	 * 회원 삭제에 관한 요청을 처리한다.
+	 * @param memberId 회원아이디
+	 * @return ResponseEntity&lt;void&gt; NoContent&lt;204&gt; HTTP 응답 반환
+	 */
+	@DeleteMapping("/{member-id}")
 	public ResponseEntity<Void> deleteMember(@PathVariable Long memberId) {
 		memberService.deleteMember(memberId);
 		return ResponseEntity.noContent().build();
 	}
 
-	@PutMapping("/{memberId}")
+	@PutMapping("/{member-id}")
 	public ResponseEntity<MemberResponseDto> updateMember(@PathVariable Long memberId, @RequestBody Member member) {
-		member.setMemberId(memberId);
 		memberService.updateMember(member);
 		MemberResponseDto updatedMember = memberService.getMember(memberId);
 		return ResponseEntity.ok(updatedMember);
 	}
 
 }
+

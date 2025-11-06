@@ -8,7 +8,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
 @Entity
 @Table(name = "packaging")
 public class Packaging {
@@ -20,8 +23,9 @@ public class Packaging {
 	@Column(name = "packaging_name", nullable = false, length = 30)
 	private String packagingName;
 
-	@Column(name = "packaging_img", nullable = false)
-	private String packagingImg;
+	@Setter
+	@Column(name = "packaging_image_url")
+	private String packagingImgUrl;
 
 	@Column(name = "packaging_price", nullable = false, precision = 10)
 	private BigDecimal packagingPrice;

@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@Getter
 @Table(name = "publishers")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

@@ -9,13 +9,11 @@ public record BookUpdateRequest(
 	String description,
 	BigDecimal regularPrice,
 	BigDecimal salePrice,
-	String isbn,
 	LocalDate publishDate,
 	Boolean isPack,
 	String bookStatus,
 	Integer stock,
-	Long publisherId,
-	boolean isDeleted
+	Long publisherId
 ) {
 }
 

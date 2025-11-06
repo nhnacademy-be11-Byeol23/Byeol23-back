@@ -9,4 +9,6 @@ import com.nhnacademy.byeol23backend.orderset.payment.domain.Payment;
 
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
 	Optional<Payment> findPaymentByOrder(Order order);
+
+	Optional<Payment> findPaymentByPaymentKey(String paymentKey);
 }
