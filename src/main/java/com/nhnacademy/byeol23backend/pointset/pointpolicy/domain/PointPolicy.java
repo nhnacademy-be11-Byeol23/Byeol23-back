@@ -18,7 +18,7 @@ public class PointPolicy {
     @Column(name = "point_policy_name", nullable = false, length = 50)
     private String pointPolicyName;
 
-    @Column(name = "save_amont", nullable = false)
+    @Column(name = "save_amouont", nullable = false)
     private Integer saveAmount;
 
     private LocalDateTime createdAt;
