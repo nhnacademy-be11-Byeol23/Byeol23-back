@@ -3,7 +3,6 @@ package com.nhnacademy.byeol23backend.orderset.packaging.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.nhnacademy.byeol23backend.image.domain.ImageDomain;
 import com.nhnacademy.byeol23backend.image.dto.ImageUrlProjection;
 import com.nhnacademy.byeol23backend.image.service.ImageService;
 import com.nhnacademy.byeol23backend.orderset.packaging.domain.Packaging;
@@ -23,7 +22,7 @@ public class PackagingServiceImpl implements PackagingService, ImageService {
 	public String saveImageUrl(Long Id, String imageUrl) {
 		Packaging packaging = packagingRepository.findById(Id)
 			.orElseThrow(() -> new IllegalArgumentException("해당 포장재를 찾을 수 없습니다. 포장재 imageId: " + Id));
-		packaging.setPackagingImgUrl(imageUrl);
+		packaging.setPackagingImg(imageUrl);
 		packagingRepository.save(packaging);
 		return packaging.toString();
 	}
@@ -32,7 +31,7 @@ public class PackagingServiceImpl implements PackagingService, ImageService {
 	public List<ImageUrlProjection> getImageUrlsById(Long Id) {
 		String url = packagingRepository.findById(Id)
 			.orElseThrow(() -> new IllegalArgumentException("해당 포장재를 찾을 수 없습니다. 포장재 imageId: " + Id))
-			.getPackagingImgUrl();
+			.getPackagingImg();
 		List<ImageUrlProjection> imageUrlProjections = new ArrayList<>();
 		imageUrlProjections.add(new ImageUrlProjection(Id, url));
 		return imageUrlProjections;
@@ -40,18 +39,10 @@ public class PackagingServiceImpl implements PackagingService, ImageService {
 
 	@Override
 	@Transactional
-	public String deleteImageUrlsById(Long Id) {
+	public void deleteImageUrlsById(Long Id) {
 		Packaging packaging = packagingRepository.findById(Id)
 			.orElseThrow(() -> new IllegalArgumentException("해당 포장재를 찾을 수 없습니다. 포장재 imageId: " + Id));
-		packaging.setPackagingImgUrl(null);
-		String url = packaging.getPackagingImgUrl();
-		packaging.setPackagingImgUrl(null);
+		packaging.setPackagingImg(null);
 		packagingRepository.save(packaging);
-		return url;
-	}
-
-	@Override
-	public boolean isSupportedDomain(ImageDomain imageDomain) {
-		return imageDomain == ImageDomain.PACKAGING;
 	}
 }
