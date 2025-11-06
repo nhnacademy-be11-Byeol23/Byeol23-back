@@ -10,7 +10,6 @@ import com.nhnacademy.byeol23backend.bookset.bookcategory.domain.BookCategory;
 import com.nhnacademy.byeol23backend.bookset.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.byeol23backend.bookset.bookcategory.service.BookCategoryService;
 import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
-import com.nhnacademy.byeol23backend.bookset.category.exception.CategoryNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.category.repository.CategoryRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -36,14 +35,13 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 		if (categoryIds == null || categoryIds.isEmpty()) {
 			return;
 		}
-		log.info("새 카테고리 추가 시작");
-		for (Long categoryId : categoryIds) {
-			Category category = categoryRepository.findById(categoryId)
-				.orElseThrow(() -> new CategoryNotFoundException("존재하지 않는 카테고리 ID입니다: " + categoryId));
-			BookCategory bookCategory = BookCategory.of(book, category);
-			bookCategoryRepository.save(bookCategory);
-		}
-		log.info("새 카테고리 추가 완료");
+		List<Category> categories = categoryRepository.findAllById(categoryIds);
+
+		List<BookCategory> bookCategories = categories.stream()
+			.map(category -> BookCategory.of(book, category))
+			.toList();
+
+		bookCategoryRepository.saveAll(bookCategories);
 	}
 
 	@Override
@@ -52,15 +50,11 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 		// 기존 카테고리를 모두 삭제
 		bookCategoryRepository.deleteByBookId(book.getBookId());
 		log.info("기존 카테고리 삭제 완료");
-		
-		if (categoryIds != null && !categoryIds.isEmpty()) {
-			for (Long categoryId : categoryIds) {
-				Category category = categoryRepository.findById(categoryId)
-					.orElseThrow(() -> new CategoryNotFoundException("존재하지 않는 카테고리 ID입니다: " + categoryId));
-				BookCategory bookCategory = BookCategory.of(book, category);
-				bookCategoryRepository.save(bookCategory);
-			}
-		}
+		List<Category> categories = categoryRepository.findAllById(categoryIds);
+		List<BookCategory> bookCategories = categories.stream()
+			.map(category -> BookCategory.of(book, category))
+			.toList();
+		bookCategoryRepository.saveAll(bookCategories);
 		log.info("새 카테고리 추가 완료");
 	}
 }

@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.bookset.book.service.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.context.ApplicationEventPublisher;
@@ -17,6 +18,8 @@ import com.nhnacademy.byeol23backend.bookset.book.exception.BookNotFoundExceptio
 import com.nhnacademy.byeol23backend.bookset.book.exception.ISBNAlreadyExistException;
 import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
 import com.nhnacademy.byeol23backend.bookset.book.service.BookService;
+import com.nhnacademy.byeol23backend.bookset.bookcategory.domain.BookCategory;
+import com.nhnacademy.byeol23backend.bookset.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.byeol23backend.bookset.bookcategory.service.BookCategoryService;
 import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
 import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse;
@@ -36,6 +39,7 @@ public class BookServiceImpl implements BookService {
 	private final BookRepository bookRepository;
 	private final PublisherRepository publisherRepository;
 	private final ApplicationEventPublisher eventPublisher;
+	private final BookCategoryRepository bookCategoryRepository;
 	private final BookCategoryService bookCategoryService;
 
 	@Override
@@ -81,11 +85,10 @@ public class BookServiceImpl implements BookService {
 			.orElseThrow(() -> new PublisherNotFoundException("존재하지 않는 출판사 ID입니다: " + updateRequest.publisherId()));
 
 		book.updateBook(updateRequest, publisher);
-		Book savedBook = bookRepository.save(book);
-		bookCategoryService.updateBookCategories(savedBook, updateRequest.categoryIds());
-		log.info("도서 정보가 수정되었습니다. ID: {}", savedBook.getBookId());
+		bookCategoryService.updateBookCategories(book, updateRequest.categoryIds());
+		log.info("도서 정보가 수정되었습니다. ID: {}", book.getBookId());
 
-		return toResponse(savedBook);
+		return toResponse(book);
 	}
 
 	@Override
@@ -98,22 +101,38 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<BookResponse> getBooks(Pageable pageable) {
-		return bookRepository.findAll().stream()
-			.map(this::toResponse)
-			.collect(Collectors.toList());
+		//전체 도서 조회
+		List<Book> books = bookRepository.findAll();
+		if (books.isEmpty()) {
+			return List.of();
+		}
+		List<Long> bookIds = books.stream()
+			.map(Book::getBookId)
+			.toList();
+		//도서에 대한 카테고리정보 조회
+		List<BookCategory> bookCategories = bookCategoryRepository.findByBookIdsWithCategory(bookIds);
+
+		Map<Long, List<Category>> categoriesByBookId = bookCategories.stream()
+			.collect(Collectors.groupingBy(
+				bc -> bc.getBook().getBookId(),
+				Collectors.mapping(BookCategory::getCategory, Collectors.toList())
+			));
+
+		return books.stream()
+			.map(book -> toResponse(book, categoriesByBookId.getOrDefault(book.getBookId(), List.of())))
+			.toList();
 	}
 
-	private BookResponse toResponse(Book book) {
-		List<Category> categories = bookCategoryService.getCategoriesByBookId(book.getBookId());
+	private BookResponse toResponse(Book book, List<Category> categories) {
 		List<CategoryLeafResponse> categoryResponses = categories.stream()
 			.map(category -> new CategoryLeafResponse(
 				category.getCategoryId(),
 				category.getCategoryName(),
 				category.getPathName()
 			))
-			.collect(Collectors.toList());
+			.toList();
 
 		return new BookResponse(
 			book.getBookId(),
@@ -131,5 +150,10 @@ public class BookServiceImpl implements BookService {
 			book.isDeleted(),
 			categoryResponses
 		);
+	}
+
+	private BookResponse toResponse(Book book) {
+		List<Category> categories = bookCategoryService.getCategoriesByBookId(book.getBookId());
+		return toResponse(book, categories);
 	}
 }
