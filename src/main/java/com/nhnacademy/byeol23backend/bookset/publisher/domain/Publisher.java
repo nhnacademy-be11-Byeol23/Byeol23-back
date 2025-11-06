@@ -9,7 +9,6 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 
 @Entity
-@Getter
 @Table(name = "publishers")
 public class Publisher {
 	@Id
