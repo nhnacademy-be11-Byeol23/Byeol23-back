@@ -11,6 +11,7 @@ import lombok.Getter;
 @Entity
 @Getter
 @Table(name = "publishers")
+@Getter
 public class Publisher {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
