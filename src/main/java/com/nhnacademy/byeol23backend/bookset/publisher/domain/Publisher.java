@@ -12,6 +12,7 @@ import lombok.Getter;
 @Table(name = "publishers")
 public class Publisher {
 	@Id
+	@Getter
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "publisher_id")
 	private Long publisherId;
