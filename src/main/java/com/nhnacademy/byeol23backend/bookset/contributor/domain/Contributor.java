@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@Getter
 @Table(name = "contributors")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -24,12 +25,10 @@ public class Contributor {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "contributor_id")
-	@Getter
 	private Long contributorId;
 
 	@Column(name = "contributor_name", nullable = false, length = 20)
 	@Setter
-	@Getter
 	private String contributorName;
 
 	@Enumerated(EnumType.STRING)
