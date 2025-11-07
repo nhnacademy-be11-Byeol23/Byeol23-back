@@ -20,7 +20,7 @@ import jakarta.validation.constraints.Size;
  * @param nickname
  * @param phoneNumber
  * @param email
- * @param birthdate
+ * @param birthDate
  * @param memberRole
  * @param joinedFrom
  */
