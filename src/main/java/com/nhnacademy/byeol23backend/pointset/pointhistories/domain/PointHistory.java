@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Table(name = "point_histories")
 @Getter
 @NoArgsConstructor
-public class PointHistories {
+public class PointHistory {
     @Id
     @Column(name = "point_history_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,15 +30,16 @@ public class PointHistories {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member memberId;
 
-    @JoinColumn(name = "order_id", nullable = false)
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Order orderId;
-
-    @JoinColumn(name = "review_id", nullable = false)
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Review reviewId;
-
     @JoinColumn(name = "point_policy_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private PointPolicy pointPolicyId;
+
+	public PointHistory(
+		Member memberId,
+		PointPolicy pointPolicyId) {
+		this.pointAmount = pointPolicyId.getSaveAmount();
+		this.changedAt = LocalDateTime.now();
+		this.memberId = memberId;
+		this.pointPolicyId = pointPolicyId;
+	}
 }

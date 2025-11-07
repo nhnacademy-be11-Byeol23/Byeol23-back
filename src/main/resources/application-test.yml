@@ -7,6 +7,12 @@ spring:
     driver-class-name: org.h2.Driver
     username: sa
     password:
+  data:
+    redis:
+      host: ${REDIS_HOST:s4.java21.net}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:*N2vya7H@muDTwdNMR!}
+      database: ${REDIS_DATABASE:321}
 
   jpa:
     hibernate:

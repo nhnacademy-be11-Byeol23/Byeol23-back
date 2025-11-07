@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.orderset.orderdetail.domain.OrderDetail;
+import com.nhnacademy.byeol23backend.pointset.pointhistories.domain.PointHistory;
 import com.nhnacademy.byeol23backend.reviewset.reviewImage.domain.ReviewImage;
 
 
@@ -13,6 +14,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Entity
@@ -49,4 +51,8 @@ public class Review {
 	@OneToMany(mappedBy = "review", fetch = FetchType.LAZY, orphanRemoval = true)
 	private List<ReviewImage> reviewImageUrls = new ArrayList<>();
 
+	@OneToOne
+	@JoinColumn(name = "point_history_id", nullable = true)
+	@Setter
+	private PointHistory pointHistory;
 }

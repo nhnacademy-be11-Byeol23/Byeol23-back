@@ -1,10 +1,13 @@
 package com.nhnacademy.byeol23backend.pointset.pointpolicy.domain;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
 @Table(name = "point_policy")
 public class PointPolicy {
     @Id
@@ -19,7 +22,7 @@ public class PointPolicy {
     private String pointPolicyName;
 
     @Column(name = "save_amouont", nullable = false)
-    private Integer saveAmount;
+    private BigDecimal saveAmount;
 
     private LocalDateTime createdAt;
 
