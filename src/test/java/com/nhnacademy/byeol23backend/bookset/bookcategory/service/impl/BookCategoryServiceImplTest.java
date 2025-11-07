@@ -6,7 +6,6 @@ import static org.mockito.BDDMockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +20,6 @@ import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import com.nhnacademy.byeol23backend.bookset.bookcategory.domain.BookCategory;
 import com.nhnacademy.byeol23backend.bookset.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
-import com.nhnacademy.byeol23backend.bookset.category.exception.CategoryNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.category.repository.CategoryRepository;
 import com.nhnacademy.byeol23backend.bookset.publisher.domain.Publisher;
 
@@ -108,21 +106,21 @@ class BookCategoryServiceImplTest {
 	void createBookCategories_Success() {
 		// given
 		List<Long> categoryIds = List.of(1L, 2L);
-		BookCategory bookCategory1 = BookCategory.of(testBook, testCategory1);
-		BookCategory bookCategory2 = BookCategory.of(testBook, testCategory2);
+		List<Category> categories = List.of(testCategory1, testCategory2);
+		List<BookCategory> bookCategories = List.of(
+			BookCategory.of(testBook, testCategory1),
+			BookCategory.of(testBook, testCategory2)
+		);
 
-		given(categoryRepository.findById(1L)).willReturn(Optional.of(testCategory1));
-		given(categoryRepository.findById(2L)).willReturn(Optional.of(testCategory2));
-		given(bookCategoryRepository.save(any(BookCategory.class)))
-			.willReturn(bookCategory1, bookCategory2);
+		given(categoryRepository.findAllById(categoryIds)).willReturn(categories);
+		given(bookCategoryRepository.saveAll(anyList())).willReturn(bookCategories);
 
 		// when
 		bookCategoryService.createBookCategories(testBook, categoryIds);
 
 		// then
-		verify(categoryRepository, times(1)).findById(1L);
-		verify(categoryRepository, times(1)).findById(2L);
-		verify(bookCategoryRepository, times(2)).save(any(BookCategory.class));
+		verify(categoryRepository, times(1)).findAllById(categoryIds);
+		verify(bookCategoryRepository, times(1)).saveAll(anyList());
 	}
 
 	@Test
@@ -132,8 +130,8 @@ class BookCategoryServiceImplTest {
 		bookCategoryService.createBookCategories(testBook, null);
 
 		// then
-		verify(categoryRepository, never()).findById(anyLong());
-		verify(bookCategoryRepository, never()).save(any(BookCategory.class));
+		verify(categoryRepository, never()).findAllById(anyList());
+		verify(bookCategoryRepository, never()).saveAll(anyList());
 	}
 
 	@Test
@@ -143,42 +141,29 @@ class BookCategoryServiceImplTest {
 		bookCategoryService.createBookCategories(testBook, new ArrayList<>());
 
 		// then
-		verify(categoryRepository, never()).findById(anyLong());
-		verify(bookCategoryRepository, never()).save(any(BookCategory.class));
+		verify(categoryRepository, never()).findAllById(anyList());
+		verify(bookCategoryRepository, never()).saveAll(anyList());
 	}
 
 	@Test
-	@DisplayName("createBookCategories - 존재하지 않는 카테고리 ID로 인한 실패")
-	void createBookCategories_Fail_CategoryNotFound() {
-		// given
-		List<Long> categoryIds = List.of(999L);
-		given(categoryRepository.findById(999L)).willReturn(Optional.empty());
-
-		// when & then
-		assertThatThrownBy(() -> bookCategoryService.createBookCategories(testBook, categoryIds))
-			.isInstanceOf(CategoryNotFoundException.class)
-			.hasMessageContaining("존재하지 않는 카테고리 ID입니다: 999");
-
-		verify(categoryRepository, times(1)).findById(999L);
-		verify(bookCategoryRepository, never()).save(any(BookCategory.class));
-	}
-
-	@Test
-	@DisplayName("createBookCategories - 일부 카테고리가 존재하지 않는 경우 실패")
-	void createBookCategories_Fail_PartialCategoryNotFound() {
+	@DisplayName("createBookCategories - 존재하지 않는 카테고리 ID는 무시되고 존재하는 것만 저장")
+	void createBookCategories_WhenSomeCategoriesNotFound_SavesOnlyExisting() {
 		// given
 		List<Long> categoryIds = List.of(1L, 999L);
-		given(categoryRepository.findById(1L)).willReturn(Optional.of(testCategory1));
-		given(categoryRepository.findById(999L)).willReturn(Optional.empty());
+		List<Category> foundCategories = List.of(testCategory1); // 999L은 없음
+		List<BookCategory> bookCategories = List.of(
+			BookCategory.of(testBook, testCategory1)
+		);
 
-		// when & then
-		assertThatThrownBy(() -> bookCategoryService.createBookCategories(testBook, categoryIds))
-			.isInstanceOf(CategoryNotFoundException.class)
-			.hasMessageContaining("존재하지 않는 카테고리 ID입니다: 999");
+		given(categoryRepository.findAllById(categoryIds)).willReturn(foundCategories);
+		given(bookCategoryRepository.saveAll(anyList())).willReturn(bookCategories);
 
-		verify(categoryRepository, times(1)).findById(1L);
-		verify(categoryRepository, times(1)).findById(999L);
-		verify(bookCategoryRepository, never()).save(any(BookCategory.class));
+		// when
+		bookCategoryService.createBookCategories(testBook, categoryIds);
+
+		// then
+		verify(categoryRepository, times(1)).findAllById(categoryIds);
+		verify(bookCategoryRepository, times(1)).saveAll(anyList());
 	}
 
 	@Test
@@ -186,17 +171,20 @@ class BookCategoryServiceImplTest {
 	void createBookCategories_Success_SingleCategory() {
 		// given
 		List<Long> categoryIds = List.of(1L);
-		BookCategory bookCategory = BookCategory.of(testBook, testCategory1);
+		List<Category> categories = List.of(testCategory1);
+		List<BookCategory> bookCategories = List.of(
+			BookCategory.of(testBook, testCategory1)
+		);
 
-		given(categoryRepository.findById(1L)).willReturn(Optional.of(testCategory1));
-		given(bookCategoryRepository.save(any(BookCategory.class))).willReturn(bookCategory);
+		given(categoryRepository.findAllById(categoryIds)).willReturn(categories);
+		given(bookCategoryRepository.saveAll(anyList())).willReturn(bookCategories);
 
 		// when
 		bookCategoryService.createBookCategories(testBook, categoryIds);
 
 		// then
-		verify(categoryRepository, times(1)).findById(1L);
-		verify(bookCategoryRepository, times(1)).save(any(BookCategory.class));
+		verify(categoryRepository, times(1)).findAllById(categoryIds);
+		verify(bookCategoryRepository, times(1)).saveAll(anyList());
 	}
 
 	// ========== updateBookCategories 테스트 ==========
@@ -206,91 +194,101 @@ class BookCategoryServiceImplTest {
 	void updateBookCategories_Success() {
 		// given
 		List<Long> categoryIds = List.of(1L, 2L);
-		BookCategory bookCategory1 = BookCategory.of(testBook, testCategory1);
-		BookCategory bookCategory2 = BookCategory.of(testBook, testCategory2);
+		List<Category> categories = List.of(testCategory1, testCategory2);
+		List<BookCategory> bookCategories = List.of(
+			BookCategory.of(testBook, testCategory1),
+			BookCategory.of(testBook, testCategory2)
+		);
 
 		doNothing().when(bookCategoryRepository).deleteByBookId(testBook.getBookId());
-		given(categoryRepository.findById(1L)).willReturn(Optional.of(testCategory1));
-		given(categoryRepository.findById(2L)).willReturn(Optional.of(testCategory2));
-		given(bookCategoryRepository.save(any(BookCategory.class)))
-			.willReturn(bookCategory1, bookCategory2);
+		given(categoryRepository.findAllById(categoryIds)).willReturn(categories);
+		given(bookCategoryRepository.saveAll(anyList())).willReturn(bookCategories);
 
 		// when
 		bookCategoryService.updateBookCategories(testBook, categoryIds);
 
 		// then
 		verify(bookCategoryRepository, times(1)).deleteByBookId(testBook.getBookId());
-		verify(categoryRepository, times(1)).findById(1L);
-		verify(categoryRepository, times(1)).findById(2L);
-		verify(bookCategoryRepository, times(2)).save(any(BookCategory.class));
+		verify(categoryRepository, times(1)).findAllById(categoryIds);
+		verify(bookCategoryRepository, times(1)).saveAll(anyList());
 	}
 
 	@Test
-	@DisplayName("updateBookCategories - 카테고리 ID 리스트가 null인 경우 삭제만 수행")
-	void updateBookCategories_WhenCategoryIdsIsNull_DeletesOnly() {
+	@DisplayName("updateBookCategories - 카테고리 ID 리스트가 null인 경우 삭제만 수행하고 빈 리스트로 findAllById 호출")
+	void updateBookCategories_WhenCategoryIdsIsNull_DeletesAndCallsFindAllById() {
 		// given
 		doNothing().when(bookCategoryRepository).deleteByBookId(testBook.getBookId());
+		given(categoryRepository.findAllById(null)).willReturn(new ArrayList<>());
 
 		// when
 		bookCategoryService.updateBookCategories(testBook, null);
 
 		// then
 		verify(bookCategoryRepository, times(1)).deleteByBookId(testBook.getBookId());
-		verify(categoryRepository, never()).findById(anyLong());
-		verify(bookCategoryRepository, never()).save(any(BookCategory.class));
+		verify(categoryRepository, times(1)).findAllById(null);
+		verify(bookCategoryRepository, times(1)).saveAll(anyList());
 	}
 
 	@Test
-	@DisplayName("updateBookCategories - 카테고리 ID 리스트가 비어있는 경우 삭제만 수행")
-	void updateBookCategories_WhenCategoryIdsIsEmpty_DeletesOnly() {
+	@DisplayName("updateBookCategories - 카테고리 ID 리스트가 비어있는 경우 삭제만 수행하고 빈 리스트로 findAllById 호출")
+	void updateBookCategories_WhenCategoryIdsIsEmpty_DeletesAndCallsFindAllById() {
 		// given
+		List<Long> emptyList = new ArrayList<>();
 		doNothing().when(bookCategoryRepository).deleteByBookId(testBook.getBookId());
+		given(categoryRepository.findAllById(emptyList)).willReturn(new ArrayList<>());
 
 		// when
-		bookCategoryService.updateBookCategories(testBook, new ArrayList<>());
+		bookCategoryService.updateBookCategories(testBook, emptyList);
 
 		// then
 		verify(bookCategoryRepository, times(1)).deleteByBookId(testBook.getBookId());
-		verify(categoryRepository, never()).findById(anyLong());
-		verify(bookCategoryRepository, never()).save(any(BookCategory.class));
+		verify(categoryRepository, times(1)).findAllById(emptyList);
+		verify(bookCategoryRepository, times(1)).saveAll(anyList());
 	}
 
 	@Test
-	@DisplayName("updateBookCategories - 존재하지 않는 카테고리 ID로 인한 실패")
-	void updateBookCategories_Fail_CategoryNotFound() {
+	@DisplayName("updateBookCategories - 존재하지 않는 카테고리 ID는 무시되고 존재하는 것만 저장")
+	void updateBookCategories_WhenSomeCategoriesNotFound_SavesOnlyExisting() {
 		// given
-		List<Long> categoryIds = List.of(999L);
+		List<Long> categoryIds = List.of(1L, 999L);
+		List<Category> foundCategories = List.of(testCategory1); // 999L은 없음
+		List<BookCategory> bookCategories = List.of(
+			BookCategory.of(testBook, testCategory1)
+		);
+
 		doNothing().when(bookCategoryRepository).deleteByBookId(testBook.getBookId());
-		given(categoryRepository.findById(999L)).willReturn(Optional.empty());
+		given(categoryRepository.findAllById(categoryIds)).willReturn(foundCategories);
+		given(bookCategoryRepository.saveAll(anyList())).willReturn(bookCategories);
 
-		// when & then
-		assertThatThrownBy(() -> bookCategoryService.updateBookCategories(testBook, categoryIds))
-			.isInstanceOf(CategoryNotFoundException.class)
-			.hasMessageContaining("존재하지 않는 카테고리 ID입니다: 999");
+		// when
+		bookCategoryService.updateBookCategories(testBook, categoryIds);
 
+		// then
 		verify(bookCategoryRepository, times(1)).deleteByBookId(testBook.getBookId());
-		verify(categoryRepository, times(1)).findById(999L);
-		verify(bookCategoryRepository, never()).save(any(BookCategory.class));
+		verify(categoryRepository, times(1)).findAllById(categoryIds);
+		verify(bookCategoryRepository, times(1)).saveAll(anyList());
 	}
 
 	@Test
 	@DisplayName("updateBookCategories - 모든 카테고리 제거 후 새 카테고리 추가")
 	void updateBookCategories_ReplaceAllCategories_Success() {
 		// given
-		List<Long> oldCategoryIds = List.of(1L);
 		List<Long> newCategoryIds = List.of(2L);
-		BookCategory bookCategory = BookCategory.of(testBook, testCategory2);
+		List<Category> categories = List.of(testCategory2);
+		List<BookCategory> bookCategories = List.of(
+			BookCategory.of(testBook, testCategory2)
+		);
 
 		doNothing().when(bookCategoryRepository).deleteByBookId(testBook.getBookId());
-		given(categoryRepository.findById(2L)).willReturn(Optional.of(testCategory2));
-		given(bookCategoryRepository.save(any(BookCategory.class))).willReturn(bookCategory);
+		given(categoryRepository.findAllById(newCategoryIds)).willReturn(categories);
+		given(bookCategoryRepository.saveAll(anyList())).willReturn(bookCategories);
 
 		// when
 		bookCategoryService.updateBookCategories(testBook, newCategoryIds);
 
 		// then
 		verify(bookCategoryRepository, times(1)).deleteByBookId(testBook.getBookId());
-		verify(categoryRepository, times(1)).findById(2L);
-		verify(bookCategoryRepository, times(1)).save(any(BookCategory.class));
+		verify(categoryRepository, times(1)).findAllById(newCategoryIds);
+		verify(bookCategoryRepository, times(1)).saveAll(anyList());
 	}
 }
