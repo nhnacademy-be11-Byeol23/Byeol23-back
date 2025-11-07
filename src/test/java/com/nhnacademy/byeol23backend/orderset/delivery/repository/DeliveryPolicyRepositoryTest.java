@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 import com.nhnacademy.byeol23backend.config.QueryDslConfig;
@@ -26,6 +27,7 @@ import com.nhnacademy.byeol23backend.orderset.delivery.domain.DeliveryPolicy;
 @DataJpaTest
 @Import(QueryDslConfig.class)
 @TestPropertySource(properties = {"spring.sql.init.mode=never"})
+@ActiveProfiles("test")
 class DeliveryPolicyRepositoryTest {
 
 	@Autowired
