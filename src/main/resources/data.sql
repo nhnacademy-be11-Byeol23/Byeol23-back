@@ -18,12 +18,12 @@ values ('test', 'test', '테스트 데이터', '테스트트틋', '01012341234',
 
 -- contributor
 INSERT INTO contributors (contributor_role, contributor_name)
-VALUES ('작가', '한강'),
-       ('엮은이', '김경식'),
-       ('옮긴이', '김난주'),
-       ('작가', '가브리엘 가르시아 마르케스'),
-       ('작가', '다자이 오사무'),
-       ('옮긴이', '홍한별');
+VALUES ('AUTHOR', '한강'),
+       ('AUTHOR', '김경식'),
+       ('TRANSLATOR', '김난주'),
+       ('AUTHOR', '가브리엘 가르시아 마르케스'),
+       ('AUTHOR', '다자이 오사무'),
+       ('TRANSLATOR', '홍한별');
 
 
 -- publisher
