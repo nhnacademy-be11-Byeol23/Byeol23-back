@@ -27,7 +27,6 @@ import com.nhnacademy.byeol23backend.orderset.delivery.domain.DeliveryPolicy;
 @DataJpaTest
 @Import(QueryDslConfig.class)
 @TestPropertySource(properties = {"spring.sql.init.mode=never"})
-@ActiveProfiles("test")
 class DeliveryPolicyRepositoryTest {
 
 	@Autowired
