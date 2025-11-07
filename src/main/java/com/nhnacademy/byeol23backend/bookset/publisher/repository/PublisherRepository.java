@@ -1,7 +1,19 @@
 package com.nhnacademy.byeol23backend.bookset.publisher.repository;
 
-import com.nhnacademy.byeol23backend.bookset.publisher.domain.Publisher;
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
 
+import com.nhnacademy.byeol23backend.bookset.publisher.domain.Publisher;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
 public interface PublisherRepository extends JpaRepository<Publisher, Long> {
+	Publisher getPublisherByPublisherId(Long publisherId);
+
+	void deletePublisherByPublisherId(Long publisherId);
+
+	Publisher findPublisherByPublisherId(Long publisherId);
+
+	Optional<Publisher> findByPublisherId(Long publisherId);
 }

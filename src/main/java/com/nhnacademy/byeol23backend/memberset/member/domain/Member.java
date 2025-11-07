@@ -4,12 +4,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.nhnacademy.byeol23backend.memberset.grade.domain.Grade;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateRequest;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateRequest;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,7 +23,7 @@ public class Member {
 	private Long memberId;
 
 	@Setter
-	@Column(name = "login_id", nullable = false, length = 20)
+	@Column(name = "login_id", nullable = false, length = 20, unique = true)
 	private String loginId;
 
 	@Setter
@@ -37,21 +35,20 @@ public class Member {
 	private String memberName;
 
 	@Setter
-	@Column(name = "nickname", nullable = false, length = 50)
+	@Column(name = "nickname", nullable = false, length = 50, unique = true)
 	private String nickname;
 
 	@Setter
-	@Column(name = "phone_number", nullable = false, length = 11)
+	@Column(name = "phone_number", nullable = false, length = 11, unique = true)
 	private String phoneNumber;
 
 	@Setter
-	@Column(name = "email", nullable = false, length = 50)
+	@Column(name = "email", nullable = false, length = 50, unique = true)
 	private String email;
 
-	//todo ZoneDate
 	@Setter
 	@Column(name = "birth_date", nullable = false)
-	private LocalDate birthday;
+	private LocalDate birthDate;
 
 	@Setter
 	@Column(name = "latest_logined_at")
@@ -61,40 +58,66 @@ public class Member {
 	private LocalDateTime joinedAt;
 
 	@Setter
+	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false, length = 10)
-	private String status;
+	private Status status;
 
 	@Setter
 	@Column(name = "current_point", nullable = false, precision = 10)
 	private BigDecimal currentPoint;
 
 	@Setter
+	@Enumerated(EnumType.STRING)
 	@Column(name = "member_role", nullable = false, length = 10)
-	private String memberRole;
+	private Role memberRole;
 
+	@Enumerated(EnumType.STRING)
 	@Column(name = "joined_from", nullable = false, length = 50)
-	private String joinedFrom;
+	private RegistrationSource joinedFrom;
 
 	@Setter
-	@Column(name = "grade_id", nullable = false)
-	private Long gradeId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "grade_id", nullable = false)
+	private Grade grade;
 
-	@Override
-	public String toString() {
-		return "아이디: " + this.loginId
-			+ "이름: " + this.memberName
-			+ "닉네임: " + this.nickname;
+	public static Member create(String loginId, String loginPassword, String memberName, String nickname,
+		String phoneNumber, String email, LocalDate birthDate, Role memberRole, RegistrationSource joinedFrom, Grade grade) {
+		return new Member(loginId, loginPassword, memberName, nickname, phoneNumber, email, birthDate,
+			LocalDateTime.now(), Status.ACTIVE, BigDecimal.ZERO, memberRole, joinedFrom, grade);
 	}
 
-	public Member update(Member member) {
-		this.loginId = member.getLoginId();
-		this.memberName = member.getMemberName();
-		this.nickname = member.getNickname();
-		this.phoneNumber = member.getPhoneNumber();
-		this.email = member.getEmail();
-		this.birthday = member.getBirthday();
-		this.status = member.getStatus();
-		this.currentPoint = member.getCurrentPoint();
-		return member;
+	private Member(String loginId, String loginPassword, String memberName, String nickname,
+		String phoneNumber, String email, LocalDate birthDate, LocalDateTime joinedAt, Status status,
+		BigDecimal currentPoint, Role memberRole, RegistrationSource joinedFrom, Grade grade){
+		this.loginId = loginId;
+		this.loginPassword = loginPassword;
+		this.memberName = memberName;
+		this.nickname = nickname;
+		this.phoneNumber = phoneNumber;
+		this.email = email;
+		this.birthDate = birthDate;
+		this.joinedAt = joinedAt;
+		this.status = status;
+		this.currentPoint = currentPoint;
+		this.memberRole = memberRole;
+		this.joinedFrom = joinedFrom;
+		this.grade = grade;
 	}
+
+	public void updateMemberInfo(MemberUpdateRequest request) {
+		if(request.memberName() != null) this.memberName = request.memberName();
+		if(request.nickname() != null) this.nickname = request.nickname();
+		if(request.phoneNumber() != null) this.phoneNumber = request.phoneNumber();
+		if(request.email() != null) this.email = request.email();
+		if(request.birthDate() != null) this.birthDate = request.birthDate();
+	}
+
+	public void updatePassword(String newPassword) {
+		this.loginPassword = newPassword;
+	}
+
+	public void updateStatus(Status st) {
+		this.status = st;
+	}
+
 }

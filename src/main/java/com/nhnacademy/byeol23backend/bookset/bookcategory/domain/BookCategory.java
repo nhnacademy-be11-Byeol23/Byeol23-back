@@ -12,8 +12,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
+@NoArgsConstructor
 @Table(name = "book_category")
 public class BookCategory {
 	@Id
@@ -22,10 +26,19 @@ public class BookCategory {
 	private Long bookCategoryId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "book_id")
+	@JoinColumn(name = "book_id", nullable = false)
 	private Book book;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "category_id")
+	@JoinColumn(name = "category_id", nullable = false)
 	private Category category;
+
+	private BookCategory(Book book, Category category) {
+		this.book = book;
+		this.category = category;
+	}
+
+	public static BookCategory of(Book book, Category category) {
+		return new BookCategory(book, category);
+	}
 }

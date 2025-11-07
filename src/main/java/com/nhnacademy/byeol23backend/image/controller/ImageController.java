@@ -41,11 +41,11 @@ public class ImageController {
 	public ResponseEntity<String> deleteImage(
 		@RequestBody ImageDeleteRequest imageDeleteRequest
 	) {
-		imageServiceGate.deleteImageUrlsById(
+		String response = imageServiceGate.deleteImageUrlsById(
 			imageDeleteRequest.imageId(),
 			imageDeleteRequest.imageDomain()
 		);
-		return ResponseEntity.ok().body("success");
+		return ResponseEntity.ok().body(response);
 	}
 
 	@GetMapping("/urls/{domain}/{id}")
