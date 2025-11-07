@@ -12,8 +12,8 @@ public class CartController {
     private final CartService cartService;
 
     // memberId로 장바구니 조회
-    @GetMapping("/{memberId}")
-    public CartResponse getCartByMember(@PathVariable Long memberId) {
+    @GetMapping("/{member-id}")
+    public CartResponse getCartByMember(@PathVariable("member-id") Long memberId) {
         return cartService.getCartWithBooksByMemberId(memberId);
     }
 
