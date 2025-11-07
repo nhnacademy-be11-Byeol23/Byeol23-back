@@ -30,6 +30,7 @@ public class PackagingServiceImpl implements PackagingService, ImageService {
 	private final PackagingRepository packagingRepository;
 
 	@Override
+	@Transactional
 	public String saveImageUrl(Long Id, String imageUrl) {
 		Packaging packaging = packagingRepository.findById(Id)
 			.orElseThrow(() -> new IllegalArgumentException("해당 포장재를 찾을 수 없습니다. 포장재 imageId: " + Id));
@@ -77,6 +78,7 @@ public class PackagingServiceImpl implements PackagingService, ImageService {
 	}
 
 	@Override
+	@Transactional
 	public PackagingCreateResponse createPackaging(PackagingCreateRequest request) {
 		Packaging packaging = Packaging.of(request.packagingName(), request.packagingPrice());
 
