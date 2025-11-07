@@ -7,5 +7,7 @@ public record CartBookResponse(
         Long bookId,
         String bookName,
         BigDecimal salePrice,
-        int quantity
+        BigDecimal regularPrice,
+        int quantity,
+        String imageUrl
 ) {}

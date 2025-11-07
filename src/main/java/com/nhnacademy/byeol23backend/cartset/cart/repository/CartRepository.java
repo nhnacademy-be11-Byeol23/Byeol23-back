@@ -14,9 +14,10 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     @Query("""
         SELECT DISTINCT c
         FROM Cart c
+        JOIN c.member m
         LEFT JOIN FETCH c.cartBooks cb
         LEFT JOIN FETCH cb.book b
-        WHERE c.member.memberId = :memberId
+        WHERE m.memberId = :memberId
     """)
     Optional<Cart> findCartWithBooksByMemberId(@Param("memberId") Long memberId);
 }

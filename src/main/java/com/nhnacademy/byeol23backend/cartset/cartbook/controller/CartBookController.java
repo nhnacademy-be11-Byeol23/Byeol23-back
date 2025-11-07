@@ -25,8 +25,8 @@ public class CartBookController {
     }
 
     // 장바구니 도서 삭제
-    @DeleteMapping("/{cartBookId}")
-    public void deleteCartBook(@PathVariable Long cartBookId) {
+    @DeleteMapping("/{cart-book-id}")
+    public void deleteCartBook(@PathVariable("cart-book-id") Long cartBookId) {
         cartBookService.deleteCartItem(cartBookId);
     }
 }

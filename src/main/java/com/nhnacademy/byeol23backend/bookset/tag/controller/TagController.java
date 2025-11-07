@@ -32,8 +32,8 @@ import lombok.RequiredArgsConstructor;
 public class TagController {
 	private final TagService tagService;
 
-	@GetMapping("/{tagId}")
-	public ResponseEntity<TagInfoResponse> getTagByTagId(@PathVariable Long tagId){
+	@GetMapping("/{tag-id}")
+	public ResponseEntity<TagInfoResponse> getTagByTagId(@PathVariable(name = "tag-id") Long tagId){
 		TagInfoResponse response = tagService.getTagByTagId(tagId);
 		return ResponseEntity.ok(response);
 	}
@@ -48,14 +48,14 @@ public class TagController {
 	}
 
 
-	@DeleteMapping("/{tagId}")
-	public ResponseEntity<Void> deleteTagByTagId(@PathVariable Long tagId) {
+	@DeleteMapping("/{tag-id}")
+	public ResponseEntity<Void> deleteTagByTagId(@PathVariable(name = "tag-id") Long tagId) {
 		tagService.deleteTagByTagId(tagId);
 		return ResponseEntity.noContent().build();
 	}
 
-	@PutMapping("/{tagId}")
-	public ResponseEntity<TagUpdateResponse> updateTagByTagId(@PathVariable Long tagId, @RequestBody TagUpdateRequest tagRequestDto) {
+	@PutMapping("/{tag-id}")
+	public ResponseEntity<TagUpdateResponse> updateTagByTagId(@PathVariable(name = "tag-id") Long tagId, @RequestBody TagUpdateRequest tagRequestDto) {
 		TagUpdateResponse response = tagService.updateTagByTagId(tagId, tagRequestDto);
 		return ResponseEntity.ok(response);
 	}
@@ -63,7 +63,7 @@ public class TagController {
 	@GetMapping
 	public ResponseEntity<Page<AllTagsInfoResponse>> getAllTags(
 		@RequestParam(value = "page", defaultValue = "0") int page,
-		@RequestParam(value = "size", defaultValue = "20") int size
+		@RequestParam(value = "size", defaultValue = "10") int size
 	){
 		Pageable pageable = PageRequest.of(page, size);
 		return ResponseEntity.ok().body(tagService.getAllTags(pageable));
