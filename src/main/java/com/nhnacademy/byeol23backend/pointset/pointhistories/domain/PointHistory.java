@@ -24,22 +24,26 @@ public class PointHistory {
     @Column(name = "point_amount", precision = 10, nullable = false)
     private BigDecimal pointAmount;
 
+	@Column(name = "changed_at", nullable = false)
     private LocalDateTime changedAt;
 
     @JoinColumn(name = "member_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Member memberId;
 
-    @JoinColumn(name = "point_policy_id", nullable = false)
-    @ManyToOne(fetch = FetchType.LAZY)
-    private PointPolicy pointPolicyId;
+	@ManyToOne
+	@JoinColumn(name = "point_policy_name")
+	private PointPolicy pointPolicy;
 
 	public PointHistory(
-		Member memberId,
-		PointPolicy pointPolicyId) {
-		this.pointAmount = pointPolicyId.getSaveAmount();
+		Member member,
+		PointPolicy pointPolicy
+	) {
+		this.memberId = member;
+		this.pointPolicy = pointPolicy;
+		this.pointAmount = pointPolicy.getSaveAmount();
 		this.changedAt = LocalDateTime.now();
-		this.memberId = memberId;
-		this.pointPolicyId = pointPolicyId;
+
 	}
+
 }

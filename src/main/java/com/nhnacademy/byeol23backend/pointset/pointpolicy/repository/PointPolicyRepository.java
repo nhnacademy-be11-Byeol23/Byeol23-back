@@ -6,3 +6,4 @@ import com.nhnacademy.byeol23backend.pointset.pointpolicy.domain.PointPolicy;
 
 public interface PointPolicyRepository extends JpaRepository<PointPolicy, Integer> {
 }
+
