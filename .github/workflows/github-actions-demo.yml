@@ -10,6 +10,7 @@ env:
   PROD_DB_URL: ${{secrets.PROD_DB_URL}}
   PROD_DB_USERNAME: ${{secrets.PROD_DB_USERNAME}}
   PROD_DB_PASSWORD: ${{secrets.PROD_DB_PASSWORD}}
+  JWT_PUBLIC_KEY: ${{secrets.JWT_PUBLIC_KEY}}
 
 jobs:
   build-and-deploy:
