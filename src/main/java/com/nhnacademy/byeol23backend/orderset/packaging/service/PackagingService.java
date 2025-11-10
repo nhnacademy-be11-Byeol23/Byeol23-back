@@ -1,5 +1,7 @@
 package com.nhnacademy.byeol23backend.orderset.packaging.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -17,4 +19,6 @@ public interface PackagingService {
 	PackagingUpdateResponse updatePackaging(Long packagingId, PackagingUpdateRequest request);
 
 	void deletePackagingById(Long packagingId);
+
+	List<PackagingInfoResponse> getPackagingLists();
 }

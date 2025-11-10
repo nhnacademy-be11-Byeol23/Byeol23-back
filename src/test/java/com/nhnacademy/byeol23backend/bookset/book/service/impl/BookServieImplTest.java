@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import com.nhnacademy.byeol23backend.bookset.bookcategory.repository.BookCategoryRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,7 +27,10 @@ import com.nhnacademy.byeol23backend.bookset.book.dto.BookUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.exception.BookNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.book.exception.ISBNAlreadyExistException;
 import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
+import com.nhnacademy.byeol23backend.bookset.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.byeol23backend.bookset.bookcategory.service.BookCategoryService;
+import com.nhnacademy.byeol23backend.bookset.bookcontributor.repository.BookContributorRepository;
+import com.nhnacademy.byeol23backend.bookset.booktag.service.BookTagService;
 import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
 import com.nhnacademy.byeol23backend.bookset.publisher.domain.Publisher;
 import com.nhnacademy.byeol23backend.bookset.publisher.exception.PublisherNotFoundException;
@@ -55,6 +57,11 @@ class BookServieImplTest {
 	@InjectMocks
 	private BookServiceImpl bookService;
 
+	@Mock
+	private BookTagService bookTagService;
+
+	@Mock
+	private BookContributorRepository bookContributorRepository;
 	// ========== createBook 테스트 ==========
 
 	@Test
@@ -77,7 +84,8 @@ class BookServieImplTest {
 			"판매중",
 			12,
 			1L,
-			categoryIds
+			categoryIds,
+			List.of(1L, 2L)
 		);
 
 		Publisher mockPublisher = new Publisher();
@@ -119,13 +127,15 @@ class BookServieImplTest {
 		assertThat(result.isPack()).isTrue();
 		assertThat(result.bookStatus()).isEqualTo("판매중");
 		assertThat(result.stock()).isEqualTo(12);
-		assertThat(result.publisherId()).isEqualTo(1L);
+		assertThat(result.publisher()).isNotNull();
+		assertThat(result.publisher().publisherId()).isEqualTo(mockPublisher.getPublisherId()); // 또는 1L
+		assertThat(result.publisher().publisherName()).isEqualTo(mockPublisher.getPublisherName()); // 또는 "민음사"
 		assertThat(result.categories()).hasSize(2);
 		assertThat(result.categories().get(0).id()).isEqualTo(1L);
 		assertThat(result.categories().get(1).id()).isEqualTo(2L);
 
 		verify(bookRepository, times(1)).existsByIsbn("1234567890123");
-		verify(publisherRepository, times(1)).findById(1L);
+		verify(publisherRepository, times(2)).findById(1L);
 		verify(bookRepository, times(1)).save(any(Book.class));
 		verify(bookCategoryService, times(1)).createBookCategories(any(Book.class), eq(categoryIds));
 		verify(bookCategoryService, times(1)).getCategoriesByBookId(1L);
@@ -147,6 +157,7 @@ class BookServieImplTest {
 			"판매중",
 			12,
 			1L,
+			List.of(1L),
 			List.of(1L)
 		);
 
@@ -177,6 +188,7 @@ class BookServieImplTest {
 			"판매중",
 			12,
 			999L,
+			List.of(1L),
 			List.of(1L)
 		);
 
@@ -216,6 +228,8 @@ class BookServieImplTest {
 		given(bookRepository.findById(bookId)).willReturn(Optional.of(book));
 		given(bookCategoryService.getCategoriesByBookId(bookId))
 			.willReturn(List.of(category));
+		
+		given(publisherRepository.findById(1L)).willReturn(Optional.of(publisher));
 
 		// when
 		BookResponse result = bookService.getBook(bookId);
@@ -281,7 +295,8 @@ class BookServieImplTest {
 			"품절",
 			5,
 			2L,
-			categoryIds
+			categoryIds,
+			List.of(1L)
 		);
 
 		Publisher existingPublisher = new Publisher();
@@ -317,7 +332,7 @@ class BookServieImplTest {
 		assertThat(result).isNotNull();
 		assertThat(result.bookId()).isEqualTo(bookId);
 		verify(bookRepository, times(1)).findById(bookId);
-		verify(publisherRepository, times(1)).findById(2L);
+		verify(publisherRepository, times(2)).findById(2L);
 		verify(bookCategoryService, times(1)).updateBookCategories(any(Book.class), eq(categoryIds));
 		verify(bookCategoryService, times(1)).getCategoriesByBookId(bookId);
 	}
@@ -338,7 +353,8 @@ class BookServieImplTest {
 			"품절",
 			5,
 			1L,
-			List.of(1L)
+			List.of(1L),
+			List.of(2L)
 		);
 
 		given(bookRepository.findById(bookId)).willReturn(Optional.empty());
@@ -369,6 +385,7 @@ class BookServieImplTest {
 			"품절",
 			5,
 			999L,
+			List.of(1L),
 			List.of(1L)
 		);
 
@@ -427,51 +444,51 @@ class BookServieImplTest {
 
 	// ========== getBooks 테스트 ==========
 
-//	@Test
-//	@DisplayName("도서 목록 조회 성공")
-//	void getBooks_Success() {
-//		// given
-//		Pageable pageable = PageRequest.of(0, 10);
-//
-//		Publisher publisher1 = new Publisher();
-//		ReflectionTestUtils.setField(publisher1, "publisherId", 1L);
-//
-//		Publisher publisher2 = new Publisher();
-//		ReflectionTestUtils.setField(publisher2, "publisherId", 2L);
-//
-//		Book book1 = new Book();
-//		ReflectionTestUtils.setField(book1, "bookId", 1L);
-//		ReflectionTestUtils.setField(book1, "bookName", "도서1");
-//		ReflectionTestUtils.setField(book1, "publisher", publisher1);
-//
-//		Book book2 = new Book();
-//		ReflectionTestUtils.setField(book2, "bookId", 2L);
-//		ReflectionTestUtils.setField(book2, "bookName", "도서2");
-//		ReflectionTestUtils.setField(book2, "publisher", publisher2);
-//
-//		Category category1 = new Category("국내도서", null);
-//		ReflectionTestUtils.setField(category1, "categoryId", 1L);
-//		ReflectionTestUtils.setField(category1, "pathId", "1");
-//		ReflectionTestUtils.setField(category1, "pathName", "국내도서");
-//
-//		given(bookRepository.findAll()).willReturn(List.of(book1, book2));
-//		given(bookCategoryService.getCategoriesByBookId(1L))
-//			.willReturn(List.of(category1));
-//		given(bookCategoryService.getCategoriesByBookId(2L))
-//			.willReturn(List.of(category1));
-//
-//		// when
-//		List<BookResponse> result = bookService.getBooks(pageable);
-//
-//		// then
-//		assertThat(result).isNotNull();
-//		assertThat(result).hasSize(2);
-//		assertThat(result.get(0).bookId()).isEqualTo(1L);
-//		assertThat(result.get(1).bookId()).isEqualTo(2L);
-//		verify(bookRepository, times(1)).findAll();
-//		verify(bookCategoryService, times(1)).getCategoriesByBookId(1L);
-//		verify(bookCategoryService, times(1)).getCategoriesByBookId(2L);
-//	}
+	//	@Test
+	//	@DisplayName("도서 목록 조회 성공")
+	//	void getBooks_Success() {
+	//		// given
+	//		Pageable pageable = PageRequest.of(0, 10);
+	//
+	//		Publisher publisher1 = new Publisher();
+	//		ReflectionTestUtils.setField(publisher1, "publisherId", 1L);
+	//
+	//		Publisher publisher2 = new Publisher();
+	//		ReflectionTestUtils.setField(publisher2, "publisherId", 2L);
+	//
+	//		Book book1 = new Book();
+	//		ReflectionTestUtils.setField(book1, "bookId", 1L);
+	//		ReflectionTestUtils.setField(book1, "bookName", "도서1");
+	//		ReflectionTestUtils.setField(book1, "publisher", publisher1);
+	//
+	//		Book book2 = new Book();
+	//		ReflectionTestUtils.setField(book2, "bookId", 2L);
+	//		ReflectionTestUtils.setField(book2, "bookName", "도서2");
+	//		ReflectionTestUtils.setField(book2, "publisher", publisher2);
+	//
+	//		Category category1 = new Category("국내도서", null);
+	//		ReflectionTestUtils.setField(category1, "categoryId", 1L);
+	//		ReflectionTestUtils.setField(category1, "pathId", "1");
+	//		ReflectionTestUtils.setField(category1, "pathName", "국내도서");
+	//
+	//		given(bookRepository.findAll()).willReturn(List.of(book1, book2));
+	//		given(bookCategoryService.getCategoriesByBookId(1L))
+	//			.willReturn(List.of(category1));
+	//		given(bookCategoryService.getCategoriesByBookId(2L))
+	//			.willReturn(List.of(category1));
+	//
+	//		// when
+	//		List<BookResponse> result = bookService.getBooks(pageable);
+	//
+	//		// then
+	//		assertThat(result).isNotNull();
+	//		assertThat(result).hasSize(2);
+	//		assertThat(result.get(0).bookId()).isEqualTo(1L);
+	//		assertThat(result.get(1).bookId()).isEqualTo(2L);
+	//		verify(bookRepository, times(1)).findAll();
+	//		verify(bookCategoryService, times(1)).getCategoriesByBookId(1L);
+	//		verify(bookCategoryService, times(1)).getCategoriesByBookId(2L);
+	//	}
 
 	@Test
 	@DisplayName("도서 목록 조회 성공 - 빈 목록")
