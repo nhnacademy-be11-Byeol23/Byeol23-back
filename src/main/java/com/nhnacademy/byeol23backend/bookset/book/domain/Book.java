@@ -2,6 +2,7 @@ package com.nhnacademy.byeol23backend.bookset.book.domain;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,6 +80,9 @@ public class Book {
 	@Column(name = "view_count", columnDefinition = "BIGINT DEFAULT 0")
 	private long viewCount;
 
+	@Column(name = "updated_at", nullable = false)
+	private LocalDateTime updatedAt;
+
 	public void createBook(BookCreateRequest request, Publisher publisher) {
 		this.bookName = request.bookName();
 		this.toc = request.toc();
@@ -92,6 +96,7 @@ public class Book {
 		this.stock = request.stock();
 		this.publisher = publisher;
 		this.isDeleted = false;
+		this.updatedAt = LocalDateTime.now();
 	}
 
 	public void updateBook(BookUpdateRequest request, Publisher publisher) {
