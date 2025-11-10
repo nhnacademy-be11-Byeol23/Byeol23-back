@@ -1,9 +1,6 @@
 package com.nhnacademy.byeol23backend.pointset.pointhistories.domain;
 
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
-import com.nhnacademy.byeol23backend.orderset.order.domain.Order;
-import com.nhnacademy.byeol23backend.pointset.pointpolicy.domain.PointPolicy;
-import com.nhnacademy.byeol23backend.reviewset.review.domain.Review;
 import com.nhnacademy.byeol23backend.pointset.pointpolicy.domain.PointPolicy;
 import jakarta.persistence.*;
 import lombok.Getter;
