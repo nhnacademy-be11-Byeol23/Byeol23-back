@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.orderset.delivery.domain.DeliveryPolicy;
+import com.nhnacademy.byeol23backend.pointset.pointhistories.domain.PointHistory;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,9 +16,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import com.nhnacademy.byeol23backend.pointset.pointhistories.domain.PointHistory;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "orders")
@@ -75,6 +80,11 @@ public class Order {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "delivery_policy_id", nullable = false)
 	private DeliveryPolicy deliveryPolicy;
+
+	@Setter
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "point_history_id", nullable = true)
+	private PointHistory pointHistory;
 
 	private Order(String orderNumber, BigDecimal totalBookPrice, BigDecimal actualOrderPrice, LocalDateTime orderedAt,
 		String orderStatus, LocalDate deliveryDesiredDate, String receiver, String postCode, String receiverAddress,

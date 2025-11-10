@@ -42,6 +42,7 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 			.toList();
 
 		bookCategoryRepository.saveAll(bookCategories);
+		log.info("카테고리 추가 완료");
 	}
 
 	@Override
