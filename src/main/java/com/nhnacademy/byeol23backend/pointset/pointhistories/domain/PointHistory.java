@@ -43,7 +43,17 @@ public class PointHistory {
 		this.pointPolicy = pointPolicy;
 		this.pointAmount = pointPolicy.getSaveAmount();
 		this.changedAt = LocalDateTime.now();
+	}
 
+	public PointHistory(
+		Member member,
+		PointPolicy policy,
+		BigDecimal additionalAmount
+	) {
+		this.memberId = member;
+		this.pointPolicy = policy;
+		this.pointAmount = policy.getSaveAmount().add(additionalAmount);
+		this.changedAt = LocalDateTime.now();
 	}
 
 }
