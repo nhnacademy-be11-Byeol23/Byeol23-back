@@ -48,8 +48,8 @@ public class Review {
     @OneToMany(mappedBy = "review", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<ReviewImage> reviewImageUrls = new ArrayList<>();
 
-    @OneToOne
-    @JoinColumn(name = "point_history_id", nullable = true)
-    @Setter
-    private PointHistory pointHistory;
+	@OneToOne
+	@JoinColumn(name = "point_history_id", nullable = true)
+	@Setter
+	private PointHistory pointHistory;
 }
