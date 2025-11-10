@@ -21,10 +21,10 @@ import com.nhnacademy.byeol23backend.orderset.packaging.exception.PackagingNotFo
 import com.nhnacademy.byeol23backend.orderset.packaging.repository.PackagingRepository;
 import com.nhnacademy.byeol23backend.orderset.packaging.service.PackagingService;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PackagingServiceImpl implements PackagingService, ImageService {
 	private final PackagingRepository packagingRepository;
