@@ -22,11 +22,16 @@ import com.nhnacademy.byeol23backend.bookset.book.service.BookService;
 import com.nhnacademy.byeol23backend.bookset.bookcategory.domain.BookCategory;
 import com.nhnacademy.byeol23backend.bookset.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.byeol23backend.bookset.bookcategory.service.BookCategoryService;
+import com.nhnacademy.byeol23backend.bookset.booktag.domain.BookTag;
+import com.nhnacademy.byeol23backend.bookset.booktag.repository.BookTagRepository;
+import com.nhnacademy.byeol23backend.bookset.booktag.service.BookTagService;
 import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
 import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse;
 import com.nhnacademy.byeol23backend.bookset.publisher.domain.Publisher;
 import com.nhnacademy.byeol23backend.bookset.publisher.exception.PublisherNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.publisher.repository.PublisherRepository;
+import com.nhnacademy.byeol23backend.bookset.tag.domain.Tag;
+import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.AllTagsInfoResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +47,8 @@ public class BookServiceImpl implements BookService {
 	private final ApplicationEventPublisher eventPublisher;
 	private final BookCategoryRepository bookCategoryRepository;
 	private final BookCategoryService bookCategoryService;
+	private final BookTagRepository bookTagRepository;
+	private final BookTagService bookTagService;
 
 	@Override
 	@Transactional
@@ -56,6 +63,7 @@ public class BookServiceImpl implements BookService {
 		book.createBook(createRequest, publisher);
 		Book savedBook = bookRepository.save(book);
 		bookCategoryService.createBookCategories(savedBook, createRequest.categoryIds());
+		bookTagService.createBookTags(savedBook, createRequest.tagIds());
 		log.info("새로운 도서가 생성되었습니다. ID: {}", savedBook.getBookId());
 
 		return toResponse(savedBook);
@@ -87,6 +95,7 @@ public class BookServiceImpl implements BookService {
 
 		book.updateBook(updateRequest, publisher);
 		bookCategoryService.updateBookCategories(book, updateRequest.categoryIds());
+		bookTagService.updateBookTags(book, updateRequest.tagIds());
 		log.info("도서 정보가 수정되었습니다. ID: {}", book.getBookId());
 
 		return toResponse(book);
@@ -116,6 +125,8 @@ public class BookServiceImpl implements BookService {
 		}
 		List<BookCategory> bookCategoryList = bookCategoryRepository.findByBookIdsWithCategory(bookIdList);
 		Map<Long, List<Category>> bookIdToCategoryListMap = new HashMap<>();
+		List<BookTag> bookTagList = bookTagRepository.findByBookIdsWithTag(bookIdList);
+		Map<Long, List<Tag>> bookIdToTagListMap = new HashMap<>();
 
 		for (BookCategory bookCategoryItem : bookCategoryList) {
 			Book bookFromCategory = bookCategoryItem.getBook();
@@ -128,21 +139,35 @@ public class BookServiceImpl implements BookService {
 			List<Category> existingCategoryList = bookIdToCategoryListMap.get(bookIdFromCategory);
 			existingCategoryList.add(categoryFromBookCategory);
 		}
+		log.info("도서별 카테고리 정보 조회 완료");
+
+		for (BookTag bookTagItem : bookTagList) {
+			Book bookFromTag = bookTagItem.getBook();
+			Long bookIdFromTag = bookFromTag.getBookId();
+			Tag tagFromBookTag = bookTagItem.getTag();
+			if (!bookIdToTagListMap.containsKey(bookIdFromTag)) {
+				List<Tag> newTagList = new ArrayList<>();
+				bookIdToTagListMap.put(bookIdFromTag, newTagList);
+			}
+			List<Tag> existingTagList = bookIdToTagListMap.get(bookIdFromTag);
+			existingTagList.add(tagFromBookTag);
+		}
+		log.info("도서별 태그 정보 조회 완료");
 
 		List<BookResponse> bookResponseList = new ArrayList<>();
 
 		for (Book bookItem : bookList) {
 			Long currentBookId = bookItem.getBookId();
 			List<Category> categoryListForBook = bookIdToCategoryListMap.getOrDefault(currentBookId, new ArrayList<>());
-
-			BookResponse bookResponse = toResponse(bookItem, categoryListForBook);
+			List<Tag> tagListForBook = bookIdToTagListMap.getOrDefault(currentBookId, new ArrayList<>());
+			BookResponse bookResponse = toResponse(bookItem, categoryListForBook, tagListForBook);
 			bookResponseList.add(bookResponse);
 		}
 		log.info("도서 조회가 완료되었습니다.");
 		return bookResponseList;
 	}
 
-	private BookResponse toResponse(Book book, List<Category> categories) {
+	private BookResponse toResponse(Book book, List<Category> categories, List<Tag> tags) {
 		List<CategoryLeafResponse> categoryResponses = categories.stream()
 			.map(category -> new CategoryLeafResponse(
 				category.getCategoryId(),
@@ -150,7 +175,7 @@ public class BookServiceImpl implements BookService {
 				category.getPathName()
 			))
 			.toList();
-
+		List<AllTagsInfoResponse> tagResponses = tags.stream().map(AllTagsInfoResponse::new).toList();
 		return new BookResponse(
 			book.getBookId(),
 			book.getBookName(),
@@ -165,12 +190,14 @@ public class BookServiceImpl implements BookService {
 			book.getStock(),
 			book.getPublisher().getPublisherId(),
 			book.isDeleted(),
-			categoryResponses
+			categoryResponses,
+			tagResponses
 		);
 	}
 
 	private BookResponse toResponse(Book book) {
 		List<Category> categories = bookCategoryService.getCategoriesByBookId(book.getBookId());
-		return toResponse(book, categories);
+		List<Tag> tags = bookTagService.getTagsByBookId(book.getBookId());
+		return toResponse(book, categories, tags);
 	}
 }

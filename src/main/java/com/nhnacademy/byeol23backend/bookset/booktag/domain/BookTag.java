@@ -12,7 +12,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
+@NoArgsConstructor
 @Entity
 @Table(name = "book_tag")
 public class BookTag {
@@ -29,4 +33,12 @@ public class BookTag {
 	@JoinColumn(name = "tag_id", nullable = false)
 	private Tag tag;
 
+	private BookTag(Book book, Tag tag) {
+		this.book = book;
+		this.tag = tag;
+	}
+
+	public static BookTag of(Book book, Tag tag) {
+		return new BookTag(book, tag);
+	}
 }
