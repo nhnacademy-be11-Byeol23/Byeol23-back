@@ -4,6 +4,7 @@ import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.orderset.order.domain.Order;
 import com.nhnacademy.byeol23backend.pointset.pointpolicy.domain.PointPolicy;
 import com.nhnacademy.byeol23backend.reviewset.review.domain.Review;
+import com.nhnacademy.byeol23backend.pointset.pointpolicy.domain.PointPolicy;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +25,7 @@ public class PointHistory {
     @Column(name = "point_amount", precision = 10, nullable = false)
     private BigDecimal pointAmount;
 
-	@Column(name = "changed_at", nullable = false)
+    @Column(name = "changed_at", nullable = false)
     private LocalDateTime changedAt;
 
     @JoinColumn(name = "member_id", nullable = false)

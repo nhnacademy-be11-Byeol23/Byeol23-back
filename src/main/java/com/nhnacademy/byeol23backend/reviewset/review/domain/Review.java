@@ -20,36 +20,33 @@ import lombok.Setter;
 @Entity
 @Table(name = "reviews")
 public class Review {
-	@Id
-	@Column(name = "review_id")
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long reviewId;
+    @Id
+    @Column(name = "review_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long reviewId;
 
-  @Min(1)
-  @Max(5)
-  @Column(name = "review_rate")
-  private Byte reviewRate;
+    @Min(1)
+    @Max(5)
+    @Column(name = "review_rate")
+    private Byte reviewRate;
 
-  @Column(name = "review_content", columnDefinition = "text")
-  private String reviewContent;
+    @Column(name = "review_content", columnDefinition = "text")
+    private String reviewContent;
 
-//    @Column(name = "review_image")
-//    private String reviewImage;
+    private LocalDateTime createdAt;
 
-	private LocalDateTime createdAt;
+    private LocalDateTime revisedAt;
 
-	private LocalDateTime revisedAt;
+    @JoinColumn(name = "member_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member member;
 
-	@JoinColumn(name = "member_id", nullable = false)
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Member member;
+    @JoinColumn(name = "order_detail_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    private OrderDetail orderDetail;
 
-	@JoinColumn(name = "order_detail_id", nullable = false)
-	@OneToOne(fetch = FetchType.LAZY)
-	private OrderDetail orderDetail;
-
-	@OneToMany(mappedBy = "review", fetch = FetchType.LAZY, orphanRemoval = true)
-	private List<ReviewImage> reviewImageUrls = new ArrayList<>();
+    @OneToMany(mappedBy = "review", fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<ReviewImage> reviewImageUrls = new ArrayList<>();
 
 	@OneToOne
 	@JoinColumn(name = "point_history_id", nullable = true)

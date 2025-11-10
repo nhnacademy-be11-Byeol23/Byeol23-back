@@ -1,3 +1,4 @@
+
 package com.nhnacademy.byeol23backend.pointset.pointpolicy.domain;
 
 import jakarta.persistence.*;
