@@ -14,12 +14,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
+@SuppressWarnings("squid:S3516")
 @RequiredArgsConstructor
 public class ViewerIdInterceptor implements HandlerInterceptor {
     private final JwtParser jwtParser;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        if(!"GET".equalsIgnoreCase(request.getMethod())) return true;
         String authHeader = request.getHeader("Authorization");
         if(authHeader == null || !authHeader.startsWith("Bearer ")) {
             if(request.getCookies() != null) {
@@ -38,14 +40,13 @@ public class ViewerIdInterceptor implements HandlerInterceptor {
                             request.setAttribute("viewerId", "guest:%s".formatted(cookie.getValue()));
                             response.addCookie(cookie);
                         });
-                return true;
             }
             else {
                 Cookie cookie = createCookie();
                 request.setAttribute("viewerId", "guest:%s".formatted(cookie.getValue()));
                 response.addCookie(cookie);
-                return true;
             }
+            return true;
         }
         String token = authHeader.substring("Bearer ".length());
         Claims claims = jwtParser.parseToken(token);
