@@ -20,7 +20,7 @@ public interface BookCategoryRepository extends JpaRepository<BookCategory, Long
 	@Query("select bc.category from BookCategory bc where bc.book.bookId = :bookId")
 	List<Category> findCategoriesByBookId(@Param("bookId") Long bookId);
 
-	@Query("SELECT bc FROM BookCategory bc JOIN FETCH bc.category WHERE bc.book.bookId IN :bookIds")
+	@Query("select bc from BookCategory bc join fetch bc.category where bc.book.bookId in :bookIds")
 	List<BookCategory> findByBookIdsWithCategory(@Param("bookIds") List<Long> bookIds);
 
 	@Modifying
