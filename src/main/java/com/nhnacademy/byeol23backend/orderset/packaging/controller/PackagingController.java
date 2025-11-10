@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.orderset.packaging.controller;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -56,6 +57,11 @@ public class PackagingController {
 	public ResponseEntity<Void> deleteById(@PathVariable(name = "packaging-id") Long packagingId) {
 		packagingService.deletePackagingById(packagingId);
 		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/api/packagings")
+	public List<PackagingInfoResponse> getAllPackagingLists() {
+		return packagingService.getPackagingLists();
 	}
 
 }

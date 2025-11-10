@@ -22,12 +22,15 @@ import com.nhnacademy.byeol23backend.bookset.book.service.BookService;
 import com.nhnacademy.byeol23backend.bookset.bookcategory.domain.BookCategory;
 import com.nhnacademy.byeol23backend.bookset.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.byeol23backend.bookset.bookcategory.service.BookCategoryService;
+import com.nhnacademy.byeol23backend.bookset.bookcontributor.repository.BookContributorRepository;
 import com.nhnacademy.byeol23backend.bookset.booktag.domain.BookTag;
 import com.nhnacademy.byeol23backend.bookset.booktag.repository.BookTagRepository;
 import com.nhnacademy.byeol23backend.bookset.booktag.service.BookTagService;
 import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
 import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse;
+import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.AllContributorResponse;
 import com.nhnacademy.byeol23backend.bookset.publisher.domain.Publisher;
+import com.nhnacademy.byeol23backend.bookset.publisher.domain.dto.AllPublishersInfoResponse;
 import com.nhnacademy.byeol23backend.bookset.publisher.exception.PublisherNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.publisher.repository.PublisherRepository;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.Tag;
@@ -47,6 +50,7 @@ public class BookServiceImpl implements BookService {
 	private final ApplicationEventPublisher eventPublisher;
 	private final BookCategoryRepository bookCategoryRepository;
 	private final BookCategoryService bookCategoryService;
+	private final BookContributorRepository bookContributorRepository;
 	private final BookTagRepository bookTagRepository;
 	private final BookTagService bookTagService;
 
@@ -175,7 +179,25 @@ public class BookServiceImpl implements BookService {
 				category.getPathName()
 			))
 			.toList();
+
 		List<AllTagsInfoResponse> tagResponses = tags.stream().map(AllTagsInfoResponse::new).toList();
+
+		Publisher publisher = publisherRepository.findById(book.getPublisher().getPublisherId())
+			.orElseThrow(() -> new PublisherNotFoundException(
+				"해당 아이디의 출판사를 찾을 수 없습니다.: " + book.getPublisher().getPublisherId()));
+
+		AllPublishersInfoResponse publisherResponse = new AllPublishersInfoResponse(publisher.getPublisherId(),
+			publisher.getPublisherName());
+
+		List<AllContributorResponse> contributors = bookContributorRepository.getAllBookContributors()
+			.stream()
+			.map(bc -> new AllContributorResponse(
+				bc.getBookContributorId(),
+				bc.getContributor().getContributorName(),
+				bc.getContributor().getContributorRole()
+			))
+			.toList();
+
 		return new BookResponse(
 			book.getBookId(),
 			book.getBookName(),
@@ -188,10 +210,11 @@ public class BookServiceImpl implements BookService {
 			book.isPack(),
 			book.getBookStatus(),
 			book.getStock(),
-			book.getPublisher().getPublisherId(),
+			publisherResponse,
 			book.isDeleted(),
 			categoryResponses,
-			tagResponses
+			tagResponses,
+			contributors
 		);
 	}
 

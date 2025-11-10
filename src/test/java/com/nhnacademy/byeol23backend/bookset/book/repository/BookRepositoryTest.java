@@ -3,7 +3,6 @@ package com.nhnacademy.byeol23backend.bookset.book.repository;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -49,6 +48,7 @@ class BookRepositoryTest {
 				"판매중",
 				10,
 				1L,
+				List.of(),
 				List.of()
 			),
 			testPublisher
@@ -262,6 +262,7 @@ class BookRepositoryTest {
 				"판매중",
 				5,
 				1L,
+				List.of(),
 				List.of()
 			),
 			testPublisher
@@ -327,6 +328,7 @@ class BookRepositoryTest {
 				"판매중",
 				5,
 				1L,
+				List.of(),
 				List.of()
 			),
 			testPublisher

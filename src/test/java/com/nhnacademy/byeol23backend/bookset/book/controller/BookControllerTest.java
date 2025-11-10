@@ -27,6 +27,9 @@ import com.nhnacademy.byeol23backend.bookset.book.exception.BookNotFoundExceptio
 import com.nhnacademy.byeol23backend.bookset.book.exception.ISBNAlreadyExistException;
 import com.nhnacademy.byeol23backend.bookset.book.service.BookService;
 import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse;
+import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.AllContributorResponse;
+import com.nhnacademy.byeol23backend.bookset.publisher.domain.dto.AllPublishersInfoResponse;
+import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.AllTagsInfoResponse;
 
 @ExtendWith(MockitoExtension.class)
 class BookControllerTest {
@@ -44,6 +47,8 @@ class BookControllerTest {
 	void createBook_Success() {
 		// given
 		List<Long> categoryIds = List.of(1L, 2L);
+		List<Long> tagIds = List.of(1L, 2L);
+		List<AllContributorResponse> contributors = List.of(new AllContributorResponse(1L, "작가이름", "역할"));
 		BookCreateRequest createRequest = new BookCreateRequest(
 			"８월에 만나요",
 			"1장, 2장, 3장, 4장, 5장, 6장",
@@ -56,7 +61,8 @@ class BookControllerTest {
 			"판매중",
 			12,
 			1L,
-			categoryIds
+			categoryIds,
+			tagIds
 		);
 
 		BookResponse response = new BookResponse(
@@ -71,12 +77,16 @@ class BookControllerTest {
 			true,
 			"판매중",
 			12,
-			1L,
+			new AllPublishersInfoResponse(1L, "출판사1"),
 			false,
 			List.of(
 				new CategoryLeafResponse(1L, "국내도서", "국내도서"),
 				new CategoryLeafResponse(2L, "소설", "국내도서/소설")
-			)
+			),
+			List.of(
+				new AllTagsInfoResponse(1L, "태그 이름")
+			),
+			contributors
 		);
 
 		given(bookService.createBook(any(BookCreateRequest.class))).willReturn(response);
@@ -116,6 +126,7 @@ class BookControllerTest {
 			"판매중",
 			12,
 			1L,
+			List.of(),
 			List.of()
 		);
 
@@ -150,9 +161,11 @@ class BookControllerTest {
 			true,
 			"판매중",
 			12,
-			1L,
+			new AllPublishersInfoResponse(1L, "출판사 이름"),
 			false,
-			List.of(new CategoryLeafResponse(1L, "국내도서", "국내도서"))
+			List.of(new CategoryLeafResponse(1L, "국내도서", "국내도서")),
+			List.of(new AllTagsInfoResponse(1L, "태그 이름")),
+			List.of(new AllContributorResponse(1L, "기여자 이름", "역할"))
 		);
 
 		given(bookService.getBookAndIncreaseViewCount(bookId, viewerId)).willReturn(response);
@@ -207,7 +220,8 @@ class BookControllerTest {
 			"품절",
 			5,
 			2L,
-			List.of(1L, 2L)
+			List.of(1L, 2L),
+			List.of(1L)
 		);
 
 		BookResponse response = new BookResponse(
@@ -222,12 +236,15 @@ class BookControllerTest {
 			false,
 			"품절",
 			5,
-			2L,
+			new AllPublishersInfoResponse(1L, "출판사"),
 			false,
 			List.of(
 				new CategoryLeafResponse(1L, "국내도서", "국내도서"),
 				new CategoryLeafResponse(2L, "소설", "국내도서/소설")
-			)
+			),
+			List.of(new AllTagsInfoResponse(1L, "태그"),
+				new AllTagsInfoResponse(2L, "태그그")),
+			List.of(new AllContributorResponse(1L, "저자명", "저자"))
 		);
 
 		given(bookService.updateBook(bookId, updateRequest)).willReturn(response);
@@ -266,6 +283,7 @@ class BookControllerTest {
 			"품절",
 			5,
 			1L,
+			List.of(),
 			List.of()
 		);
 
@@ -333,10 +351,12 @@ class BookControllerTest {
 			false,
 			"판매중",
 			10,
-			1L,
+			new AllPublishersInfoResponse(1L, "출판사"),
 			false,
-			List.of(new CategoryLeafResponse(1L, "국내도서", "국내도서"))
-		);
+			List.of(new CategoryLeafResponse(1L, "국내도서", "국내도서")),
+			List.of(new AllTagsInfoResponse(1L, "태그 이름")),
+			List.of(new AllContributorResponse(1L, "기여자", "기여자 역할")
+			));
 
 		BookResponse book2 = new BookResponse(
 			2L,
@@ -350,10 +370,12 @@ class BookControllerTest {
 			false,
 			"판매중",
 			5,
-			1L,
+			new AllPublishersInfoResponse(1L, "출판사"),
 			false,
-			List.of(new CategoryLeafResponse(2L, "소설", "국내도서/소설"))
-		);
+			List.of(new CategoryLeafResponse(1L, "국내도서", "국내도서")),
+			List.of(new AllTagsInfoResponse(1L, "태그 이름")),
+			List.of(new AllContributorResponse(1L, "기여자", "기여자 역할")
+			));
 
 		List<BookResponse> books = List.of(book1, book2);
 		given(bookService.getBooks(any(Pageable.class))).willReturn(books);

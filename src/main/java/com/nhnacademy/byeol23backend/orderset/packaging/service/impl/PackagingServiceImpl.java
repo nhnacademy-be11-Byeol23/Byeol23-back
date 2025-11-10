@@ -109,4 +109,18 @@ public class PackagingServiceImpl implements PackagingService, ImageService {
 
 		packagingRepository.deleteById(packagingId);
 	}
+
+	@Override
+	public List<PackagingInfoResponse> getPackagingLists() {
+		List<Packaging> packagings = packagingRepository.findAll();
+
+		return packagings.stream()
+			.map(p -> new PackagingInfoResponse(
+				p.getPackagingId(),
+				p.getPackagingName(),
+				p.getPackagingPrice(),
+				p.getPackagingImgUrl()
+			))
+			.toList();
+	}
 }
