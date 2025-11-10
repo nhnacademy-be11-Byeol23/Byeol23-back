@@ -1,10 +1,10 @@
 spring:
   datasource:
+    url: ${PROD_DB_URL}
+    username: ${PROD_DB_USERNAME}
+    password: ${PROD_DB_PASSWORD}
     type: org.apache.commons.dbcp2.BasicDataSource
-    url: jdbc:mysql://s4.java21.net:13306/project_be11_team2?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: project_be11_team2
-    password: F@R_UmfIzCl0uW)8
     dbcp2:
       initial-size: 5
       max-total: 50
