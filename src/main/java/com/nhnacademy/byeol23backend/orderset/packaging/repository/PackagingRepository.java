@@ -1,11 +1,8 @@
 package com.nhnacademy.byeol23backend.orderset.packaging.repository;
 
-import java.util.List;
-
-import com.nhnacademy.byeol23backend.image.dto.ImageUrlProjection;
-import com.nhnacademy.byeol23backend.orderset.packaging.domain.Packaging;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+
+import com.nhnacademy.byeol23backend.orderset.packaging.domain.Packaging;
 
 public interface PackagingRepository extends JpaRepository<Packaging, Long> {
 
@@ -15,4 +12,5 @@ public interface PackagingRepository extends JpaRepository<Packaging, Long> {
 	// 		"WHERE p.packagingId = :packagingId"
 	// )
 	// List<ImageUrlProjection> getImageUrlsByPackagingId(Long packagingId);
+
 }

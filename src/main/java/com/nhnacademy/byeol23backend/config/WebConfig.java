@@ -18,7 +18,8 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new ViewerIdInterceptor(jwtParser));
+        registry.addInterceptor(new ViewerIdInterceptor(jwtParser))
+                .addPathPatterns("/api/books/*");
     }
 
     @Override

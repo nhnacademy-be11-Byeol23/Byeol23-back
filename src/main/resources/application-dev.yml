@@ -3,10 +3,16 @@ server:
 
 spring:
   datasource:
+    type: org.apache.commons.dbcp2.BasicDataSource
+
     url: jdbc:mysql://s4.java21.net:13306/project_be11_team2_dev?serverTimezone=UTC&characterEncoding=UTF-8
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: project_be11_team2
     password: F@R_UmfIzCl0uW)8
+    dbcp2:
+      initial-size: 5
+      max-total: 50
+
   data:
     redis:
       host: ${REDIS_HOST:s4.java21.net}
@@ -29,6 +35,6 @@ spring:
 jwt:
   public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiNJoRcPJmLQ7Ii+hv78JNhtSgo7w7u8TS3PsftAMKBvkqpeAInmnpra1usEPhXTVWOyLLxL6yJAymKY8lzDf3I74T0F4GJiomkjjOdIT5TEAc5X3um+IuHxu7Qapr0BuKwBvT4FCBJ9jzPOCq8xkh2q/AWGfOTlPLjBmAVnp2NbbV4aI5cQR6D9a/extPX6hhAtq/NZqE665L/SVIXqPabu2Owpvn90O6HtNXzg6ytk7Rj4FBx6YLtqHy0QAf8/o/Zc1nr+ZHwSsDQ+am6Sp2ZmUl03ScerF7EMtfZyzUqY46RFNgUkhB7iJb2hZ3xYGtR9SUI+PDvt2Kz6AETewhQIDAQAB
 
-#eureka:
-#  client:
-#    enabled: false
+eureka:
+  client:
+    enabled: false

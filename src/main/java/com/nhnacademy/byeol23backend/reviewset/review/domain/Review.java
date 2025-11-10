@@ -27,8 +27,8 @@ public class Review {
 
   @Min(1)
   @Max(5)
-  @Column(name = "review_rate", columnDefinition = "tinyint(1)")
-  private Integer reviewRate;
+  @Column(name = "review_rate")
+  private Byte reviewRate;
 
   @Column(name = "review_content", columnDefinition = "text")
   private String reviewContent;
