@@ -7,6 +7,9 @@ on:
 env:
   SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  PROD_DB_URL: ${{secrets.PROD_DB_URL}}
+  PROD_DB_USERNAME: ${{secrets.PROD_DB_USERNAME}}
+  PROD_DB_PASSWORD: ${{secrets.PROD_DB_PASSWORD}}
 
 jobs:
   build-and-deploy:
