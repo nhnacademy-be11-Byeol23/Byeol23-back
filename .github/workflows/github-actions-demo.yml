@@ -52,15 +52,15 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script_stop: true
           script: |
-            export PROD_DB_URL=${{ secrets.PROD_DB_URL }}
-            export PROD_DB_USERNAME=${{ secrets.PROD_DB_USERNAME }}
-            export PROD_DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}
-            export JWT_PUBLIC_KEY=${{ secrets.JWT_PUBLIC_KEY }}
+            export PROD_DB_URL="${{ secrets.PROD_DB_URL }}"
+            export PROD_DB_USERNAME="${{ secrets.PROD_DB_USERNAME }}"
+            export PROD_DB_PASSWORD="${{ secrets.PROD_DB_PASSWORD }}"
+            export JWT_PUBLIC_KEY="${{ secrets.JWT_PUBLIC_KEY }}"
             
-            export REDIS_HOST=${{ secrets.REDIS_HOST }}
-            export REDIS_PORT=${{ secrets.REDIS_PORT }}
-            export REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
-            export REDIS_DATABASE=${{ secrets.REDIS_DATABASE }}
+            export REDIS_HOST="${{ secrets.REDIS_HOST }}"
+            export REDIS_PORT="${{ secrets.REDIS_PORT }}"
+            export REDIS_PASSWORD="${{ secrets.REDIS_PASSWORD }}"
+            export REDIS_DATABASE="${{ secrets.REDIS_DATABASE }}"
             
             echo "--- GitHub Actions Debug ---"
             echo "Checking value: PROD_DB_URL"
