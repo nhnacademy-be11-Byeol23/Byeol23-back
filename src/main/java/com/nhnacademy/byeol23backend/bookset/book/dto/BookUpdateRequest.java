@@ -16,7 +16,8 @@ public record BookUpdateRequest(
 	Integer stock,
 	Long publisherId,
 	List<Long> categoryIds,
-	List<Long> tagIds
+	List<Long> tagIds,
+	List<Long> contributorIds
 ) {
 }
 

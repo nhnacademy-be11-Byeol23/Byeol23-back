@@ -48,14 +48,41 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	@Override
 	@Transactional
 	public void updateBookCategories(Book book, List<Long> categoryIds) {
-		// 기존 카테고리를 모두 삭제
-		bookCategoryRepository.deleteByBookId(book.getBookId());
-		log.info("기존 카테고리 삭제 완료");
-		List<Category> categories = categoryRepository.findAllById(categoryIds);
-		List<BookCategory> bookCategories = categories.stream()
-			.map(category -> BookCategory.of(book, category))
+		List<Category> oldCategories = getCategoriesByBookId(book.getBookId());
+		List<Long> oldCategoryIds = oldCategories.stream().map(Category::getCategoryId).toList();
+
+		List<Long> categoryIdsToAdd = categoryIds.stream()
+			.filter(id -> !oldCategoryIds.contains(id))
 			.toList();
-		bookCategoryRepository.saveAll(bookCategories);
-		log.info("새 카테고리 추가 완료");
+		
+		List<Long> categoryIdsToDelete = oldCategoryIds.stream()
+			.filter(id -> !categoryIds.contains(id))
+			.toList();
+
+		log.info("추가할 카테고리 ID: {}", categoryIdsToAdd);
+		log.info("삭제할 카테고리 ID: {}", categoryIdsToDelete);
+
+		if (categoryIdsToAdd.isEmpty() && categoryIdsToDelete.isEmpty()) {
+			log.info("카테고리 변경사항 없음");
+			return;
+		}
+
+		if (!categoryIdsToAdd.isEmpty()) {
+			List<Category> categoriesToAdd = categoryRepository.findAllById(categoryIdsToAdd);
+
+			List<BookCategory> bookCategories = categoriesToAdd.stream()
+				.map(category -> BookCategory.of(book, category))
+				.toList();
+
+			bookCategoryRepository.saveAll(bookCategories);
+			log.info("카테고리 {}개 추가 완료", categoryIdsToAdd.size());
+		}
+		
+		if (!categoryIdsToDelete.isEmpty()) {
+			bookCategoryRepository.deleteByBookIdAndCategoryIds(book.getBookId(), categoryIdsToDelete);
+			log.info("카테고리 {}개 삭제 완료", categoryIdsToDelete.size());
+		}
+		
+		log.info("카테고리 수정 완료");
 	}
 }

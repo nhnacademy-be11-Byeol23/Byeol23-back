@@ -29,6 +29,7 @@ public class BookTagServiceImpl implements BookTagService {
 	}
 
 	@Override
+	@Transactional
 	public void createBookTags(Book book, List<Long> tagIds) {
 		if (tagIds.isEmpty()) {
 			return;
@@ -42,12 +43,32 @@ public class BookTagServiceImpl implements BookTagService {
 	}
 
 	@Override
+	@Transactional
 	public void updateBookTags(Book book, List<Long> tagIds) {
-		bookTagRepository.deleteByBookId(book.getBookId());
-		log.info("기존 태그 삭제 완료");
-		List<Tag> tags = tagRepository.findAllById(tagIds);
-		List<BookTag> bookTags = tags.stream().map(tag -> BookTag.of(book, tag)).toList();
-		bookTagRepository.saveAll(bookTags);
-		log.info("새 태그 추가 완료");
+		List<Tag> oldTags = getTagsByBookId(book.getBookId());
+		List<Long> oldTagIds = oldTags.stream().map(Tag::getTagId).toList();
+
+		List<Long> tagIdsToAdd = tagIds.stream()
+			.filter(id -> !oldTagIds.contains(id))
+			.toList();
+		log.info(tagIdsToAdd.toString());
+		List<Long> tagIdsToDelete = oldTagIds.stream().filter(id -> !tagIds.contains(id)).toList();
+		log.info(tagIdsToDelete.toString());
+
+		if (tagIdsToAdd.isEmpty() && tagIdsToDelete.isEmpty()) {
+			return;
+		}
+
+		if (!tagIdsToAdd.isEmpty()) {
+			List<Tag> tags = tagRepository.findAllById(tagIds);
+
+			List<BookTag> bookTags = tags.stream().map(tag -> BookTag.of(book, tag)).toList();
+
+			bookTagRepository.saveAll(bookTags);
+		}
+		if (!tagIdsToDelete.isEmpty()) {
+			bookTagRepository.deleteByBookIdAndTagIds(book.getBookId(), tagIdsToDelete);
+		}
+		log.info("태그 수정 완료");
 	}
 }
