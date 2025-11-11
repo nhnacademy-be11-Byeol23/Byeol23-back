@@ -29,8 +29,7 @@ spring:
   quartz:
     job-store-type: jdbc
     jdbc:
-      initialize-schema: always
-      schema: classpath:sql/back_quartz_schema.sql
+      initialize-schema: never
 
     properties:
       org:
