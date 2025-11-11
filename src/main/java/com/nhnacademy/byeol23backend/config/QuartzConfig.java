@@ -1,17 +1,11 @@
 package com.nhnacademy.byeol23backend.config;
 
-import java.util.TimeZone;
-
-import org.quartz.CronScheduleBuilder;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
+import com.nhnacademy.byeol23backend.bookset.book.job.BookViewCountSyncJob;
+import org.quartz.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.nhnacademy.byeol23backend.bookset.book.job.BookViewCountSyncJob;
-import org.springframework.context.annotation.Profile;
+import java.util.TimeZone;
 
 @Configuration
 public class QuartzConfig {
@@ -31,7 +25,7 @@ public class QuartzConfig {
 			.forJob(bookViewCountSyncJobDetail())
 			.withIdentity("bookViewCountSyncTrigger")
 			.withSchedule(
-				CronScheduleBuilder.cronSchedule("*/30 * * * * ?").withMisfireHandlingInstructionFireAndProceed())
+				CronScheduleBuilder.cronSchedule("0 0/10 * * * ?").withMisfireHandlingInstructionFireAndProceed())
 			.build();
 	}
 

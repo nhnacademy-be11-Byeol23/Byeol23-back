@@ -5,12 +5,14 @@ import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
 import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryCreateRequest;
 import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryUpdateResponse;
+import com.nhnacademy.byeol23backend.bookset.category.event.CategoryTreeCacheUpdateEvent;
 import com.nhnacademy.byeol23backend.bookset.category.exception.CategoryDeleteReferencedByBookException;
 import com.nhnacademy.byeol23backend.bookset.category.exception.CategoryNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.category.repository.CategoryRepository;
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryCommandService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CategoryCommandServiceImpl implements CategoryCommandService {
     private final CategoryRepository categoryRepository;
     private final BookCategoryRepository bookCategoryRepository;
+    private final ApplicationEventPublisher publisher;
 
     @Override
     @Transactional
@@ -38,6 +41,7 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
         Category savedCategory = categoryRepository.save(saveCategory);
         setCategoryPath(parent, savedCategory);
         log.info("카테고리 생성:{}", savedCategory.getCategoryName());
+        publisher.publishEvent(new CategoryTreeCacheUpdateEvent());
     }
 
     @Override
@@ -56,6 +60,7 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
         updateCategory.updatePath(currentPathId, newPathName);
         categoryRepository.updateSubPathNames(currentPathId, oldPathName, newPathName);
         log.info("카테고리 수정:{}", updateCategoryName);
+        publisher.publishEvent(new CategoryTreeCacheUpdateEvent());
         return CategoryUpdateResponse.from(updateCategory);
     }
 

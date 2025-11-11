@@ -16,6 +16,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Table(name = "categories")
@@ -40,6 +41,7 @@ public class Category {
     @Column(name = "path_name", length = 1024)
     private String pathName;
 
+    @BatchSize(size = 100)
 	@OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Category> children = new ArrayList<>();
 
