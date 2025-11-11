@@ -63,13 +63,13 @@ jobs:
             export REDIS_DATABASE="${{ secrets.REDIS_DATABASE }}"
             
             echo "--- GitHub Actions Debug ---"
-            echo "Checking value: PROD_DB_URL"
-            echo "Checking value: PROD_DB_USERNAME"
+            echo "Checking value: $PROD_DB_URL"
+            echo "Checking value: $PROD_DB_USERNAME"
             
-            echo "Checking value: REDIS_HOST"
-            echo "Checking value: REDIS_PORT"
-            echo "Checking value: REDIS_PASSWORD"
-            echo "Checking value: REDIS_DATABASE"
+            echo "Checking value: $REDIS_HOST"
+            echo "Checking value: $REDIS_PORT"
+            echo "Checking value: $REDIS_PASSWORD"
+            echo "Checking value: $REDIS_DATABASE"
             echo "------------------------------"
             
             chmod +x ~/startup.sh
