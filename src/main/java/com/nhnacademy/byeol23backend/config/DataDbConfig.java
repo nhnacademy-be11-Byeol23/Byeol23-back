@@ -6,6 +6,7 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -15,6 +16,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import javax.sql.DataSource;
 import java.util.HashMap;
 
+@Profile("!test")
 @Configuration
 @EnableJpaRepositories(
         basePackages = {"com.nhnacademy.byeol23backend.bookset", "com.nhnacademy.byeol23backend.cartset", "com.nhnacademy.byeol23backend.couponset", "com.nhnacademy.byeol23backend.memberset", "com.nhnacademy.byeol23backend.orderset", "com.nhnacademy.byeol23backend.pointset", "com.nhnacademy.byeol23backend.reviewset"},

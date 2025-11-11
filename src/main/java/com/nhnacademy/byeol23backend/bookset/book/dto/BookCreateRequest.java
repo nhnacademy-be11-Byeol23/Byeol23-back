@@ -17,7 +17,8 @@ public record BookCreateRequest(
 	Integer stock,
 	Long publisherId,
 	List<Long> categoryIds,
-	List<Long> tagIds
+	List<Long> tagIds,
+	List<Long> contributorIds
 ) {
 }
 
