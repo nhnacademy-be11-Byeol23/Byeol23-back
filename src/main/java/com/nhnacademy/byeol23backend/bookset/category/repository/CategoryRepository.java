@@ -48,4 +48,9 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
                 from Category c1 where not exists (select 1 from Category c2 where c1.categoryId = c2.parent.categoryId)
         """)
     List<CategoryLeafResponse> findLeafCategories();
+
+    @Query("""
+        select distinct c from Category c left join fetch c.children c1 left join fetch c1.children c2 where c.parent is null order by c.categoryName
+        """)
+    List<Category> findCategoriesWithChildren2Depth();
 }

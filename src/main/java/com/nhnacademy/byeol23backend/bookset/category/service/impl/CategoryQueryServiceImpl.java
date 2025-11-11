@@ -1,7 +1,9 @@
 package com.nhnacademy.byeol23backend.bookset.category.service.impl;
 
+import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
 import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse;
 import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryListResponse;
+import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryTreeResponse;
 import com.nhnacademy.byeol23backend.bookset.category.repository.CategoryRepository;
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryQueryService;
 import lombok.RequiredArgsConstructor;
@@ -27,5 +29,12 @@ public class CategoryQueryServiceImpl implements CategoryQueryService {
     @Override
     public List<CategoryLeafResponse> getLeafCategories() {
         return categoryRepository.findLeafCategories();
+    }
+
+    @Override
+    public List<CategoryTreeResponse> getCategoriesWithChildren2Depth() {
+        List<Category> categories = categoryRepository.findCategoriesWithChildren2Depth();
+
+        return List.of();
     }
 }
