@@ -24,6 +24,10 @@ public interface BookCategoryRepository extends JpaRepository<BookCategory, Long
 	List<BookCategory> findByBookIdsWithCategory(@Param("bookIds") List<Long> bookIds);
 
 	@Modifying
+	@Query("delete from BookCategory bc where bc.book.bookId = :bookId and bc.category.categoryId in :categoryIds")
+	void deleteByBookIdAndCategoryIds(@Param("bookId") Long bookId, @Param("categoryIds") List<Long> categoryIds);
+
+	@Modifying
 	@Query("delete from BookCategory bc where bc.book.bookId = :bookId")
 	void deleteByBookId(@Param("bookId") Long bookId);
 }

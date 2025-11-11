@@ -33,4 +33,12 @@ public class BookContributor {
 	@JoinColumn(name = "contributor_id", nullable = false)
 	private Contributor contributor;
 
+	private BookContributor(Book book, Contributor contributor) {
+		this.book = book;
+		this.contributor = contributor;
+	}
+
+	public static BookContributor of(Book book, Contributor contributor) {
+		return new BookContributor(book, contributor);
+	}
 }

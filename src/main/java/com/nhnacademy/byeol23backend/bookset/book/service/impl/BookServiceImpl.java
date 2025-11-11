@@ -22,12 +22,15 @@ import com.nhnacademy.byeol23backend.bookset.book.service.BookService;
 import com.nhnacademy.byeol23backend.bookset.bookcategory.domain.BookCategory;
 import com.nhnacademy.byeol23backend.bookset.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.byeol23backend.bookset.bookcategory.service.BookCategoryService;
+import com.nhnacademy.byeol23backend.bookset.bookcontributor.domain.BookContributor;
 import com.nhnacademy.byeol23backend.bookset.bookcontributor.repository.BookContributorRepository;
+import com.nhnacademy.byeol23backend.bookset.bookcontributor.service.BookContributorService;
 import com.nhnacademy.byeol23backend.bookset.booktag.domain.BookTag;
 import com.nhnacademy.byeol23backend.bookset.booktag.repository.BookTagRepository;
 import com.nhnacademy.byeol23backend.bookset.booktag.service.BookTagService;
 import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
 import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse;
+import com.nhnacademy.byeol23backend.bookset.contributor.domain.Contributor;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.AllContributorResponse;
 import com.nhnacademy.byeol23backend.bookset.publisher.domain.Publisher;
 import com.nhnacademy.byeol23backend.bookset.publisher.domain.dto.AllPublishersInfoResponse;
@@ -53,6 +56,7 @@ public class BookServiceImpl implements BookService {
 	private final BookContributorRepository bookContributorRepository;
 	private final BookTagRepository bookTagRepository;
 	private final BookTagService bookTagService;
+	private final BookContributorService bookContributorService;
 
 	@Override
 	@Transactional
@@ -68,6 +72,7 @@ public class BookServiceImpl implements BookService {
 		Book savedBook = bookRepository.save(book);
 		bookCategoryService.createBookCategories(savedBook, createRequest.categoryIds());
 		bookTagService.createBookTags(savedBook, createRequest.tagIds());
+		bookContributorService.createBookContributors(savedBook, createRequest.contributorIds());
 		log.info("새로운 도서가 생성되었습니다. ID: {}", savedBook.getBookId());
 
 		return toResponse(savedBook);
@@ -100,6 +105,7 @@ public class BookServiceImpl implements BookService {
 		book.updateBook(updateRequest, publisher);
 		bookCategoryService.updateBookCategories(book, updateRequest.categoryIds());
 		bookTagService.updateBookTags(book, updateRequest.tagIds());
+		bookContributorService.updateBookContributors(book, updateRequest.contributorIds());
 		log.info("도서 정보가 수정되었습니다. ID: {}", book.getBookId());
 
 		return toResponse(book);
@@ -112,6 +118,8 @@ public class BookServiceImpl implements BookService {
 			.orElseThrow(() -> new BookNotFoundException("존재하지 않는 도서입니다: " + bookId));
 		bookRepository.delete(book);
 		bookCategoryRepository.deleteByBookId(bookId);
+		bookTagRepository.deleteByBookId(bookId);
+		bookContributorRepository.deleteByBookId(bookId);
 		log.info("도서가 삭제 처리되었습니다. ID: {}", bookId);
 	}
 
@@ -131,6 +139,8 @@ public class BookServiceImpl implements BookService {
 		Map<Long, List<Category>> bookIdToCategoryListMap = new HashMap<>();
 		List<BookTag> bookTagList = bookTagRepository.findByBookIdsWithTag(bookIdList);
 		Map<Long, List<Tag>> bookIdToTagListMap = new HashMap<>();
+		List<BookContributor> bookContributorList = bookContributorRepository.findByBookIdsWithContributor(bookIdList);
+		Map<Long, List<Contributor>> bookIdToContributorListMap = new HashMap<>();
 
 		for (BookCategory bookCategoryItem : bookCategoryList) {
 			Book bookFromCategory = bookCategoryItem.getBook();
@@ -158,20 +168,37 @@ public class BookServiceImpl implements BookService {
 		}
 		log.info("도서별 태그 정보 조회 완료");
 
+		for (BookContributor bookContributorItem : bookContributorList) {
+			Book bookFromContributor = bookContributorItem.getBook();
+			Long bookIdFromContributor = bookFromContributor.getBookId();
+			Contributor contributorFromBookContributor = bookContributorItem.getContributor();
+			if (!bookIdToContributorListMap.containsKey(bookIdFromContributor)) {
+				List<Contributor> newContributorList = new ArrayList<>();
+				bookIdToContributorListMap.put(bookIdFromContributor, newContributorList);
+			}
+			List<Contributor> existingContributorList = bookIdToContributorListMap.get(bookIdFromContributor);
+			existingContributorList.add(contributorFromBookContributor);
+		}
+		log.info("도서별 기여자 정보 조회 완료");
+
 		List<BookResponse> bookResponseList = new ArrayList<>();
 
 		for (Book bookItem : bookList) {
 			Long currentBookId = bookItem.getBookId();
 			List<Category> categoryListForBook = bookIdToCategoryListMap.getOrDefault(currentBookId, new ArrayList<>());
 			List<Tag> tagListForBook = bookIdToTagListMap.getOrDefault(currentBookId, new ArrayList<>());
-			BookResponse bookResponse = toResponse(bookItem, categoryListForBook, tagListForBook);
+			List<Contributor> contributorListForBook = bookIdToContributorListMap.getOrDefault(currentBookId,
+				new ArrayList<>());
+			BookResponse bookResponse = toResponse(bookItem, categoryListForBook, tagListForBook,
+				contributorListForBook);
 			bookResponseList.add(bookResponse);
 		}
 		log.info("도서 조회가 완료되었습니다.");
 		return bookResponseList;
 	}
 
-	private BookResponse toResponse(Book book, List<Category> categories, List<Tag> tags) {
+	private BookResponse toResponse(Book book, List<Category> categories, List<Tag> tags,
+		List<Contributor> contributors) {
 		List<CategoryLeafResponse> categoryResponses = categories.stream()
 			.map(category -> new CategoryLeafResponse(
 				category.getCategoryId(),
@@ -182,21 +209,16 @@ public class BookServiceImpl implements BookService {
 
 		List<AllTagsInfoResponse> tagResponses = tags.stream().map(AllTagsInfoResponse::new).toList();
 
+		List<AllContributorResponse> contributorResonses = contributors.stream()
+			.map(AllContributorResponse::new)
+			.toList();
+
 		Publisher publisher = publisherRepository.findById(book.getPublisher().getPublisherId())
 			.orElseThrow(() -> new PublisherNotFoundException(
 				"해당 아이디의 출판사를 찾을 수 없습니다.: " + book.getPublisher().getPublisherId()));
 
 		AllPublishersInfoResponse publisherResponse = new AllPublishersInfoResponse(publisher.getPublisherId(),
 			publisher.getPublisherName());
-
-		List<AllContributorResponse> contributors = bookContributorRepository.getAllBookContributors()
-			.stream()
-			.map(bc -> new AllContributorResponse(
-				bc.getBookContributorId(),
-				bc.getContributor().getContributorName(),
-				bc.getContributor().getContributorRole()
-			))
-			.toList();
 
 		return new BookResponse(
 			book.getBookId(),
@@ -214,13 +236,14 @@ public class BookServiceImpl implements BookService {
 			book.isDeleted(),
 			categoryResponses,
 			tagResponses,
-			contributors
+			contributorResonses
 		);
 	}
 
 	private BookResponse toResponse(Book book) {
 		List<Category> categories = bookCategoryService.getCategoriesByBookId(book.getBookId());
 		List<Tag> tags = bookTagService.getTagsByBookId(book.getBookId());
-		return toResponse(book, categories, tags);
+		List<Contributor> contributors = bookContributorService.getContributorsByBookId(book.getBookId());
+		return toResponse(book, categories, tags, contributors);
 	}
 }
