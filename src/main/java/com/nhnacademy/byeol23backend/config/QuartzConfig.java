@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.nhnacademy.byeol23backend.bookset.book.job.BookViewCountSyncJob;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class QuartzConfig {
