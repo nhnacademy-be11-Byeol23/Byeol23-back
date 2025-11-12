@@ -2,6 +2,8 @@ package com.nhnacademy.byeol23backend.orderset.refundpolicy.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,6 +21,7 @@ public class RefundPolicy {
 	@Column(name = "refund_policy_id")
 	private Long refundPolicyId;
 
+	@Enumerated(EnumType.STRING)
 	@Column(name = "refund_option", nullable = false, length = 30)
 	private RefundOption refundOption;
 
