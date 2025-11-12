@@ -1,7 +1,5 @@
 package com.nhnacademy.byeol23backend.orderset.refundpolicy.domain;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,25 +20,6 @@ public class RefundPolicy {
 	private Long refundPolicyId;
 
 	@Column(name = "refund_policy_name", nullable = false, length = 30)
-	private String refundPolicyName;
+	private RefundReason refundPolicyName;
 
-	@Column(name = "refund_condition", nullable = false, length = 20)
-	private String refundCondition;
-
-	@Column(name = "comment", nullable = false, columnDefinition = "text")
-	private String comment;
-
-	private LocalDateTime changedAt;
-
-	private RefundPolicy(String refundPolicyName, String refundCondition, String comment, LocalDateTime changedAt) {
-		this.refundPolicyName = refundPolicyName;
-		this.refundCondition = refundCondition;
-		this.comment = comment;
-		this.changedAt = changedAt;
-	}
-
-	public static RefundPolicy of(String refundPolicyName, String refundCondition, String comment,
-		LocalDateTime changedAt) {
-		return new RefundPolicy(refundPolicyName, refundCondition, comment, changedAt);
-	}
 }
