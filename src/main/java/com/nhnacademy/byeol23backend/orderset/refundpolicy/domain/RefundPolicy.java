@@ -22,4 +22,6 @@ public class RefundPolicy {
 	@Column(name = "refund_policy_name", nullable = false, length = 30)
 	private RefundReason refundPolicyName;
 
+	@Column(name = "refund_option", nullable = false, length = 30)
+	private RefundOption refundOption;
 }
