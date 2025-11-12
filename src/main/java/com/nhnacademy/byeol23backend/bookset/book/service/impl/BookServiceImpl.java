@@ -25,6 +25,7 @@ import com.nhnacademy.byeol23backend.bookset.bookcategory.service.BookCategorySe
 import com.nhnacademy.byeol23backend.bookset.bookcontributor.domain.BookContributor;
 import com.nhnacademy.byeol23backend.bookset.bookcontributor.repository.BookContributorRepository;
 import com.nhnacademy.byeol23backend.bookset.bookcontributor.service.BookContributorService;
+import com.nhnacademy.byeol23backend.bookset.bookimage.service.BookImageServiceImpl;
 import com.nhnacademy.byeol23backend.bookset.booktag.domain.BookTag;
 import com.nhnacademy.byeol23backend.bookset.booktag.repository.BookTagRepository;
 import com.nhnacademy.byeol23backend.bookset.booktag.service.BookTagService;
@@ -38,6 +39,7 @@ import com.nhnacademy.byeol23backend.bookset.publisher.exception.PublisherNotFou
 import com.nhnacademy.byeol23backend.bookset.publisher.repository.PublisherRepository;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.Tag;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.AllTagsInfoResponse;
+import com.nhnacademy.byeol23backend.image.dto.GetUrlResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,6 +59,7 @@ public class BookServiceImpl implements BookService {
 	private final BookTagRepository bookTagRepository;
 	private final BookTagService bookTagService;
 	private final BookContributorService bookContributorService;
+	private final BookImageServiceImpl bookImageService;
 
 	@Override
 	@Transactional
@@ -220,6 +223,10 @@ public class BookServiceImpl implements BookService {
 		AllPublishersInfoResponse publisherResponse = new AllPublishersInfoResponse(publisher.getPublisherId(),
 			publisher.getPublisherName());
 
+		List<GetUrlResponse> imageResponses = bookImageService.getImageUrlsById(book.getBookId()).stream()
+			.map(projection -> new GetUrlResponse(projection.getUrlId(), projection.getImageUrl()))
+			.toList();
+
 		return new BookResponse(
 			book.getBookId(),
 			book.getBookName(),
@@ -236,7 +243,8 @@ public class BookServiceImpl implements BookService {
 			book.isDeleted(),
 			categoryResponses,
 			tagResponses,
-			contributorResonses
+			contributorResonses,
+			imageResponses
 		);
 	}
 

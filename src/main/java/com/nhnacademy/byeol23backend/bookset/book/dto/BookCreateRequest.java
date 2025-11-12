@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public record BookCreateRequest(
 	String bookName,
 	String toc,
@@ -18,7 +20,13 @@ public record BookCreateRequest(
 	Long publisherId,
 	List<Long> categoryIds,
 	List<Long> tagIds,
-	List<Long> contributorIds
+	List<Long> contributorIds,
+	List<MultipartFile> images
 ) {
+	public BookCreateRequest {
+		if (images == null) {
+			images = List.of();
+		}
+	}
 }
 

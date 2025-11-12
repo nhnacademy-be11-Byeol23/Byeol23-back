@@ -1,5 +1,6 @@
 package com.nhnacademy.byeol23backend.config;
 
+import com.nhnacademy.byeol23backend.bookset.book.interceptor.GuestIdCookieInterceptor;
 import com.nhnacademy.byeol23backend.bookset.book.interceptor.ViewerIdInterceptor;
 import com.nhnacademy.byeol23backend.bookset.book.resolver.ViewerIdResolver;
 import com.nhnacademy.byeol23backend.bookset.book.utils.JwtParser;
@@ -18,6 +19,9 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new GuestIdCookieInterceptor())
+                .addPathPatterns("/api/**");
+
         registry.addInterceptor(new ViewerIdInterceptor(jwtParser))
                 .addPathPatterns("/api/books/*");
     }

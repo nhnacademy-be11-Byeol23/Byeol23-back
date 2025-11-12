@@ -11,7 +11,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 
-@Profile("!test")
+@Profile("prod")
 @Configuration
 public class QuartzDbConfig {
     @Bean

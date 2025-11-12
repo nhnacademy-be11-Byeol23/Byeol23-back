@@ -11,11 +11,6 @@ import com.nhnacademy.byeol23backend.bookset.bookcontributor.domain.BookContribu
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.Contributor;
 
 public interface BookContributorRepository extends JpaRepository<BookContributor, Long> {
-	@Query("SELECT bc FROM BookContributor bc " +
-		"JOIN FETCH bc.book " +
-		"JOIN FETCH bc.contributor")
-	List<BookContributor> getAllBookContributors();
-
 	@Query("select bc.contributor from BookContributor bc where bc.book.bookId = :bookId")
 	List<Contributor> findContributorByBookId(@Param("bookId") Long bookId);
 
@@ -30,4 +25,8 @@ public interface BookContributorRepository extends JpaRepository<BookContributor
 	@Modifying
 	@Query("delete from BookContributor bc where bc.book.bookId = :bookId")
 	void deleteByBookId(@Param("bookId") Long bookId);
+	@Query("SELECT bc FROM BookContributor bc " +
+		"JOIN FETCH bc.book " +
+		"JOIN FETCH bc.contributor")
+	List<BookContributor> getAllBookContributors();
 }

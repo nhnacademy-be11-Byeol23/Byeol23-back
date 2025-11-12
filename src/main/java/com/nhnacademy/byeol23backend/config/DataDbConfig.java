@@ -16,7 +16,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import javax.sql.DataSource;
 import java.util.HashMap;
 
-@Profile("!test")
+@Profile("prod")
 @Configuration
 @EnableJpaRepositories(
         basePackages = {"com.nhnacademy.byeol23backend.bookset", "com.nhnacademy.byeol23backend.cartset", "com.nhnacademy.byeol23backend.couponset", "com.nhnacademy.byeol23backend.memberset", "com.nhnacademy.byeol23backend.orderset", "com.nhnacademy.byeol23backend.pointset", "com.nhnacademy.byeol23backend.reviewset"},
