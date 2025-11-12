@@ -20,13 +20,6 @@ public class RefundPolicy {
 	private Long refundPolicyId;
 
 	@Column(name = "refund_policy_name", nullable = false, length = 30)
-	private String refundPolicyName;
+	private RefundReason refundPolicyName;
 
-	private RefundPolicy(String refundPolicyName) {
-		this.refundPolicyName = refundPolicyName;
-	}
-
-	public static RefundPolicy of(String refundPolicyName) {
-		return new RefundPolicy(refundPolicyName);
-	}
 }
