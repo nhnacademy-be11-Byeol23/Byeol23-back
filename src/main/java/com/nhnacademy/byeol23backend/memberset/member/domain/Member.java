@@ -120,4 +120,7 @@ public class Member {
 		this.status = st;
 	}
 
+	public void updatePoint(BigDecimal point) {
+		this.currentPoint = point;
+	}
 }

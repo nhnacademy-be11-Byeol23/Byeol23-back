@@ -1,6 +1,8 @@
 package com.nhnacademy.byeol23backend.memberset.member.service.impl;
 
-import com.nhnacademy.byeol23backend.memberset.grade.domain.Grade;
+import java.math.BigDecimal;
+
+import com.nhnacademy.byeol23backend.cartset.cart.service.CartService;
 import com.nhnacademy.byeol23backend.memberset.grade.repository.GradeRepository;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Status;
 import com.nhnacademy.byeol23backend.memberset.member.dto.*;
@@ -27,6 +29,7 @@ public class MemberServiceImpl implements MemberService {
 	private final MemberRepository memberRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final GradeRepository gradeRepository;
+	private final CartService cartService;
 
 	/**
 	 * 회원을 저장하는 함수
@@ -51,6 +54,7 @@ public class MemberServiceImpl implements MemberService {
 				request.joinedFrom(),
 				gradeRepository.findByGradeName("일반")
 		);
+		cartService.createCart(newMember);
 
 		memberRepository.save(newMember);
 		log.info("멤버 생성을 완료했습니다. {}", newMember.getMemberId());
@@ -116,6 +120,13 @@ public class MemberServiceImpl implements MemberService {
 		log.info("비밀번호 변경을 완료하였습니다.");
 
 		return new MemberPasswordUpdateResponse();
+	}
+
+	@Override
+	@Transactional
+	public void updateMemberPoint(Long memberId, BigDecimal point) {
+		Member member = findMemberById(memberId);
+		member.updatePoint(point);
 	}
 
 	/**
@@ -187,4 +198,5 @@ public class MemberServiceImpl implements MemberService {
 			throw new DuplicatePhoneNumberException("이미 사용 중인 휴대전화입니다.");
 		}
 	}
+
 }
