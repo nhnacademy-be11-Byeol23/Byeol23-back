@@ -68,7 +68,7 @@ public class BookServiceImpl implements BookService {
 			throw new ISBNAlreadyExistException("이미 존재하는 ISBN입니다: " + createRequest.isbn());
 		}
 		Publisher publisher = publisherRepository.findById(createRequest.publisherId())
-			.orElseThrow(() -> new PublisherNotFoundException("존재하지 않는 출판사 ID입니다: " + createRequest.publisherId()));
+				.orElseThrow(() -> new PublisherNotFoundException("존재하지 않는 출판사 ID입니다: " + createRequest.publisherId()));
 
 		Book book = new Book();
 		book.createBook(createRequest, publisher);
@@ -197,6 +197,26 @@ public class BookServiceImpl implements BookService {
 			bookResponseList.add(bookResponse);
 		}
 		log.info("도서 조회가 완료되었습니다.");
+		return bookResponseList;
+	}
+
+	@Override
+	public List<BookResponse> getBooksByIds(List<Long> bookIds) {
+		log.info("요청된 도서 ID 목록: {}", bookIds);
+
+		List<Book> bookList = bookRepository.findAllById(bookIds);
+		if (bookList.isEmpty()) {
+			log.info("요청된 ID에 해당하는 도서가 존재하지 않습니다.");
+			return new ArrayList<>();
+		}
+
+		List<BookResponse> bookResponseList = new ArrayList<>();
+		for (Book book : bookList) {
+			BookResponse response = toResponse(book);
+			bookResponseList.add(response);
+		}
+
+		log.info("도서 다중 조회 완료 ({}건)", bookResponseList.size());
 		return bookResponseList;
 	}
 

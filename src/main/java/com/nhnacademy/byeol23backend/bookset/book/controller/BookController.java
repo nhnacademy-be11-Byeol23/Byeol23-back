@@ -67,4 +67,10 @@ public class BookController {
 		List<BookResponse> books = bookService.getBooks(pageable);
 		return ResponseEntity.ok(books);
 	}
+
+	@GetMapping("/list")
+	public ResponseEntity<List<BookResponse>> getBooksByIds(@RequestParam("ids") List<Long> bookIds) {
+		List<BookResponse> books = bookService.getBooksByIds(bookIds);
+		return ResponseEntity.ok(books);
+	}
 }
