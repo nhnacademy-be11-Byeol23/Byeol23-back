@@ -37,4 +37,4 @@ jwt:
 
 eureka:
   client:
-    enabled: false
+    enabled: true
