@@ -6,9 +6,7 @@ import java.math.RoundingMode;
 import org.springframework.stereotype.Service;
 
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
-import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
-import com.nhnacademy.byeol23backend.pointset.pointhistories.dto.ReservedPolicy;
-import com.nhnacademy.byeol23backend.pointset.pointhistories.repository.PointHistoryRepository;
+import com.nhnacademy.byeol23backend.pointset.pointpolicy.dto.ReservedPolicy;
 import com.nhnacademy.byeol23backend.pointset.pointhistories.domain.PointHistory;
 import com.nhnacademy.byeol23backend.pointset.pointhistories.service.PointService;
 import com.nhnacademy.byeol23backend.pointset.pointpolicy.domain.PointPolicy;

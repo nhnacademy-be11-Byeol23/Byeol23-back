@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.pointset.pointhistories.domain.PointHistory;
-import com.nhnacademy.byeol23backend.pointset.pointhistories.dto.ReservedPolicy;
+import com.nhnacademy.byeol23backend.pointset.pointpolicy.dto.ReservedPolicy;
 import com.nhnacademy.byeol23backend.pointset.pointpolicy.domain.PointPolicy;
 
 public interface PointService {
