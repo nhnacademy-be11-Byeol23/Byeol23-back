@@ -59,7 +59,7 @@ public class PackagingController {
 		return ResponseEntity.noContent().build();
 	}
 
-	@GetMapping("/api/packagings")
+	@GetMapping("/lists")
 	public List<PackagingInfoResponse> getAllPackagingLists() {
 		return packagingService.getPackagingLists();
 	}

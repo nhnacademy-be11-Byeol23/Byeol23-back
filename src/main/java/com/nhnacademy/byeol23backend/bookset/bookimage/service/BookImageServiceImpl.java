@@ -1,9 +1,9 @@
 package com.nhnacademy.byeol23backend.bookset.bookimage.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
@@ -17,11 +17,13 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
+@Transactional(readOnly = true)
 public class BookImageServiceImpl implements ImageService {
 	private final BookImageRepository bookImageRepository;
 	private final BookRepository bookRepository;
 
 	@Override
+	@Transactional
 	public String saveImageUrl(Long bookId, String imageUrl) {
 		Book book = bookRepository.findById(bookId)
 			.orElseThrow(() -> new IllegalArgumentException("해당 도서를 찾을 수 없습니다. 도서 imageId: " + bookId));
@@ -36,6 +38,7 @@ public class BookImageServiceImpl implements ImageService {
 	}
 
 	@Override
+	@Transactional
 	public String deleteImageUrlsById(Long bookId) {
 		String url = (bookImageRepository.findById(bookId)
 			.orElseThrow(() -> new IllegalArgumentException("해당 도서 이미지를 찾을 수 없습니다. 도서 imageId: " + bookId)))
