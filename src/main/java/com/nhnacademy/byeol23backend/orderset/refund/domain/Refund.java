@@ -16,9 +16,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @Table(name = "refunds")
+@NoArgsConstructor
 public class Refund {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,13 +42,25 @@ public class Refund {
 	@Column(name = "refund_reason", nullable = false, length = 100)
 	private String refundReason;
 
-	@Column(name = "refund_quantity", nullable = false)
-	private Integer refundQuantity;
-
 	@Column(name = "refund_price", nullable = false, precision = 10)
 	private BigDecimal refundPrice;
 
 	@Column(name = "refund_fee", nullable = false, precision = 10)
 	private BigDecimal refundFee;
+
+	private Refund(Order order, RefundPolicy refundPolicy, LocalDateTime refundedAt,
+		String refundReason, BigDecimal refundPrice, BigDecimal refundFee) {
+		this.order = order;
+		this.refundPolicy = refundPolicy;
+		this.refundedAt = refundedAt;
+		this.refundReason = refundReason;
+		this.refundPrice = refundPrice;
+		this.refundFee = refundFee;
+	}
+
+	public static Refund of(Order order, RefundPolicy refundPolicy, LocalDateTime refundedAt,
+		String refundReason, BigDecimal refundPrice, BigDecimal refundFee) {
+		return new Refund(order, refundPolicy, refundedAt, refundReason, refundPrice, refundFee);
+	}
 
 }
