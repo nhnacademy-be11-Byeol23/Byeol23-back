@@ -34,6 +34,9 @@ import com.nhnacademy.byeol23backend.orderset.order.repository.OrderRepository;
 import com.nhnacademy.byeol23backend.orderset.order.service.OrderService;
 import com.nhnacademy.byeol23backend.orderset.orderdetail.domain.OrderDetail;
 import com.nhnacademy.byeol23backend.orderset.orderdetail.repository.OrderDetailRepository;
+import com.nhnacademy.byeol23backend.orderset.packaging.domain.Packaging;
+import com.nhnacademy.byeol23backend.orderset.packaging.exception.PackagingNotFoundException;
+import com.nhnacademy.byeol23backend.orderset.packaging.repository.PackagingRepository;
 import com.nhnacademy.byeol23backend.orderset.payment.domain.Payment;
 import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentCancelRequest;
 import com.nhnacademy.byeol23backend.orderset.payment.exception.PaymentNotFoundException;
@@ -52,6 +55,7 @@ public class OrderServiceImpl implements OrderService {
 	private final PaymentRepository paymentRepository;
 	private final PaymentService paymentService;
 	private final DeliveryPolicyRepository deliveryPolicyRepository;
+	private final PackagingRepository packagingRepository;
 	private static final String ORDER_STATUS_PAYMENT_COMPLETED = "결제 완료";
 	private static final String ORDER_STATUS_ORDER_CANCELED = "주문 취소";
 	private static final String PAYMENT_METHOD_POINT = "포인트 결제";
@@ -80,8 +84,12 @@ public class OrderServiceImpl implements OrderService {
 			Book book = bookRepository.findById(bookInfoRequest.bookId())
 				.orElseThrow(() -> new BookNotFoundException("해당 아이디의 도서가 존재하지 않습니다.: " + bookInfoRequest.bookId()));
 
+			Packaging packaging = packagingRepository.findById(bookInfoRequest.packagingId())
+				.orElseThrow(
+					() -> new PackagingNotFoundException("해당 아이디의 포장지를 찾을 수 없습니다.: " + bookInfoRequest.packagingId()));
+
 			OrderDetail orderDetail = OrderDetail.of(bookInfoRequest.quantity(), book.getSalePrice(),
-				book, null, order);
+				book, packaging, order);
 
 			orderDetailRepository.save(orderDetail);
 		}
