@@ -4,7 +4,6 @@ import com.nhnacademy.byeol23backend.bookset.book.service.BookViewCountSyncServi
 import lombok.RequiredArgsConstructor;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.springframework.stereotype.Component;
 
 @Component

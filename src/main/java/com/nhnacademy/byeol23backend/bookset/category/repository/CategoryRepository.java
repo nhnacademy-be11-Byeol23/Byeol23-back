@@ -19,6 +19,12 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
         """)
     List<CategoryListResponse> findRootCategories();
 
+    // 카테고리 테이블에서 최상위 루트 카테고리 엔티티를 조회하는 메서드
+    @Query("""
+        select c from Category c where c.parent.categoryId is null order by c.categoryName
+        """)
+    List<Category> findRootCategoryEntities();
+
     // 카테고리 테이블에서 부모 카테고리의 직계 자손 카테고리를 조회하는 메서드
     @Query("""
         select new com.nhnacademy.byeol23backend.bookset.category.dto.CategoryListResponse(
@@ -48,4 +54,11 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
                 from Category c1 where not exists (select 1 from Category c2 where c1.categoryId = c2.parent.categoryId)
         """)
     List<CategoryLeafResponse> findLeafCategories();
+
+    /*
+    @Query("""
+        select distinct c from Category c left join fetch c.children c1 left join fetch c1.children c2 where c.parent is null order by c.categoryName
+        """)
+    List<Category> findCategoriesWithChildren2Depth();
+     */
 }
