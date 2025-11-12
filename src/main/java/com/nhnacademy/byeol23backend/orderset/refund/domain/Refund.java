@@ -38,9 +38,6 @@ public class Refund {
 	@Column(name = "refund_reason", nullable = false, length = 100)
 	private String refundReason;
 
-	@Column(name = "refund_quantity", nullable = false)
-	private Integer refundQuantity;
-
 	@Column(name = "refund_price", nullable = false, precision = 10)
 	private BigDecimal refundPrice;
 
