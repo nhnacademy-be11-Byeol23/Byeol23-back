@@ -8,6 +8,7 @@ import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.AllContributorResponse;
 import com.nhnacademy.byeol23backend.bookset.publisher.domain.dto.AllPublishersInfoResponse;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.AllTagsInfoResponse;
+import com.nhnacademy.byeol23backend.image.dto.GetUrlResponse;
 
 public record BookResponse(
 	Long bookId,
@@ -25,6 +26,7 @@ public record BookResponse(
 	boolean isDeleted,
 	List<CategoryLeafResponse> categories,
 	List<AllTagsInfoResponse> tags,
-	List<AllContributorResponse> contributors
+	List<AllContributorResponse> contributors,
+	List<GetUrlResponse> images
 ) {
 }

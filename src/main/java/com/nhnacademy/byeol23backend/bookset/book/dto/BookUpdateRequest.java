@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public record BookUpdateRequest(
 	String bookName,
 	String toc,
@@ -17,7 +19,13 @@ public record BookUpdateRequest(
 	Long publisherId,
 	List<Long> categoryIds,
 	List<Long> tagIds,
-	List<Long> contributorIds
+	List<Long> contributorIds,
+	List<MultipartFile> images
 ) {
+	public BookUpdateRequest {
+		if (images == null) {
+			images = List.of();
+		}
+	}
 }
 
