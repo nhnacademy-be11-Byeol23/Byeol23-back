@@ -9,5 +9,4 @@ import com.nhnacademy.byeol23backend.orderset.refundpolicy.domain.RefundPolicy;
 
 public interface RefundPolicyRepository extends JpaRepository<RefundPolicy, Long> {
 	Optional<RefundPolicy> getRefundPolicyByRefundOption(RefundOption refundOption);
-
 }
