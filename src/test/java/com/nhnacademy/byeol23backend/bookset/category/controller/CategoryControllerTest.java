@@ -1,5 +1,6 @@
 package com.nhnacademy.byeol23backend.bookset.category.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.byeol23backend.bookset.book.interceptor.ViewerIdInterceptor;
 import com.nhnacademy.byeol23backend.bookset.category.dto.*;
@@ -7,7 +8,9 @@ import com.nhnacademy.byeol23backend.bookset.category.exception.CategoryDeleteRe
 import com.nhnacademy.byeol23backend.bookset.category.exception.CategoryNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.category.service.impl.CategoryCommandServiceImpl;
 import com.nhnacademy.byeol23backend.bookset.category.service.impl.CategoryQueryServiceImpl;
+import com.nhnacademy.byeol23backend.bookset.category.service.impl.RedisCategoryCacheService;
 import com.nhnacademy.byeol23backend.config.WebConfig;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -18,6 +21,7 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
 
@@ -38,6 +42,8 @@ class CategoryControllerTest {
     private CategoryCommandServiceImpl categoryCommandService;
     @MockitoBean
     private CategoryQueryServiceImpl categoryQueryService;
+    @MockitoBean
+    private RedisCategoryCacheService categoryCacheService;
 
 
     @Test
@@ -160,5 +166,31 @@ class CategoryControllerTest {
                 .andExpect(jsonPath("$[1].id").value(11))
                 .andExpect(jsonPath("$[1].pathName").value("기술/IT"))
                 .andExpect(jsonPath("$[1].categoryName").value("IT"));
+    }
+
+    @Test
+    @DisplayName("루트 카테고리 트리 2depth 조회")
+    void getRootsWithChildren2Depth_success() throws Exception {
+        CategoryTreeResponse r1c1g1 = new CategoryTreeResponse(10L, "인공지능", "1/5/10", List.of());
+        CategoryTreeResponse r1c1 = new CategoryTreeResponse(5L, "IT", "1/5", List.of(r1c1g1));
+        CategoryTreeResponse r1c2 = new CategoryTreeResponse(6L, "만화", "1/6", List.of());
+        CategoryTreeResponse r1 = new CategoryTreeResponse(1L, "국내도서", "1", List.of(r1c1, r1c2));
+
+        CategoryTreeResponse r2c1g1 = new CategoryTreeResponse(12L, "경제", "2/4/12", List.of());
+        CategoryTreeResponse r2c1 = new CategoryTreeResponse(4L, "인문", "2/4", List.of(r2c1g1));
+        CategoryTreeResponse r2 = new CategoryTreeResponse(2L, "해외도서", "2", List.of(r2c1));
+
+        List<CategoryTreeResponse> mockResponse = List.of(r1, r2);
+
+        Mockito.when(categoryCacheService.getRootsWithChildren2Depth()).thenReturn(mockResponse);
+
+        MvcResult result = mockMvc.perform(get("/api/categories/tree"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String json = result.getResponse().getContentAsString();
+        List<CategoryTreeResponse> actual = objectMapper.readValue(json, new TypeReference<>() {});
+
+        Assertions.assertEquals(mockResponse, actual);
     }
 }

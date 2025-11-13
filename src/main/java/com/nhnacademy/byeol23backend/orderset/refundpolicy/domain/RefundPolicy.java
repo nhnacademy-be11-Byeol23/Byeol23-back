@@ -18,4 +18,12 @@ public class RefundPolicy {
 	@Column(name = "refund_option", nullable = false, length = 30)
 	private RefundOption refundOption;
 
+	private RefundPolicy(RefundOption refundOption) {
+		this.refundOption = refundOption;
+	}
+
+	public static RefundPolicy of(RefundOption refundOption) {
+		return new RefundPolicy(refundOption);
+	}
+
 }

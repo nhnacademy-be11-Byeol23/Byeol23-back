@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.nhnacademy.byeol23backend.bookset.book.document.BookDocument;
+import com.nhnacademy.byeol23backend.bookset.book.event.BookDocumentAddEvent;
+import com.nhnacademy.byeol23backend.bookset.book.event.BookDocumentDeleteEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -78,6 +82,34 @@ public class BookServiceImpl implements BookService {
 		bookContributorService.createBookContributors(savedBook, createRequest.contributorIds());
 		log.info("새로운 도서가 생성되었습니다. ID: {}", savedBook.getBookId());
 
+        List<Category> categories = book.getBookCategories().stream().map(BookCategory::getCategory).toList();
+        List<Tag> tags = book.getBookTags() == null ? List.of() : book.getBookTags().stream().map(BookTag::getTag).toList();
+
+        Map<String, List<Contributor>> contributorMap = book.getBookContributors().stream()
+                .map(BookContributor::getContributor)
+                .collect(Collectors.groupingBy(Contributor::getContributorRole));
+
+        BookDocument bookDocument = BookDocument.builder()
+                .id(String.valueOf(savedBook.getBookId()))
+                .title(savedBook.getBookName())
+                .author(contributorMap.get("저자").stream().map(Contributor::getContributorName).toList())
+                .translator(contributorMap.getOrDefault("역자", List.of()).stream().map(Contributor::getContributorName).toList())
+                .isbn(book.getIsbn())
+                .regularPrice(book.getRegularPrice().intValue())
+                .salePrice(book.getSalePrice().intValue())
+                .publisher(book.getPublisher().getPublisherName())
+                .publishedAt(book.getPublishDate())
+                .tagNames(tags.stream().map(Tag::getTagName).toList())
+                .pathIds(categories.stream().map(Category::getPathId).toList())
+                .pathNames(categories.stream().map(Category::getPathName).toList())
+                .viewCount(book.getViewCount())
+                .reviewCount(0)
+                .ratingAverage(0.0f)
+                .isSoldOut(book.getStock() == 0)
+                .build();
+        log.info("도서 문서 저장 이벤트 발행: {}", bookDocument.getId());
+        eventPublisher.publishEvent(new BookDocumentAddEvent(bookDocument));
+
 		return toResponse(savedBook);
 	}
 
@@ -124,6 +156,8 @@ public class BookServiceImpl implements BookService {
 		bookTagRepository.deleteByBookId(bookId);
 		bookContributorRepository.deleteByBookId(bookId);
 		log.info("도서가 삭제 처리되었습니다. ID: {}", bookId);
+
+        eventPublisher.publishEvent(new BookDocumentDeleteEvent(String.valueOf(bookId)));
 	}
 
 	@Override
