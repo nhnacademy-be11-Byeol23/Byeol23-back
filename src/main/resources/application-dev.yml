@@ -19,10 +19,17 @@ spring:
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:*N2vya7H@muDTwdNMR!}
       database: ${REDIS_DATABASE:321}
+
+  elasticsearch:
+    uris: http://${ES_HOST:s4.java21.net}:${ES_PORT:9200}
+    username: ${ES_USERNAME:elastic}
+    password: ${ES_PASSWORD:nhnacademy123!}
+
   jpa:
     hibernate:
       ddl-auto: validate
     defer-datasource-initialization: true
+
   quartz:
     job-store-type: memory
     properties:
@@ -31,6 +38,13 @@ spring:
           threadPool:
             class: org.quartz.simpl.SimpleThreadPool
             threadCount: 4
+
+  ai:
+    ollama:
+      base-url: ${OLLAMA_BASE_URL}
+      embedding:
+        options:
+          model: bge-m3
 
 jwt:
   public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiNJoRcPJmLQ7Ii+hv78JNhtSgo7w7u8TS3PsftAMKBvkqpeAInmnpra1usEPhXTVWOyLLxL6yJAymKY8lzDf3I74T0F4GJiomkjjOdIT5TEAc5X3um+IuHxu7Qapr0BuKwBvT4FCBJ9jzPOCq8xkh2q/AWGfOTlPLjBmAVnp2NbbV4aI5cQR6D9a/extPX6hhAtq/NZqE665L/SVIXqPabu2Owpvn90O6HtNXzg6ytk7Rj4FBx6YLtqHy0QAf8/o/Zc1nr+ZHwSsDQ+am6Sp2ZmUl03ScerF7EMtfZyzUqY46RFNgUkhB7iJb2hZ3xYGtR9SUI+PDvt2Kz6AETewhQIDAQAB
