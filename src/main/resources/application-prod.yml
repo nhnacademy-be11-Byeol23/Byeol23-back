@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${PROD_DB_URL}
-    username: ${PROD_DB_USERNAME}
-    password: ${PROD_DB_PASSWORD}
+    url: jdbc:mysql://s4.java21.net:13306/project_be11_team2?serverTimezone=UTC&characterEncoding=UTF-8
+    username: project_be11_team2
+    password: F@R_UmfIzCl0uW)8
     type: org.apache.commons.dbcp2.BasicDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
     dbcp2:
@@ -12,15 +12,15 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
     jdbc-url: jdbc:mysql://s4.java21.net:13306/project_be11_team2_dev?serverTimezone=UTC&characterEncoding=UTF-8
-    username: ${PROD_DB_USERNAME}
-    password: ${PROD_DB_PASSWORD}
+    username: project_be11_team2_dev
+    password: F@R_UmfIzCl0uW)8
 
   data:
     redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-      password: ${REDIS_PASSWORD}
-      database: ${REDIS_DATABASE}
+      host: ${REDIS_HOST:s4.java21.net}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:*N2vya7H@muDTwdNMR!}
+      database: ${REDIS_DATABASE:321}
 
   jpa:
     hibernate:
@@ -49,7 +49,7 @@ spring:
 
 
 jwt:
-  public-key: ${JWT_PUBLIC_KEY}
+  public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiNJoRcPJmLQ7Ii+hv78JNhtSgo7w7u8TS3PsftAMKBvkqpeAInmnpra1usEPhXTVWOyLLxL6yJAymKY8lzDf3I74T0F4GJiomkjjOdIT5TEAc5X3um+IuHxu7Qapr0BuKwBvT4FCBJ9jzPOCq8xkh2q/AWGfOTlPLjBmAVnp2NbbV4aI5cQR6D9a/extPX6hhAtq/NZqE665L/SVIXqPabu2Owpvn90O6HtNXzg6ytk7Rj4FBx6YLtqHy0QAf8/o/Zc1nr+ZHwSsDQ+am6Sp2ZmUl03ScerF7EMtfZyzUqY46RFNgUkhB7iJb2hZ3xYGtR9SUI+PDvt2Kz6AETewhQIDAQAB
 
 logging:
   level:
