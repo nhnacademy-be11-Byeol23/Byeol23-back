@@ -1,0 +1,17 @@
+package com.nhnacademy.byeol23backend.orderset.refundpolicy.domain;
+
+public enum RefundOption {
+	BREAK("파손, 파지"),
+	MIND_CHANGED("단순 변심");
+
+	private final String value;
+
+	RefundOption(String value) {
+		this.value = value;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+}
