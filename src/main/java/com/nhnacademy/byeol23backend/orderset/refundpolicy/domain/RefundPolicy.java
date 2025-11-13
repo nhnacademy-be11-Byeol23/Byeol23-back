@@ -1,6 +1,6 @@
 package com.nhnacademy.byeol23backend.orderset.refundpolicy.domain;
 
-import jakarta.persistence.*
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
