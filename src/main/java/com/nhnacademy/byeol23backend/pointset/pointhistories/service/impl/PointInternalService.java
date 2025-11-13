@@ -26,7 +26,6 @@ public class PointInternalService {
 	protected PointHistory addPoints(Member member, PointPolicy policy , BigDecimal additionalAmount) {
 		PointHistory pointHistory = new PointHistory(member, policy, additionalAmount);
 		member.setCurrentPoint(member.getCurrentPoint().add(policy.getSaveAmount().add(additionalAmount)));
-		//point가 0보다 작으면 exception 발생
 		if(!policy.getIsActive()){
 			log.error("Point policy {} is inactive.", policy.getPointPolicyName());
 			throw new IllegalStateException("Point policy is inactive: " + policy.getPointPolicyName());
@@ -39,8 +38,7 @@ public class PointInternalService {
 		return pointHistory;
 	}
 
-	@Transactional(propagation = Propagation.MANDATORY)
 	protected List<PointHistory> getPointHistoriesByMember(Member member) {
-		return pointHistoryRepository.findAllByMemberId((member));
+		return pointHistoryRepository.findAllByMemberId(member);
 	}
 }
