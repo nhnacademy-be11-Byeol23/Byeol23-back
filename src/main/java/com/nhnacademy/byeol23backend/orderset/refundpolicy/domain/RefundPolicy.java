@@ -1,6 +1,6 @@
 package com.nhnacademy.byeol23backend.orderset.refundpolicy.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.*
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -17,5 +17,13 @@ public class RefundPolicy {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "refund_option", nullable = false, length = 30)
 	private RefundOption refundOption;
+
+	private RefundPolicy(RefundOption refundOption) {
+		this.refundOption = refundOption;
+	}
+
+	public static RefundPolicy of(RefundOption refundOption) {
+		return new RefundPolicy(refundOption);
+	}
 
 }
