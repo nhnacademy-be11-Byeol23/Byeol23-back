@@ -11,7 +11,7 @@ spring:
   datasource-quartz:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://s4.java21.net:13306/project_be11_team2_dev?serverTimezone=UTC&characterEncoding=UTF-8
+    jdbc-url: jdbc:mysql://s4.java21.net:13306/project_be11_team2_dev?serverTimezone=UTC&characterEncoding=UTF-8
     username: ${PROD_DB_USERNAME}
     password: ${PROD_DB_PASSWORD}
 
