@@ -32,23 +32,6 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
-#      - name: Set yaml file
-#        uses: microsoft/variable-substitution@v1
-#        with:
-#          files: ${{env.RESOURCE_PATH}}
-#        env:
-#          spring.datasource.url: ${{secrets.PROD_DB_URL}}
-#          spring.datasource.username: ${{secrets.PROD_DB_USERNAME}}
-#          spring.datasource.password: ${{secrets.PROD_DB_PASSWORD}}
-#          spring.datasource-quartz.username: ${{secrets.PROD_DB_URL}}
-#          spring.datasource-quartz.password: ${{secrets.PROD_DB_PASSWORD}}
-#          spring.data.redis.host: ${{secrets.REDIS_HOST}}
-#          spring.data.redis.port: ${{secrets.REDIS_PORT}}
-#          spring.data.redis.password: ${{secrets.REDIS_PASSWORD}}
-#          spring.data.redis.database: ${{secrets.REDIS_DATABASE}}
-#          jwt.public-key: ${{secrets.JWT_PUBLIC_KEY}}
-
-
       #      빌드된 jar 서버에 업로드
       - name: upload file
         uses: appleboy/scp-action@master
