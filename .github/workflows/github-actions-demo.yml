@@ -31,6 +31,23 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
+      - name: Set yaml file
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: ${{env.RESOURCE_PATH}}
+        env:
+          spring.datasource.url: ${{secrets.PROD_DB_URL}}
+          spring.datasource.username: ${{secrets.PROD_DB_USERNAME}}
+          spring.datasource.password: ${{secrets.PROD_DB_PASSWORD}}
+          spring.datasource-quartz.username: ${{secrets.PROD_DB_URL}}
+          spring.datasource-quartz.password: ${{secrets.PROD_DB_PASSWORD}}
+          spring.data.redis.host: ${{secrets.REDIS_HOST}}
+          spring.data.redis.port: ${{secrets.REDIS_PORT}}
+          spring.data.redis.password: ${{secrets.REDIS_PASSWORD}}
+          spring.data.redis.database: ${{secrets.REDIS_DATABASE}}
+          jwt.public-key: ${{secrets.JWT_PUBLIC_KEY}}
+
+
       #      빌드된 jar 서버에 업로드
       - name: upload file
         uses: appleboy/scp-action@master
@@ -52,26 +69,6 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script_stop: true
           script: |
-            export PROD_DB_URL="${{ secrets.PROD_DB_URL }}"
-            export PROD_DB_USERNAME="${{ secrets.PROD_DB_USERNAME }}"
-            export PROD_DB_PASSWORD="${{ secrets.PROD_DB_PASSWORD }}"
-            export JWT_PUBLIC_KEY="${{ secrets.JWT_PUBLIC_KEY }}"
-            
-            export REDIS_HOST="${{ secrets.REDIS_HOST }}"
-            export REDIS_PORT="${{ secrets.REDIS_PORT }}"
-            export REDIS_PASSWORD="${{ secrets.REDIS_PASSWORD }}"
-            export REDIS_DATABASE="${{ secrets.REDIS_DATABASE }}"
-            
-            echo "--- GitHub Actions Debug ---"
-            echo "Checking value: $PROD_DB_URL"
-            echo "Checking value: $PROD_DB_USERNAME"
-            
-            echo "Checking value: $REDIS_HOST"
-            echo "Checking value: $REDIS_PORT"
-            echo "Checking value: $REDIS_PASSWORD"
-            echo "Checking value: $REDIS_DATABASE"
-            echo "------------------------------"
-            
             chmod +x ~/startup.sh
             bash ~/startup.sh backend
             
