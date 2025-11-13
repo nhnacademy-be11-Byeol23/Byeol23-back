@@ -4,7 +4,7 @@ import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
 
 import java.util.List;
 
-public record CategoryTreeResponse(Long categoryId, String categoryName, List<CategoryTreeResponse> children) {
+public record CategoryTreeResponse(Long categoryId, String categoryName, String pathId, List<CategoryTreeResponse> children) {
     public static CategoryTreeResponse from(Category category, int depth) {
         if(category == null) return null;
 
@@ -16,6 +16,6 @@ public record CategoryTreeResponse(Long categoryId, String categoryName, List<Ca
                     .toList();
         }
 
-        return new CategoryTreeResponse(category.getCategoryId(), category.getCategoryName(), children);
+        return new CategoryTreeResponse(category.getCategoryId(), category.getCategoryName(), category.getPathId(), children);
     }
 }
