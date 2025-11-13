@@ -1,9 +1,9 @@
 spring:
   datasource-data:
-    url: jdbc:mysql://s4.java21.net:13306/project_be11_team2?serverTimezone=UTC&characterEncoding=UTF-8
+    url: ${PROD_DB_URL}
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: project_be11_team2
-    password: F@R_UmfIzCl0uW)8
+    username: ${PROD_DB_USERNAME}
+    password: ${PROD_DB_PASSWORD}
     type: org.apache.commons.dbcp2.BasicDataSource
     dbcp2:
       initial-size: 5
@@ -13,8 +13,8 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://s4.java21.net:13306/project_be11_team2_dev?serverTimezone=UTC&characterEncoding=UTF-8
-    username: ${PROD_DB_USERNAME:project_be11_team2}
-    password: ${PROD_DB_PASSWORD:F@R_UmfIzCl0uW)8}
+    username: ${PROD_DB_USERNAME}
+    password: ${PROD_DB_PASSWORD}
 
   data:
     redis:
