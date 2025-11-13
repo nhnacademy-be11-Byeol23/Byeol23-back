@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nhnacademy.byeol23backend.bookset.book.annotation.ViewerId;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookCreateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookResponse;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockResponse;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.service.BookService;
 
@@ -66,5 +68,17 @@ public class BookController {
 		Pageable pageable = PageRequest.of(pageNo, pageSize);
 		List<BookResponse> books = bookService.getBooks(pageable);
 		return ResponseEntity.ok(books);
+	}
+
+	@GetMapping("/{book-id}/stock")
+	public ResponseEntity<BookStockResponse> getBookStock(@PathVariable("book-id") Long bookId) {
+		return ResponseEntity.ok(bookService.getBookStock(bookId));
+	}
+
+	@PostMapping("/{book-id}/stock")
+	public ResponseEntity<Void> updateBookStock(@PathVariable("book-id") Long bookId,
+		@RequestBody BookStockUpdateRequest request) {
+		bookService.updateBookStock(bookId, request);
+		return ResponseEntity.noContent().build();
 	}
 }
