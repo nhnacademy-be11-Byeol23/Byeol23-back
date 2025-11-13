@@ -7,6 +7,7 @@ on:
 env:
   SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#  RESOURCE_PATH: 'src/main/resources/application-prod.yml'
 
 jobs:
   build-and-deploy:
@@ -40,7 +41,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
           source: "target/*.jar"
-          target: "~/"
+          target: "~/target"
           rm: false
 
       - name: execute shell script
@@ -55,23 +56,11 @@ jobs:
             export PROD_DB_URL="${{ secrets.PROD_DB_URL }}"
             export PROD_DB_USERNAME="${{ secrets.PROD_DB_USERNAME }}"
             export PROD_DB_PASSWORD="${{ secrets.PROD_DB_PASSWORD }}"
-            export JWT_PUBLIC_KEY="${{ secrets.JWT_PUBLIC_KEY }}"
-            
             export REDIS_HOST="${{ secrets.REDIS_HOST }}"
             export REDIS_PORT="${{ secrets.REDIS_PORT }}"
             export REDIS_PASSWORD="${{ secrets.REDIS_PASSWORD }}"
             export REDIS_DATABASE="${{ secrets.REDIS_DATABASE }}"
-            
-            echo "--- GitHub Actions Debug ---"
-            echo "Checking value: $PROD_DB_URL"
-            echo "Checking value: $PROD_DB_USERNAME"
-            
-            echo "Checking value: $REDIS_HOST"
-            echo "Checking value: $REDIS_PORT"
-            echo "Checking value: $REDIS_PASSWORD"
-            echo "Checking value: $REDIS_DATABASE"
-            echo "------------------------------"
-            
+            export JWT_PUBLIC_KEY="${{ secrets.JWT_PUBLIC_KEY }}"
             chmod +x ~/startup.sh
             bash ~/startup.sh backend
             
