@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.pointset.pointhistories.service.impl;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -36,5 +37,10 @@ public class PointInternalService {
 		}
 		pointHistoryRepository.save(pointHistory);
 		return pointHistory;
+	}
+
+	@Transactional(propagation = Propagation.MANDATORY)
+	protected List<PointHistory> getPointHistoriesByMember(Member member) {
+		return pointHistoryRepository.findAllByMemberId((member));
 	}
 }

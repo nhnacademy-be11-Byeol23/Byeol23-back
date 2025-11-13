@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.pointset.pointhistories.service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.pointset.pointhistories.domain.PointHistory;
@@ -13,4 +14,6 @@ public interface PointService {
 	PointHistory addPointsWithPolicy(Member member, PointPolicy pointPolicy);
 
 	PointHistory addPointsByOrder(Member member, BigDecimal orderAmount);
+
+	List<PointHistory> getPointHistoriesByMember(Member member);
 }
