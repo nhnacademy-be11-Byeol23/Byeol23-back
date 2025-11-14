@@ -2,14 +2,16 @@ package com.nhnacademy.byeol23backend.bookset.category.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.byeol23backend.bookset.book.interceptor.GuestIdCookieInterceptor;
 import com.nhnacademy.byeol23backend.bookset.book.interceptor.ViewerIdInterceptor;
 import com.nhnacademy.byeol23backend.bookset.category.dto.*;
 import com.nhnacademy.byeol23backend.bookset.category.exception.CategoryDeleteReferencedByBookException;
 import com.nhnacademy.byeol23backend.bookset.category.exception.CategoryNotFoundException;
-import com.nhnacademy.byeol23backend.bookset.category.service.impl.CategoryCommandServiceImpl;
-import com.nhnacademy.byeol23backend.bookset.category.service.impl.CategoryQueryServiceImpl;
-import com.nhnacademy.byeol23backend.bookset.category.service.impl.RedisCategoryCacheService;
+import com.nhnacademy.byeol23backend.bookset.category.service.CategoryCacheService;
+import com.nhnacademy.byeol23backend.bookset.category.service.CategoryCommandService;
+import com.nhnacademy.byeol23backend.bookset.category.service.CategoryQueryService;
 import com.nhnacademy.byeol23backend.config.WebConfig;
+import com.nhnacademy.byeol23backend.filter.TokenFilter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,18 +34,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = CategoryController.class,
-excludeFilters = @ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, classes = {ViewerIdInterceptor.class, WebConfig.class}))
+excludeFilters = @ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, classes = {TokenFilter.class, GuestIdCookieInterceptor.class, ViewerIdInterceptor.class, WebConfig.class}))
 class CategoryControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
     @MockitoBean
-    private CategoryCommandServiceImpl categoryCommandService;
+    private CategoryCommandService categoryCommandService;
     @MockitoBean
-    private CategoryQueryServiceImpl categoryQueryService;
+    private CategoryQueryService categoryQueryService;
     @MockitoBean
-    private RedisCategoryCacheService categoryCacheService;
+    private CategoryCacheService categoryCacheService;
 
 
     @Test
