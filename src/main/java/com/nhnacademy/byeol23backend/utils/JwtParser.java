@@ -1,4 +1,4 @@
-package com.nhnacademy.byeol23backend.bookset.book.utils;
+package com.nhnacademy.byeol23backend.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

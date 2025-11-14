@@ -55,3 +55,13 @@ jwt:
 logging:
   level:
     root: info
+
+management:
+  health:
+    # 헬스 체크 항목에서 개별 서비스 제외
+    redis:
+      enabled: false  # Redis
+    elasticsearch:
+      enabled: false  # Elasticsearch
+    db:
+      enabled: false  # 데이터베이스 (Quartz용)
