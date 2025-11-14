@@ -69,9 +69,7 @@ public class RefundServiceImpl implements RefundService {
 		} else {
 			throw new RefundPolicyNotFoundException("해당 환불 정책을 찾을 수 없습니다.: " + request.refundOption());
 		}
-
-		// PaymentGate를 이용해서 결제 취소 로직을 호출해야하는지 물어볼 것
-
+		
 		// 나머지 금액은 포인트로 환불, 현재 포인트에 실제로 결제한 금액을 더해줌
 		orderedMember.updatePoint(orderedMember.getCurrentPoint().add(refundAmount));
 
