@@ -20,4 +20,6 @@ public interface BookService {
 	void deleteBook(Long bookId);
 
 	List<BookResponse> getBooks(Pageable pageable);
+
+	List<BookResponse> getBooksByIds(List<Long> bookIds);
 }
