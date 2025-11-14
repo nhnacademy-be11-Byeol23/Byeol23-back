@@ -68,7 +68,7 @@ public class PaymentServiceImpl implements PaymentService {
 			.orElseThrow(
 				() -> new MemberNotFoundException("해당 아이디의 회원을 찾을 수 없습니다.: " + order.getMember().getMemberId()));
 
-		pointService.addPointsByOrder(member, order.getActualOrderPrice());
+		pointService.offsetPointsByOrder(member, order.getActualOrderPrice());
 
 		return new PaymentResultResponse(confirmResponse.paymentKey(), confirmResponse.orderId(),
 			confirmResponse.orderName(),

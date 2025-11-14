@@ -22,19 +22,19 @@ public class PointServiceImpl implements PointService {
 	private final PointPolicyRepository pointPolicyRepository;
 
 	@Override
-	public PointHistory addPointsByReserved(Member member, ReservedPolicy reservedPolicy, BigDecimal orderAmount) {
+	public PointHistory offsetPointsByReserved(Member member, ReservedPolicy reservedPolicy, BigDecimal orderAmount) {
 		final PointPolicy pointPolicy = pointPolicyRepository.findByPointPolicyName(reservedPolicy.name())
 			.orElseThrow(() -> new IllegalArgumentException("Invalid Point Policy Name: " + reservedPolicy.name()));
 		return pointInternalService.addPoints(member, pointPolicy, orderAmount);
 	}
 
 	@Override
-	public PointHistory addPointsWithPolicy(Member member, PointPolicy pointPolicy) {
+	public PointHistory offsetPointsWithPolicy(Member member, PointPolicy pointPolicy) {
 		return pointInternalService.addPoints(member, pointPolicy, BigDecimal.ZERO);
 	}
 
 	@Override
-	public PointHistory addPointsByOrder(Member member, BigDecimal orderAmount) {
+	public PointHistory offsetPointsByOrder(Member member, BigDecimal orderAmount) {
 		final PointPolicy orderPolicy = pointPolicyRepository.findByPointPolicyName(ReservedPolicy.ORDER.name())
 			.orElseThrow(() -> new IllegalArgumentException("Invalid Point Policy Name: " + ReservedPolicy.ORDER.name()));
 
@@ -49,5 +49,16 @@ public class PointServiceImpl implements PointService {
 	@Override
 	public List<PointHistory> getPointHistoriesByMember(Member member) {
 		return pointInternalService.getPointHistoriesByMember(member);
+	}
+
+	@Override
+	public PointHistory cancelPoints(PointHistory pointHistory) {
+		PointPolicy cancel = pointPolicyRepository.findByPointPolicyName(ReservedPolicy.CANCEL.name())
+			.orElseThrow(() -> new IllegalArgumentException("Invalid Point Policy Name: " + ReservedPolicy.CANCEL.name()));
+		return pointInternalService.addPoints(
+			pointHistory.getMemberId(),
+			cancel,
+			pointHistory.getPointAmount().negate()
+		);
 	}
 }
