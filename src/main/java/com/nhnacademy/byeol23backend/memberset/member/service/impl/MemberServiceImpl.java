@@ -129,6 +129,12 @@ public class MemberServiceImpl implements MemberService {
 		member.updatePoint(point);
 	}
 
+	@Override
+	public Member getMemberProxy(Long memberId) {
+		return memberRepository.getReferenceByMemberId(memberId)
+			.orElseThrow(() -> new MemberNotFoundException(memberId + "에 해당하는 멤버를 찾을 수 없습니다."));
+	}
+
 	/**
 	 * 휴면 상태인 회원을 활성 상태로 변경한다.
 	 * @param memberId Long
