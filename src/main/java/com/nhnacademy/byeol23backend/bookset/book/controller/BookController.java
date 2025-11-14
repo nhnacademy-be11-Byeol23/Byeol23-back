@@ -2,6 +2,7 @@ package com.nhnacademy.byeol23backend.bookset.book.controller;
 
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -65,6 +66,12 @@ public class BookController {
 	) {
 		Pageable pageable = PageRequest.of(pageNo, pageSize);
 		List<BookResponse> books = bookService.getBooks(pageable);
+		return ResponseEntity.ok(books);
+	}
+
+	@GetMapping("/list")
+	public ResponseEntity<List<BookResponse>> getBooksByIds(@RequestParam("ids") List<Long> bookIds) {
+		List<BookResponse> books = bookService.getBooksByIds(bookIds);
 		return ResponseEntity.ok(books);
 	}
 }

@@ -15,6 +15,10 @@ import com.nhnacademy.byeol23backend.bookset.book.domain.dto.BookOrderInfoRespon
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookInfoRequest;
 import com.nhnacademy.byeol23backend.bookset.book.exception.BookNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
+import com.nhnacademy.byeol23backend.bookset.book.utils.JwtParser;
+import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
+import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
+import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
 import com.nhnacademy.byeol23backend.orderset.delivery.domain.DeliveryPolicy;
 import com.nhnacademy.byeol23backend.orderset.delivery.exception.DeliveryPolicyNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.delivery.repository.DeliveryPolicyRepository;
@@ -49,6 +53,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class OrderServiceImpl implements OrderService {
+	private final MemberRepository memberRepository;
 	private final OrderRepository orderRepository;
 	private final OrderDetailRepository orderDetailRepository;
 	private final BookRepository bookRepository;
@@ -56,6 +61,7 @@ public class OrderServiceImpl implements OrderService {
 	private final PaymentService paymentService;
 	private final DeliveryPolicyRepository deliveryPolicyRepository;
 	private final PackagingRepository packagingRepository;
+	private final JwtParser jwtParser;
 	private static final String ORDER_STATUS_PAYMENT_COMPLETED = "결제 완료";
 	private static final String ORDER_STATUS_ORDER_CANCELED = "주문 취소";
 	private static final String PAYMENT_METHOD_POINT = "포인트 결제";
@@ -65,10 +71,15 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	@Transactional
-	public OrderPrepareResponse prepareOrder(OrderPrepareRequest request) {
+	public OrderPrepareResponse prepareOrder(OrderPrepareRequest request, String accessToken) {
 		String timeStamp = new SimpleDateFormat("yyMMddHHmmss").format(new Date());
 		String randomPart = String.format("%06d", new Random().nextInt(1_000_000));
 		String orderId = timeStamp + randomPart;
+
+		Long memberId = accessTokenParser(accessToken);
+
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> new MemberNotFoundException("해당 아이디의 멤버를 찾을 수 없습니다.: " + memberId));
 
 		DeliveryPolicy currentDeliveryPolicy = deliveryPolicyRepository.findFirstByOrderByChangedAtDesc()
 			.orElseThrow(() -> new DeliveryPolicyNotFoundException(DELIVERY_POLICY_NOT_FOUND_MESSAGE));
@@ -76,7 +87,7 @@ public class OrderServiceImpl implements OrderService {
 		Order order = Order.of(orderId, request.totalBookPrice(), request.actualOrderPrice(),
 			request.deliveryArrivedDate(), request.receiver(), request.postCode(),
 			request.receiverAddress(), request.receiverAddressDetail(), request.receiverAddressExtra(),
-			request.receiverPhone(), currentDeliveryPolicy);
+			request.receiverPhone(), member, currentDeliveryPolicy);
 
 		orderRepository.save(order);
 
@@ -84,9 +95,11 @@ public class OrderServiceImpl implements OrderService {
 			Book book = bookRepository.findById(bookInfoRequest.bookId())
 				.orElseThrow(() -> new BookNotFoundException("해당 아이디의 도서가 존재하지 않습니다.: " + bookInfoRequest.bookId()));
 
-			Packaging packaging = packagingRepository.findById(bookInfoRequest.packagingId())
-				.orElseThrow(
-					() -> new PackagingNotFoundException("해당 아이디의 포장지를 찾을 수 없습니다.: " + bookInfoRequest.packagingId()));
+			Packaging packaging =
+				bookInfoRequest.packagingId() != 0 ? packagingRepository.findById(bookInfoRequest.packagingId())
+					.orElseThrow(
+						() -> new PackagingNotFoundException(
+							"해당 아이디의 포장지를 찾을 수 없습니다.: " + bookInfoRequest.packagingId())) : null;
 
 			OrderDetail orderDetail = OrderDetail.of(bookInfoRequest.quantity(), book.getSalePrice(),
 				book, packaging, order);
@@ -185,6 +198,10 @@ public class OrderServiceImpl implements OrderService {
 				orderDetail.getOrderPrice()
 			))
 			.toList();
+	}
+
+	private Long accessTokenParser(String accessToken) {
+		return jwtParser.parseToken(accessToken).get("memberId", Long.class);
 	}
 
 }

@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AddressServiceImpl implements AddressService {
 	// private final AddressRepository addressRepository;
-	//
+	// 아카데미에서 제일로 잘생기고 공부 잘 하고 멋있고 만능 스포츠맨인 사람 -- 정답은 가장 아래에
 	// public Address getAddress(Long memberId) {
 	// 	return addressRepository.findById()
 	// 		.orElseThrow(() -> new IllegalArgumentException("Address not found with id: " + addressId));
@@ -91,3 +91,4 @@ public class AddressServiceImpl implements AddressService {
 	// 	return addressRepository.save(address);
 	// }
 }
+//그 이름 바로 윤.빈
