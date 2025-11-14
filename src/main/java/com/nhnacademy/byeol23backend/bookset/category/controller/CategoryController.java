@@ -61,7 +61,7 @@ public class CategoryController {
         return categoryQueryService.getSubCategories(parentId);
     }
 
-    @GetMapping("/categories")
+    @GetMapping("/categories/leaf")
     public List<CategoryLeafResponse> getLeafs() {
         return categoryQueryService.getLeafCategories();
     }
