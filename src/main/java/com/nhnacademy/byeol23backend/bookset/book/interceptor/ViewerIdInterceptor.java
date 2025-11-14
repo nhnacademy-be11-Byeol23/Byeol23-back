@@ -1,6 +1,6 @@
 package com.nhnacademy.byeol23backend.bookset.book.interceptor;
 
-import com.nhnacademy.byeol23backend.bookset.book.utils.JwtParser;
+import com.nhnacademy.byeol23backend.utils.JwtParser;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
