@@ -86,7 +86,7 @@ public class Order {
 
 	private Order(String orderNumber, BigDecimal totalBookPrice, BigDecimal actualOrderPrice, LocalDateTime orderedAt,
 		String orderStatus, LocalDate deliveryDesiredDate, String receiver, String postCode, String receiverAddress,
-		String receiverAddressDetail, String receiverAddressExtra, String receiverPhone,
+		String receiverAddressDetail, String receiverAddressExtra, String receiverPhone, Member member,
 		DeliveryPolicy deliveryPolicy) {
 		this.orderNumber = orderNumber;
 		this.totalBookPrice = totalBookPrice;
@@ -100,17 +100,18 @@ public class Order {
 		this.receiverAddressDetail = receiverAddressDetail;
 		this.receiverAddressExtra = receiverAddressExtra;
 		this.receiverPhone = receiverPhone;
+		this.member = member;
 		this.deliveryPolicy = deliveryPolicy;
 	}
 
 	public static Order of(String orderNumber, BigDecimal totalBookPrice, BigDecimal actualOrderPrice,
 		LocalDate deliveryDesiredDate, String receiver, String postCode, String receiverAddress,
-		String receiverAddressDetail, String receiverAddressExtra, String receiverPhone,
+		String receiverAddressDetail, String receiverAddressExtra, String receiverPhone, Member member,
 		DeliveryPolicy deliveryPolicy) {
 
 		return new Order(orderNumber, totalBookPrice, actualOrderPrice, LocalDateTime.now(),
 			"대기", deliveryDesiredDate, receiver, postCode, receiverAddress, receiverAddressDetail, receiverAddressExtra,
-			receiverPhone, deliveryPolicy);
+			receiverPhone, member, deliveryPolicy);
 	}
 
 	public void updateOrderStatus(String orderStatus) {

@@ -15,7 +15,7 @@ import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderSearchCondit
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.PointOrderResponse;
 
 public interface OrderService {
-	OrderPrepareResponse prepareOrder(OrderPrepareRequest request);
+	OrderPrepareResponse prepareOrder(OrderPrepareRequest request, String accessToken);
 
 	OrderCreateResponse updateOrderStatus(String orderNumber, String orderStatus);
 
