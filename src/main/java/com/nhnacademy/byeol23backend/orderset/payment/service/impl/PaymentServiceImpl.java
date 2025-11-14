@@ -67,7 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
 		Member member = order.getMember();
 
 		if (!Objects.isNull(member)) {
-			pointService.addPointsByOrder(member, order.getActualOrderPrice());
+			pointService.offsetPointsByOrder(member, order.getActualOrderPrice());
 		}
 
 		return new PaymentResultResponse(confirmResponse.paymentKey(), confirmResponse.orderId(),
