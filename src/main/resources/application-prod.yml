@@ -55,3 +55,8 @@ jwt:
 logging:
   level:
     root: info
+
+eureka:
+  client:
+    healthcheck:
+      enabled: false
