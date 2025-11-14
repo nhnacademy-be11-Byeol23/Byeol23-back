@@ -27,6 +27,7 @@ import com.nhnacademy.byeol23backend.bookset.book.service.BookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/books")
 @RequiredArgsConstructor
@@ -43,6 +44,7 @@ public class BookController {
 
 	@GetMapping("/{bookId}")
 	public ResponseEntity<BookResponse> getBook(@PathVariable("bookId") Long bookId, @ViewerId String viewerId) {
+        log.info("viewerId: {}", viewerId);
 		BookResponse response = bookService.getBookAndIncreaseViewCount(bookId, viewerId);
 		return ResponseEntity.ok(response);
 	}
