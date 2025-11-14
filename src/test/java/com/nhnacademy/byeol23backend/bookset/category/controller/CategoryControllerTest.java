@@ -158,7 +158,7 @@ class CategoryControllerTest {
 
         Mockito.when(categoryQueryService.getLeafCategories()).thenReturn(mockResponse);
 
-        mockMvc.perform(get("/api/categories"))
+        mockMvc.perform(get("/api/categories/leaf"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(10))
                 .andExpect(jsonPath("$[0].categoryName").value("경제"))

@@ -20,10 +20,12 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new GuestIdCookieInterceptor())
-                .addPathPatterns("/api/**");
+                .addPathPatterns("/api/books/*")
+                .order(0);
 
         registry.addInterceptor(new ViewerIdInterceptor(jwtParser))
-                .addPathPatterns("/api/books/*");
+                .addPathPatterns("/api/books/*")
+                .order(1);
     }
 
     @Override
