@@ -1,8 +1,10 @@
 package com.nhnacademy.byeol23backend.bookset.category.repository;
 
 import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
+import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryAllResponse;
 import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse;
 import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryListResponse;
+import com.nhnacademy.byeol23backend.bookset.category.dto.SubCategoryIdListResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -50,15 +52,13 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     // leaf 카테고리 조회
     @Query("""
-        select new  com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse(c1.categoryId, c1.categoryName, c1.pathName)
+        select new com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse(c1.categoryId, c1.categoryName, c1.pathName)
                 from Category c1 where not exists (select 1 from Category c2 where c1.categoryId = c2.parent.categoryId)
         """)
     List<CategoryLeafResponse> findLeafCategories();
 
-    /*
     @Query("""
-        select distinct c from Category c left join fetch c.children c1 left join fetch c1.children c2 where c.parent is null order by c.categoryName
+        select new com.nhnacademy.byeol23backend.bookset.category.dto.SubCategoryIdListResponse(c.categoryId) from Category c where c.pathId like concat(:pathId, '%') 
         """)
-    List<Category> findCategoriesWithChildren2Depth();
-     */
+    List<SubCategoryIdListResponse> findSubCategoryIdsByPathId(@Param("pathId") String pathId);
 }

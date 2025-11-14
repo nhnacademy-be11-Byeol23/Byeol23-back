@@ -31,8 +31,9 @@ public class RedisCategoryCacheService implements CategoryCacheService {
     @Override
     public List<CategoryTreeResponse> getRootsWithChildren2Depth() {
         String categoryTreeResponseJson = stringRedisTemplate.opsForValue().get(CATEGORY_TREE_KEY);
+        log.info("루트 카테고리 2계층 트리 캐시: {}", categoryTreeResponseJson);
         if(categoryTreeResponseJson == null) {
-            log.info("루트 카테고리 2계층 트리  캐시 미스 -> DB 조회 후 캐시 저장");
+            log.info("루트 카테고리 2계층 트리 캐시 미스 -> DB 조회 후 캐시 저장");
             List<CategoryTreeResponse> categories = categoryQueryService.getCategoriesWithChildren2Depth();
             updateCategoryTree2Depth(categories);
             return categories;

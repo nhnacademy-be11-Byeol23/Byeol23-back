@@ -1,6 +1,6 @@
 package com.nhnacademy.byeol23backend.bookset.book.interceptor;
 
-import com.nhnacademy.byeol23backend.bookset.book.utils.JwtParser;
+import com.nhnacademy.byeol23backend.utils.JwtParser;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +22,7 @@ public class ViewerIdInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         if(!"GET".equalsIgnoreCase(request.getMethod())) return true;
 
+        // 회원인 경우
         String accessToken = null;
         if(request.getCookies() != null) {
             accessToken = Arrays.stream(request.getCookies())
@@ -38,12 +39,28 @@ public class ViewerIdInterceptor implements HandlerInterceptor {
             return true;
         }
 
+        // 비회원인 경우
         if(request.getCookies() != null) {
-            Arrays.stream(request.getCookies())
+            String guestId = Arrays.stream(request.getCookies())
                     .filter(cookie -> cookie.getName().equals("guestId"))
+                    .map(Cookie::getValue)
+                    .filter(StringUtils::isNotBlank)
                     .findFirst()
-                    .ifPresent(cookie -> request.setAttribute("viewerId", "guest:%s".formatted(cookie.getValue())));
+                    .orElse(null);
+
+            if(StringUtils.isNotBlank(guestId)) {
+                request.setAttribute("viewerId", "guest:%s".formatted(guestId));
+                return true;
+            }
         }
+
+        // 비회원이지만 첫 요청인 경우
+        String guestId = (String) request.getAttribute("guestId");
+        if(StringUtils.isNotBlank(guestId)) {
+            request.setAttribute("viewerId", "guest:%s".formatted(guestId));
+            return true;
+        }
+
         return true;
     }
 }
