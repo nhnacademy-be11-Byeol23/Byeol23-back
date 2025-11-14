@@ -39,7 +39,7 @@ jobs:
           target: "~/"
           rm: false
 
-      - name: Deploy on Server
+      - name: execute shell script
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_IP }}
@@ -48,15 +48,14 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script_stop: true
           script: |
-            # 1. 서비스에 필요한 .env 파일을 서버에 생성 (덮어쓰기)
-            echo "PROD_DB_URL=${{ secrets.PROD_DB_URL }}" > ~/.env
-            echo "PROD_DB_USERNAME=${{ secrets.PROD_DB_USERNAME }}" >> ~/.env
-            echo "PROD_DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}" >> ~/.env
-            echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> ~/.env
-            echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> ~/.env
-            echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" >> ~/.env
-            echo "REDIS_DATABASE=${{ secrets.REDIS_DATABASE }}" >> ~/.env
-            echo "JWT_PUBLIC_KEY=${{ secrets.JWT_PUBLIC_KEY }}" >> ~/.env
+            export "PROD_DB_URL=${{ secrets.PROD_DB_URL }}" 
+            export "PROD_DB_USERNAME=${{ secrets.PROD_DB_USERNAME }}"
+            export "PROD_DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}"
+            export "REDIS_HOST=${{ secrets.REDIS_HOST }}"
+            export "REDIS_PORT=${{ secrets.REDIS_PORT }}"
+            export "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" 
+            export "REDIS_DATABASE=${{ secrets.REDIS_DATABASE }}" 
+            export "JWT_PUBLIC_KEY=${{ secrets.JWT_PUBLIC_KEY }}" 
             
             # 2. startup.sh 스크립트에 실행 권한 부여
             chmod +x ~/startup.sh
