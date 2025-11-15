@@ -24,4 +24,6 @@ public interface BookRepository extends JpaRepository<Book, Long>, JdbcBookRepos
 		"WHERE b.bookId = :bookId And b.stock >= :quantity")
 	int decreaseBookStock(@Param("bookId") Long bookId, @Param("quantity") Integer quantity);
 
+    @Query("select b from Book b join fetch b.publisher p where b.bookId = :bookId")
+    Book queryBookWithPublisherById(@Param("bookId") Long bookId);
 }

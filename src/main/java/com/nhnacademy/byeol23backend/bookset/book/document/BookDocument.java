@@ -24,7 +24,7 @@ public class BookDocument {
     @Field(type = FieldType.Text)
     private String description;
 
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Text)
     private List<String> author;
 
     @Field(type = FieldType.Keyword)
@@ -63,8 +63,8 @@ public class BookDocument {
     @Field(type = FieldType.Float)
     private float ratingAverage;
 
-    @Field(type = FieldType.Boolean)
-    private boolean isSoldOut;
+    @Field(type = FieldType.Keyword)
+    private String bookStatus;
 
     @Setter
     @Field(type = FieldType.Dense_Vector, dims = 1024)
