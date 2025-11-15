@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.orderset.delivery.domain.DeliveryPolicy;
 import com.nhnacademy.byeol23backend.orderset.delivery.exception.DeliveryPolicyNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.delivery.repository.DeliveryPolicyRepository;
@@ -36,9 +37,12 @@ public class RefundServiceImpl implements RefundService {
 	@Override
 	@Transactional
 	public RefundResponse refundRequest(RefundRequest request) {
+		// 주문을 가져옴
 		Order order = orderRepository.findOrderByOrderNumber(request.orderNumber())
 			.orElseThrow(() -> new OrderNotFoundException("해당 주문 번호의 주문을 찾을 수 없습니다.: " + request.orderNumber()));
 
+		// 주문한 멤버를 가져옴
+		Member orderedMember = order.getMember();
 		BigDecimal actualOrderPrice = order.getActualOrderPrice();
 
 		Refund refund = null;
@@ -47,19 +51,29 @@ public class RefundServiceImpl implements RefundService {
 				() -> new RefundPolicyNotFoundException("해당 이름의 환불 종류를 찾을 수 없습니다.: " + request.refundOption()));
 		LocalDateTime now = LocalDateTime.now();
 
-		if (request.refundOption().equals(RefundOption.BREAK)) {
-			actualOrderPrice = getRefundFee(actualOrderPrice, new BigDecimal(0L));
-			refund = Refund.of(order, refundPolicy, now, request.refundReason(), actualOrderPrice, new BigDecimal(0L));
-		} else if (request.refundOption().equals(RefundOption.MIND_CHANGED)) {
+		// [추가] 포인트 사용 내역 있으면 돌려주는 로직 추가해야 됨
+
+		// [추가] 쿠폰 사용 내역 있으면 쿠폰 다시 사용 가능 상태로 변경
+
+		BigDecimal refundAmount = null;
+		if (request.refundOption().equals(RefundOption.BREAK)) { // 파손 파지
+			refundAmount = getRefundFee(actualOrderPrice, new BigDecimal(0L)); // 배송비 0원
+			refund = Refund.of(order, refundPolicy, now, request.refundReason(), refundAmount, new BigDecimal(0L));
+		} else if (request.refundOption().equals(RefundOption.MIND_CHANGED)) { // 단순 변심
 			DeliveryPolicy currentDeliveryPolicy = deliveryPolicyRepository.findFirstByOrderByChangedAtDesc()
 				.orElseThrow(() -> new DeliveryPolicyNotFoundException("현재 배송비 정책을 찾을 수 없습니다."));
-			actualOrderPrice = getRefundFee(actualOrderPrice, currentDeliveryPolicy.getDeliveryFee());
-			refund = Refund.of(order, refundPolicy, now, request.refundReason(), actualOrderPrice,
+			refundAmount = getRefundFee(actualOrderPrice,
+				currentDeliveryPolicy.getDeliveryFee()); // 배송비는 현재 배송비 정책에 따름
+			refund = Refund.of(order, refundPolicy, now, request.refundReason(), refundAmount,
 				currentDeliveryPolicy.getDeliveryFee());
+		} else {
+			throw new RefundPolicyNotFoundException("해당 환불 정책을 찾을 수 없습니다.: " + request.refundOption());
 		}
 
-		// 포인트로 돌려주는 로직, 쿠폰 사용여부 확인 후 쿠폰 돌려주기
-		// order.getTotalBookPrice(), order.getActualOrderPrice 차이 계산해서 포인트로 돌려주면 될 듯
+		// PaymentGate를 이용해서 결제 취소 로직을 호출해야하는지 물어볼 것
+
+		// 나머지 금액은 포인트로 환불, 현재 포인트에 실제로 결제한 금액을 더해줌
+		orderedMember.updatePoint(orderedMember.getCurrentPoint().add(refundAmount));
 
 		refundRepository.save(refund);
 		order.updateOrderStatus("반품");

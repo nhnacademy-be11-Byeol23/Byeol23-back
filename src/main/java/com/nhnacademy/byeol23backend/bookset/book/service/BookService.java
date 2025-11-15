@@ -23,6 +23,8 @@ public interface BookService {
 
 	List<BookResponse> getBooks(Pageable pageable);
 
+	List<BookResponse> getBooksByIds(List<Long> bookIds);
+
 	void updateBookStock(Long bookId, BookStockUpdateRequest request);
 
 	BookStockResponse getBookStock(Long bookId);

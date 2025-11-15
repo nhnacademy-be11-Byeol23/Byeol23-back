@@ -7,6 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.byeol23backend.bookset.book.exception.BookStockNotEnoughException;
 import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
+import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
+import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
+import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
 import com.nhnacademy.byeol23backend.orderset.order.domain.Order;
 import com.nhnacademy.byeol23backend.orderset.order.exception.OrderNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.order.repository.OrderRepository;
@@ -22,6 +25,7 @@ import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentResultRe
 import com.nhnacademy.byeol23backend.orderset.payment.exception.PaymentNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.payment.repository.PaymentRepository;
 import com.nhnacademy.byeol23backend.orderset.payment.service.PaymentService;
+import com.nhnacademy.byeol23backend.pointset.pointhistories.service.PointService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,7 +38,9 @@ public class PaymentServiceImpl implements PaymentService {
 	private final OrderRepository orderRepository;
 	private final OrderDetailRepository orderDetailRepository;
 	private final BookRepository bookRepository;
+	private final PointService pointService;
 	private static final String ORDER_NOT_FOUND_MESSAGE = "해당 주문을 찾을 수 없습니다.: ";
+	private final MemberRepository memberRepository;
 
 	@Override
 	@Transactional
@@ -57,6 +63,12 @@ public class PaymentServiceImpl implements PaymentService {
 				throw new BookStockNotEnoughException("재고 차감 실패 : " + orderDetail.getBook().getBookId());
 			}
 		}
+
+		Member member = memberRepository.findById(order.getMember().getMemberId())
+			.orElseThrow(
+				() -> new MemberNotFoundException("해당 아이디의 회원을 찾을 수 없습니다.: " + order.getMember().getMemberId()));
+
+		pointService.offsetPointsByOrder(member, order.getActualOrderPrice());
 
 		return new PaymentResultResponse(confirmResponse.paymentKey(), confirmResponse.orderId(),
 			confirmResponse.orderName(),

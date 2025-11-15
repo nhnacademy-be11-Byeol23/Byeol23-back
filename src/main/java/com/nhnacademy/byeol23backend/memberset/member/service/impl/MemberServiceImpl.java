@@ -54,9 +54,8 @@ public class MemberServiceImpl implements MemberService {
 				request.joinedFrom(),
 				gradeRepository.findByGradeName("일반")
 		);
-		cartService.createCart(newMember);
-
 		memberRepository.save(newMember);
+		cartService.createCart(newMember);
 		log.info("멤버 생성을 완료했습니다. {}", newMember.getMemberId());
 
 		return new MemberCreateResponse();
