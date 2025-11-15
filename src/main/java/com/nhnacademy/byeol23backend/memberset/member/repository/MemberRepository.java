@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.memberset.member.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -24,5 +25,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     boolean existsByPhoneNumberAndMemberIdNot(String phoneNumber, Long memberId);
     boolean existsByEmailAndMemberIdNot(String email, Long memberId);
 
-
+	Optional<Member> getReferenceByMemberId(Long memberId);
 }

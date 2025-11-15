@@ -12,6 +12,7 @@ import com.nhnacademy.byeol23backend.bookset.book.event.BookDocumentDeleteEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.byeol23backend.bookset.book.domain.Book;

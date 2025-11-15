@@ -2,6 +2,7 @@ package com.nhnacademy.byeol23backend.memberset.member.service;
 
 import java.math.BigDecimal;
 
+import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.memberset.member.dto.*;
 
 public interface MemberService {
@@ -12,4 +13,7 @@ public interface MemberService {
     void reactivateMember(Long memberId);
     void deleteMember(Long memberId);
     void updateMemberPoint(Long memberId, BigDecimal point);
+
+	//member proxy
+	Member getMemberProxy(Long memberId);
 }
