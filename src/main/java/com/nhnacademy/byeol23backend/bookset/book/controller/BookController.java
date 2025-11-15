@@ -84,7 +84,7 @@ public class BookController {
 		return ResponseEntity.ok(bookService.getBookStock(bookId));
 	}
 
-	@PostMapping("/{book-id}/stock")
+	@PutMapping("/{book-id}/stock")
 	public ResponseEntity<Void> updateBookStock(@PathVariable("book-id") Long bookId,
 		@RequestBody BookStockUpdateRequest request) {
 		bookService.updateBookStock(bookId, request);
