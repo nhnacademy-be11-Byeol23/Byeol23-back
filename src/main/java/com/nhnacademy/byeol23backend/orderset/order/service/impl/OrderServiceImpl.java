@@ -1,5 +1,16 @@
 package com.nhnacademy.byeol23backend.orderset.order.service.impl;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import com.nhnacademy.byeol23backend.bookset.book.domain.dto.BookOrderInfoResponse;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookInfoRequest;
@@ -12,7 +23,16 @@ import com.nhnacademy.byeol23backend.orderset.delivery.domain.DeliveryPolicy;
 import com.nhnacademy.byeol23backend.orderset.delivery.exception.DeliveryPolicyNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.delivery.repository.DeliveryPolicyRepository;
 import com.nhnacademy.byeol23backend.orderset.order.domain.Order;
-import com.nhnacademy.byeol23backend.orderset.order.domain.dto.*;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderBulkUpdateRequest;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelRequest;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCreateResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderDetailResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderInfoResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareRequest;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderSearchCondition;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.PointOrderResponse;
 import com.nhnacademy.byeol23backend.orderset.order.exception.OrderNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.order.repository.OrderRepository;
 import com.nhnacademy.byeol23backend.orderset.order.service.OrderService;
@@ -27,16 +47,8 @@ import com.nhnacademy.byeol23backend.orderset.payment.exception.PaymentNotFoundE
 import com.nhnacademy.byeol23backend.orderset.payment.repository.PaymentRepository;
 import com.nhnacademy.byeol23backend.orderset.payment.service.PaymentService;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +63,7 @@ public class OrderServiceImpl implements OrderService {
 	private final DeliveryPolicyRepository deliveryPolicyRepository;
 	private final PackagingRepository packagingRepository;
 	private final JwtParser jwtParser;
+	private final PasswordEncoder passwordEncoder;
 	private static final String ORDER_STATUS_PAYMENT_COMPLETED = "결제 완료";
 	private static final String ORDER_STATUS_ORDER_CANCELED = "주문 취소";
 	private static final String PAYMENT_METHOD_POINT = "포인트 결제";
@@ -64,16 +77,22 @@ public class OrderServiceImpl implements OrderService {
 		String timeStamp = new SimpleDateFormat("yyMMddHHmmss").format(new Date());
 		String randomPart = String.format("%06d", new Random().nextInt(1_000_000));
 		String orderId = timeStamp + randomPart;
+		Long memberId;
+		Member member = null;
 
-		Long memberId = accessTokenParser(accessToken);
+		// 회원
+		if (accessToken != null && !accessToken.isBlank()) {
+			memberId = accessTokenParser(accessToken);
+			member = memberRepository.findById(memberId)
+				.orElseThrow(() -> new MemberNotFoundException("해당 아이디의 멤버를 찾을 수 없습니다.: " + memberId));
+		}
 
-		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new MemberNotFoundException("해당 아이디의 멤버를 찾을 수 없습니다.: " + memberId));
+		String orderPassword = request.orderPassword() == null ? null : passwordEncoder.encode(request.orderPassword());
 
 		DeliveryPolicy currentDeliveryPolicy = deliveryPolicyRepository.findFirstByOrderByChangedAtDesc()
 			.orElseThrow(() -> new DeliveryPolicyNotFoundException(DELIVERY_POLICY_NOT_FOUND_MESSAGE));
 
-		Order order = Order.of(orderId, request.totalBookPrice(), request.actualOrderPrice(),
+		Order order = Order.of(orderId, orderPassword, request.totalBookPrice(), request.actualOrderPrice(),
 			request.deliveryArrivedDate(), request.receiver(), request.postCode(),
 			request.receiverAddress(), request.receiverAddressDetail(), request.receiverAddressExtra(),
 			request.receiverPhone(), member, currentDeliveryPolicy);

@@ -39,7 +39,7 @@ public class OrderController {
 
 	@PostMapping
 	public ResponseEntity<OrderPrepareResponse> prepareOrder(@Valid @RequestBody OrderPrepareRequest request,
-		@CookieValue(name = "Access-Token") String accessToken) {
+		@CookieValue(name = "Access-Token", required = false) String accessToken) {
 		OrderPrepareResponse response = orderService.prepareOrder(request, accessToken);
 		URI uri = URI.create("/api/orders/" + response.orderNumber());
 		return ResponseEntity.created(uri).body(response);
