@@ -1,19 +1,5 @@
 package com.nhnacademy.byeol23backend.bookset.book.service.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import com.nhnacademy.byeol23backend.bookset.book.document.BookDocument;
-import com.nhnacademy.byeol23backend.bookset.book.event.BookDocumentAddEvent;
-import com.nhnacademy.byeol23backend.bookset.book.event.BookDocumentDeleteEvent;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookCreateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookResponse;
@@ -37,6 +23,9 @@ import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
 import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.Contributor;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.AllContributorResponse;
+import com.nhnacademy.byeol23backend.bookset.outbox.BookOutbox;
+import com.nhnacademy.byeol23backend.bookset.outbox.event.BookOutboxEvent;
+import com.nhnacademy.byeol23backend.bookset.outbox.repository.BookOutboxRepository;
 import com.nhnacademy.byeol23backend.bookset.publisher.domain.Publisher;
 import com.nhnacademy.byeol23backend.bookset.publisher.domain.dto.AllPublishersInfoResponse;
 import com.nhnacademy.byeol23backend.bookset.publisher.exception.PublisherNotFoundException;
@@ -44,9 +33,17 @@ import com.nhnacademy.byeol23backend.bookset.publisher.repository.PublisherRepos
 import com.nhnacademy.byeol23backend.bookset.tag.domain.Tag;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.AllTagsInfoResponse;
 import com.nhnacademy.byeol23backend.image.dto.GetUrlResponse;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -64,6 +61,7 @@ public class BookServiceImpl implements BookService {
 	private final BookTagService bookTagService;
 	private final BookContributorService bookContributorService;
 	private final BookImageServiceImpl bookImageService;
+    private final BookOutboxRepository bookOutboxRepository;
 
 	@Override
 	@Transactional
@@ -83,8 +81,11 @@ public class BookServiceImpl implements BookService {
 		log.info("새로운 도서가 생성되었습니다. ID: {}", savedBook.getBookId());
 
         Long bookId = savedBook.getBookId();
-        log.info("도서 문서 저장 이벤트 발행: {}", bookId);
-        eventPublisher.publishEvent(new BookDocumentAddEvent(bookId));
+        BookOutbox savedOutBox = bookOutboxRepository.save(new BookOutbox(bookId, BookOutbox.EventType.ADD));
+
+        Long outboxId = savedOutBox.getId();
+        log.info("[추가] 도서 아웃박스 이벤트 발행: {}", outboxId);
+        eventPublisher.publishEvent(new BookOutboxEvent(outboxId));
 
 		return toResponse(savedBook);
 	}
@@ -133,7 +134,11 @@ public class BookServiceImpl implements BookService {
 		bookContributorRepository.deleteByBookId(bookId);
 		log.info("도서가 삭제 처리되었습니다. ID: {}", bookId);
 
-        eventPublisher.publishEvent(new BookDocumentDeleteEvent(String.valueOf(bookId)));
+        BookOutbox savedOutBox = bookOutboxRepository.save(new BookOutbox(bookId, BookOutbox.EventType.DELETE));
+        Long outboxId = savedOutBox.getId();
+
+        log.info("[삭제] 도서 아웃박스 이벤트 발행: {}", outboxId);
+        eventPublisher.publishEvent(new BookOutboxEvent(outboxId));
 	}
 
 	@Override

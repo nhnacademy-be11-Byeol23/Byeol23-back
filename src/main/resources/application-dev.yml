@@ -39,6 +39,13 @@ spring:
             class: org.quartz.simpl.SimpleThreadPool
             threadCount: 4
 
+  rabbitmq:
+    host: ${RABBITMQ_HOST:s4.java21.net}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:admin}
+    password: ${RABBITMQ_PASSWORD:nhnacademy123!}
+    virtual-host: ${RABBITMQ_VIRTUAL_HOST:byeol23}
+
   ai:
     ollama:
       base-url: ${OLLAMA_BASE_URL}
@@ -60,3 +67,14 @@ eureka:
   instance:
     prefer-ip-address: true
     instance-id: ${spring.cloud.client.hostname}:${spring.application.instance_id:${server.port}}
+
+book:
+  outbox:
+    exchange: byeol23.book.outbox.exchange
+    queue: byeol23.book.outbox.queue
+    routing-key: byeol23.book.outbox.key
+
+  reindex:
+    exchange: byeol23.book.reindex.status.exchange
+    queue: byeol23.book.reindex.status.queue
+    routing-key: byeol23.book.reindex.status.key
