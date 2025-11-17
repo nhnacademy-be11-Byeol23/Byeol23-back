@@ -1,8 +1,11 @@
 package com.nhnacademy.byeol23backend.bookset.book.service.impl;
 
 import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
+import com.nhnacademy.byeol23backend.bookset.book.domain.BookStatus;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookCreateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookResponse;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockResponse;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.event.ViewCountIncreaseEvent;
 import com.nhnacademy.byeol23backend.bookset.book.exception.BookNotFoundException;
@@ -98,6 +101,14 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
+	public BookStockResponse getBookStock(Long bookId) {
+		Book book = bookRepository.findById(bookId)
+			.orElseThrow(() -> new BookNotFoundException("존재하지 않는 도서입니다: " + bookId));
+
+		return new BookStockResponse(book.getBookId(), book.getBookName(), book.getStock());
+	}
+
+	@Override
 	public BookResponse getBookAndIncreaseViewCount(Long bookId, String viewerId) {
 		Book book = bookRepository.findById(bookId)
 			.orElseThrow(() -> new BookNotFoundException("존재하지 않는 도서입니다: " + bookId));
@@ -113,7 +124,10 @@ public class BookServiceImpl implements BookService {
 
 		Publisher publisher = publisherRepository.findById(updateRequest.publisherId())
 			.orElseThrow(() -> new PublisherNotFoundException("존재하지 않는 출판사 ID입니다: " + updateRequest.publisherId()));
-
+		if (updateRequest.bookStatus() == BookStatus.SOLDOUT) {
+			book.setStock(0);
+			log.info("품절 시 재고 0 처리");
+		}
 		book.updateBook(updateRequest, publisher);
 		bookCategoryService.updateBookCategories(book, updateRequest.categoryIds());
 		bookTagService.updateBookTags(book, updateRequest.tagIds());
@@ -121,6 +135,16 @@ public class BookServiceImpl implements BookService {
 		log.info("도서 정보가 수정되었습니다. ID: {}", book.getBookId());
 
 		return toResponse(book);
+	}
+
+	@Override
+	@Transactional
+	public void updateBookStock(Long bookId, BookStockUpdateRequest request) {
+		Book book = bookRepository.findById(bookId)
+			.orElseThrow(() -> new BookNotFoundException("존재하지 않는 도서입니다: " + bookId));
+
+		book.setStock(request.stock());
+		log.info("도서 재고가 수정되었습니다. ID: {}", bookId);
 	}
 
 	@Override

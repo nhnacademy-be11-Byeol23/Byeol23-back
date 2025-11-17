@@ -15,10 +15,10 @@ spring:
 
   data:
     redis:
-      host: ${REDIS_HOST:s4.java21.net}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:*N2vya7H@muDTwdNMR!}
-      database: ${REDIS_DATABASE:321}
+      host: s4.java21.net
+      port: 6379
+      password: '*N2vya7H@muDTwdNMR!'
+      database: 321
 
   elasticsearch:
     uris: http://${ES_HOST:s4.java21.net}:${ES_PORT:9200}
