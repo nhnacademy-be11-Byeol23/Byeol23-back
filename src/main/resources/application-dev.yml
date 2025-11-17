@@ -48,7 +48,7 @@ spring:
 
   ai:
     ollama:
-      base-url: ${OLLAMA_BASE_URL}
+      base-url: ${OLLAMA_BASE_URL:http://ollama.java21.net}
       embedding:
         options:
           model: bge-m3
@@ -78,3 +78,8 @@ book:
     exchange: byeol23.book.reindex.status.exchange
     queue: byeol23.book.reindex.status.queue
     routing-key: byeol23.book.reindex.status.key
+
+  embedding:
+    exchange: byeol23.book.embedding.exchange
+    queue: byeol23.book.embedding.queue
+    routing-key: byeol23.book.embedding.key

@@ -13,10 +13,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableRabbit
 @RequiredArgsConstructor
-@EnableConfigurationProperties(value = {BookOutboxRabbitProperties.class, BookReindexRabbitProperties.class})
+@EnableConfigurationProperties(value = {BookOutboxRabbitProperties.class, BookReindexRabbitProperties.class, BookEmbeddingRabbitProperties.class})
 public class RabbitMqConfig {
     private final BookOutboxRabbitProperties bookOutboxRabbitProperties;
     private final BookReindexRabbitProperties bookReindexRabbitProperties;
+    private final BookEmbeddingRabbitProperties bookEmbeddingRabbitProperties;
 
     @Bean
     public DirectExchange bookOutboxExchange() {
@@ -52,5 +53,23 @@ public class RabbitMqConfig {
                 .bind(bookReindexQueue())
                 .to(bookReindexExchange())
                 .with(bookReindexRabbitProperties.routingKey());
+    }
+
+    @Bean
+    public DirectExchange bookEmbeddingExchange() {
+        return new DirectExchange(bookEmbeddingRabbitProperties.exchange());
+    }
+
+    @Bean
+    public Queue bookEmbeddingQueue() {
+        return new Queue(bookEmbeddingRabbitProperties.queue(), true);
+    }
+
+    @Bean
+    public Binding bookEmbeddingBinding() {
+        return BindingBuilder
+                .bind(bookEmbeddingQueue())
+                .to(bookReindexExchange())
+                .with(bookEmbeddingRabbitProperties.routingKey());
     }
 }

@@ -25,7 +25,7 @@ public class BookDocumentBuilder {
     private final BookTagService bookTagService;
 
     @Transactional(readOnly = true)
-    public BookDocument build(Long bookId) {
+    public BookDocument buildWithOutEmbedding(Long bookId) {
         Book book = bookService.getBookWithPublisher(bookId);
         List<Category> categories = bookCategoryService.getCategoriesByBookId(bookId);
         Map<String, List<Contributor>> contributorMap = bookContributorService.getContributorsByBookId(bookId).stream().collect(Collectors.groupingBy(Contributor::getContributorRole));
