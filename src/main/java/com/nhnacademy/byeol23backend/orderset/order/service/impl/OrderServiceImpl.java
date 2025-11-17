@@ -23,7 +23,16 @@ import com.nhnacademy.byeol23backend.orderset.delivery.domain.DeliveryPolicy;
 import com.nhnacademy.byeol23backend.orderset.delivery.exception.DeliveryPolicyNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.delivery.repository.DeliveryPolicyRepository;
 import com.nhnacademy.byeol23backend.orderset.order.domain.Order;
-import com.nhnacademy.byeol23backend.orderset.order.domain.dto.*;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderBulkUpdateRequest;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelRequest;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCreateResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderDetailResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderInfoResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareRequest;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderSearchCondition;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.PointOrderResponse;
 import com.nhnacademy.byeol23backend.orderset.order.exception.OrderNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.order.repository.OrderRepository;
 import com.nhnacademy.byeol23backend.orderset.order.service.OrderService;
@@ -38,6 +47,7 @@ import com.nhnacademy.byeol23backend.orderset.payment.exception.PaymentNotFoundE
 import com.nhnacademy.byeol23backend.orderset.payment.repository.PaymentRepository;
 import com.nhnacademy.byeol23backend.orderset.payment.service.PaymentService;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -75,8 +85,6 @@ public class OrderServiceImpl implements OrderService {
 			memberId = accessTokenParser(accessToken);
 			member = memberRepository.findById(memberId)
 				.orElseThrow(() -> new MemberNotFoundException("해당 아이디의 멤버를 찾을 수 없습니다.: " + memberId));
-		} else {
-			memberId = -1L;
 		}
 
 		String orderPassword = request.orderPassword() == null ? null : passwordEncoder.encode(request.orderPassword());
