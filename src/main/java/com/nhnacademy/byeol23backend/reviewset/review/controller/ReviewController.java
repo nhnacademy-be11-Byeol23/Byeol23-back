@@ -18,8 +18,10 @@ public class ReviewController {
 		this.reviewService = reviewService;
 	}
 
-	@GetMapping("/product/{bookId}")
-	public ResponseEntity<List<ReviewResponse>> getReviewsByProductId(@PathVariable Long bookId) {
+	@GetMapping("/product/{book-id}")
+	public ResponseEntity<List<ReviewResponse>> getReviewsByProductId(@PathVariable(
+		"book-id"
+	) Long bookId) {
 		return ResponseEntity.ok(reviewService.getReviewsByProductId(bookId));
 	}
 

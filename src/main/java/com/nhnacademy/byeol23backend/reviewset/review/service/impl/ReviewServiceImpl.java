@@ -41,7 +41,6 @@ public class ReviewServiceImpl implements ReviewService {
 			.orElseThrow(()-> new IllegalArgumentException("No reviews found for bookId: " + bookId));
 		List<ReviewResponse> reviewResponses = new ArrayList<>();
 		for(Review review : reviews) {
-			Map<Long, String> imageUrls = imageServiceGate.getImageUrlsById(review.getReviewId(), ImageDomain.REVIEW);
 			ReviewResponse response = ReviewResponse
 				.builder()
 				.reviewId(review.getReviewId())
@@ -49,7 +48,7 @@ public class ReviewServiceImpl implements ReviewService {
 				.reviewContent(review.getReviewContent())
 				.reviewRate(review.getReviewRate())
 				.revisedAt(review.getRevisedAt())
-				.reviewImageUrls(imageUrls)
+				.reviewImageUrls(review.getReviewImageUrls())
 				.build();
 			reviewResponses.add(response);
 		}

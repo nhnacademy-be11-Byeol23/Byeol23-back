@@ -16,6 +16,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
 	@Query("SELECT r FROM Review r "
 		+ "JOIN FETCH r.member "  // <--- 핵심: Member를 즉시 로딩해서 가져옴
+		+ "LEFT JOIN FETCH r.reviewImageUrls " // <--- 핵심: ReviewImage들을 즉시 로딩해서 가져옴
 		+ "JOIN r.orderDetail "   // OrderDetail은 조건절용으로만 쓴다면 일반 JOIN 유지
 		+ "WHERE r.orderDetail.book.bookId = :bookId") // book 객체 비교가 아니라면 id 명시 추천
 	Optional<List<Review>> findAllByBookId(@Param("bookId") Long bookId);
