@@ -48,7 +48,8 @@ public class ReviewServiceImpl implements ReviewService {
 				.reviewContent(review.getReviewContent())
 				.reviewRate(review.getReviewRate())
 				.revisedAt(review.getCreatedAt())
-				.reviewImageUrls(review.getReviewImageUrls())
+				.reviewImageUrls(review.getReviewImageUrls().stream().map(v->v.getReviewImageUrl()).toList()
+				)
 				.build();
 			reviewResponses.add(response);
 		}

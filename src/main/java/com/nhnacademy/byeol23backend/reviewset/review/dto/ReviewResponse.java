@@ -15,6 +15,6 @@ public record ReviewResponse(
 	Byte reviewRate,
 	String reviewContent,
 	LocalDateTime revisedAt,
-	List<ReviewImage> reviewImageUrls
+	List<String> reviewImageUrls
 ) {
 }
