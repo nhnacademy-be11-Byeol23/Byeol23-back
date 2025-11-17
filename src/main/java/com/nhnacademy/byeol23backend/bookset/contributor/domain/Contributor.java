@@ -31,7 +31,6 @@ public class Contributor {
 	@Setter
 	private String contributorName;
 
-	@Enumerated(EnumType.STRING)
 	@Column(name = "contributor_role", nullable = false, length = 10)
 	private ContributorRole contributorRole;
 
