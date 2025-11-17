@@ -23,6 +23,7 @@ public interface BookRepository extends JpaRepository<Book, Long>, JdbcBookRepos
 	@Query("UPDATE Book b SET b.stock = b.stock - :quantity " +
 		"WHERE b.bookId = :bookId And b.stock >= :quantity")
 	int decreaseBookStock(@Param("bookId") Long bookId, @Param("quantity") Integer quantity);
+	// 재고가 0이 되면 도서 상태(book status) -> 품절로
 
     @Query("select b from Book b join fetch b.publisher p where b.bookId = :bookId")
     Book queryBookWithPublisherById(@Param("bookId") Long bookId);

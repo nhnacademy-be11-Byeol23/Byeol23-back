@@ -94,7 +94,7 @@ public class PackagingServiceImpl implements PackagingService, ImageService {
 		Packaging packaging = packagingRepository.findById(packagingId)
 			.orElseThrow(() -> new PackagingNotFoundException("해당 아이디의 포장지를 찾을 수 없습니다.: " + packagingId));
 
-		packaging.updateInfo(packaging.getPackagingName(), packaging.getPackagingPrice());
+		packaging.updateInfo(request.packagingName(), request.packagingPrice());
 
 		return new PackagingUpdateResponse(packaging.getPackagingName(), packaging.getPackagingPrice(),
 			packaging.getPackagingImgUrl());
