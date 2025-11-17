@@ -2,6 +2,7 @@ package com.nhnacademy.byeol23backend.bookset.book.service;
 
 import java.util.List;
 
+import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import org.springframework.data.domain.Pageable;
 
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookCreateRequest;
@@ -24,6 +25,8 @@ public interface BookService {
 	List<BookResponse> getBooks(Pageable pageable);
 
 	List<BookResponse> getBooksByIds(List<Long> bookIds);
+
+    Book getBookWithPublisher(Long bookId);
 
 	void updateBookStock(Long bookId, BookStockUpdateRequest request);
 
