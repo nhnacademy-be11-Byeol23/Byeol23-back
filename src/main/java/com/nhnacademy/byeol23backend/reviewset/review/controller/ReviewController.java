@@ -5,6 +5,9 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
+import com.nhnacademy.byeol23backend.orderset.orderdetail.domain.OrderDetail;
+import com.nhnacademy.byeol23backend.orderset.orderdetail.service.OrderDetailService;
 import com.nhnacademy.byeol23backend.reviewset.review.dto.ReviewRegisterRequest;
 import com.nhnacademy.byeol23backend.reviewset.review.dto.ReviewResponse;
 import com.nhnacademy.byeol23backend.reviewset.review.service.ReviewService;
@@ -27,6 +30,7 @@ public class ReviewController {
 
 	@PostMapping
 	public ResponseEntity<Void> register(@RequestBody ReviewRegisterRequest request) {
+
 		reviewService.registerReview(
 			request.reviewContent(),
 			request.reviewRate(),

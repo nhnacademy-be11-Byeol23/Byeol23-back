@@ -17,6 +17,10 @@ import com.nhnacademy.byeol23backend.memberset.member.service.MemberService;
 import com.nhnacademy.byeol23backend.orderset.order.service.OrderService;
 import com.nhnacademy.byeol23backend.orderset.orderdetail.domain.OrderDetail;
 import com.nhnacademy.byeol23backend.orderset.orderdetail.service.OrderDetailService;
+import com.nhnacademy.byeol23backend.pointset.pointhistories.service.PointService;
+import com.nhnacademy.byeol23backend.pointset.pointpolicy.domain.PointPolicy;
+import com.nhnacademy.byeol23backend.pointset.pointpolicy.dto.PointPolicyDTO;
+import com.nhnacademy.byeol23backend.pointset.pointpolicy.dto.ReservedPolicy;
 import com.nhnacademy.byeol23backend.reviewset.review.domain.Review;
 import com.nhnacademy.byeol23backend.reviewset.review.dto.ReviewResponse;
 import com.nhnacademy.byeol23backend.reviewset.review.repository.ReviewRepository;
@@ -33,6 +37,7 @@ public class ReviewServiceImpl implements ReviewService {
 	private final OrderDetailService orderDetailService;
 	private final MemberService memberService;
 	private final ImageServiceGate imageServiceGate;
+	private final PointService pointService;
 
 	@Override
 	@Transactional
@@ -61,6 +66,11 @@ public class ReviewServiceImpl implements ReviewService {
 	public void registerReview(String reviewContent, Byte reviewRate, Long orderDetailId, List<String> imageUrls) {
 		OrderDetail orderDetail = orderDetailService.getOrderDetailById(orderDetailId);
 		Long memberId = orderDetail.getOrder().getMember().getMemberId();
+		Member member = memberService.getMemberProxy(memberId);
+		pointService.offsetPointsByReserved(
+			member,
+			ReservedPolicy.REVIEW
+		);
 		Member memberProxy = memberService.getMemberProxy(memberId);
 		Review review = new Review(
 			reviewRate,
