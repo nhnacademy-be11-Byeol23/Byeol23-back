@@ -47,7 +47,7 @@ public class ReviewServiceImpl implements ReviewService {
 				.reviewerName(review.getMember().getMemberName())
 				.reviewContent(review.getReviewContent())
 				.reviewRate(review.getReviewRate())
-				.revisedAt(review.getRevisedAt())
+				.revisedAt(review.getCreatedAt())
 				.reviewImageUrls(review.getReviewImageUrls())
 				.build();
 			reviewResponses.add(response);
