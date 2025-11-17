@@ -32,18 +32,12 @@ public class Contributor {
 	private String contributorName;
 
 	@Column(name = "contributor_role", nullable = false, length = 10)
-	private ContributorRole contributorRole;
+	@Getter
+	@Setter
+	private String contributorRole;
 
 	public Contributor(ContributorCreateRequest contributorCreateRequest){
 		this.contributorName = contributorCreateRequest.contributorName();
 		this.contributorRole = contributorCreateRequest.contributorRole();
-	}
-
-	public void setContributorRole(String contributorRole) {
-		this.contributorRole = ContributorRole.from(contributorRole);
-	}
-
-	public String getContributorRole(){
-		return this.contributorRole.getLabel();
 	}
 }
