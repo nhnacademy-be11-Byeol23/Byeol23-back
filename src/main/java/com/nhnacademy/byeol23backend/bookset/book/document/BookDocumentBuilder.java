@@ -48,7 +48,7 @@ public class BookDocumentBuilder {
                 .viewCount(book.getViewCount())
                 .reviewCount(0)
                 .ratingAverage(0.0f)
-                .bookStatus(book.getBookStatus())
+                .bookStatus(book.getBookStatus().name())
                 .build();
     }
 }
