@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.orderset.payment.service.impl;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.nhnacademy.byeol23backend.bookset.book.exception.BookStockNotEnoughException;
 import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
-import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
 import com.nhnacademy.byeol23backend.orderset.order.domain.Order;
 import com.nhnacademy.byeol23backend.orderset.order.exception.OrderNotFoundException;
@@ -64,11 +64,11 @@ public class PaymentServiceImpl implements PaymentService {
 			}
 		}
 
-		Member member = memberRepository.findById(order.getMember().getMemberId())
-			.orElseThrow(
-				() -> new MemberNotFoundException("해당 아이디의 회원을 찾을 수 없습니다.: " + order.getMember().getMemberId()));
+		Member member = order.getMember();
 
-		pointService.offsetPointsByOrder(member, order.getActualOrderPrice());
+		if (!Objects.isNull(member)) {
+			pointService.offsetPointsByOrder(member, order.getActualOrderPrice());
+		}
 
 		return new PaymentResultResponse(confirmResponse.paymentKey(), confirmResponse.orderId(),
 			confirmResponse.orderName(),
