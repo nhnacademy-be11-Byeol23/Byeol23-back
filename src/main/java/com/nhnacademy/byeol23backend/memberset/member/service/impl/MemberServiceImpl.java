@@ -17,6 +17,7 @@ import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
 import com.nhnacademy.byeol23backend.memberset.member.service.MemberService;
+import com.nhnacademy.byeol23backend.utils.JwtParser;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
