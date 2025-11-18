@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.orderset.order.controller;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -88,6 +89,12 @@ public class OrderController {
 	public ResponseEntity<Void> updateBulkOrderStatus(@RequestBody OrderBulkUpdateRequest request) {
 		orderService.updateBulkOrderStatus(request);
 		return ResponseEntity.ok().build();
+	}
+
+	@GetMapping("/members")
+	public ResponseEntity<List<OrderDetailResponse>> getOrders(@CookieValue(name = "Access-Token") String token) {
+		List<OrderDetailResponse> responses = orderService.getOrders(token);
+		return ResponseEntity.ok(responses);
 	}
 
 }
