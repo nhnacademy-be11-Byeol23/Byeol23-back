@@ -2,7 +2,6 @@ package com.nhnacademy.byeol23backend.bookset.book.controller;
 
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -28,6 +27,7 @@ import com.nhnacademy.byeol23backend.bookset.book.service.BookService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
@@ -46,7 +46,7 @@ public class BookController {
 
 	@GetMapping("/{bookId}")
 	public ResponseEntity<BookResponse> getBook(@PathVariable("bookId") Long bookId, @ViewerId String viewerId) {
-        log.info("viewerId: {}", viewerId);
+		log.info("viewerId: {}", viewerId);
 		BookResponse response = bookService.getBookAndIncreaseViewCount(bookId, viewerId);
 		return ResponseEntity.ok(response);
 	}
@@ -65,10 +65,10 @@ public class BookController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<BookResponse>> getBooks(@RequestParam(defaultValue = "0") int pageNo,
-		@RequestParam(defaultValue = "10") int pageSize
+	public ResponseEntity<List<BookResponse>> getBooks(@RequestParam(value = "page", defaultValue = "0") int page,
+		@RequestParam(value = "size", defaultValue = "10") int size
 	) {
-		Pageable pageable = PageRequest.of(pageNo, pageSize);
+		Pageable pageable = PageRequest.of(page, size);
 		List<BookResponse> books = bookService.getBooks(pageable);
 		return ResponseEntity.ok(books);
 	}

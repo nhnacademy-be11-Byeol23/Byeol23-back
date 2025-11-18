@@ -83,3 +83,11 @@ book:
     exchange: byeol23.book.embedding.exchange
     queue: byeol23.book.embedding.queue
     routing-key: byeol23.book.embedding.key
+
+management:
+  health:
+    redis:
+      enabled: false
+
+    elasticsearch:
+      enabled: false
