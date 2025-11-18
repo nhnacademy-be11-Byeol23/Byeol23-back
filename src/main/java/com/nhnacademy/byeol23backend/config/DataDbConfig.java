@@ -39,7 +39,7 @@ public class DataDbConfig {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
 
         em.setDataSource(dataSource);
-        em.setPackagesToScan(new String[]{"com.nhnacademy.byeol23backend"});
+        em.setPackagesToScan("com.nhnacademy.byeol23backend");
         em. setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 
         HashMap<String, Object> properties = new HashMap<>();

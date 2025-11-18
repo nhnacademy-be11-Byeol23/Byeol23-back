@@ -22,10 +22,10 @@ public class PointServiceImpl implements PointService {
 	private final PointPolicyRepository pointPolicyRepository;
 
 	@Override
-	public PointHistory offsetPointsByReserved(Member member, ReservedPolicy reservedPolicy, BigDecimal orderAmount) {
+	public PointHistory offsetPointsByReserved(Member member, ReservedPolicy reservedPolicy) {
 		final PointPolicy pointPolicy = pointPolicyRepository.findByPointPolicyName(reservedPolicy.name())
 			.orElseThrow(() -> new IllegalArgumentException("Invalid Point Policy Name: " + reservedPolicy.name()));
-		return pointInternalService.addPoints(member, pointPolicy, orderAmount);
+		return pointInternalService.addPoints(member, pointPolicy, BigDecimal.ZERO);
 	}
 
 	@Override

@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -22,12 +23,15 @@ public class DeliveryPolicy {
 	@Column(name = "delivery_policy_id")
 	private Long deliveryPolicyId;
 
+	@Setter
 	@Column(name = "free_delivery_condition", nullable = false, precision = 10)
 	private BigDecimal freeDeliveryCondition;
 
+	@Setter
 	@Column(name = "delivery_fee", nullable = false, precision = 10)
 	private BigDecimal deliveryFee;
 
+	@Setter
 	private LocalDateTime changedAt;
 
 	public DeliveryPolicy(BigDecimal freeDeliveryCondition, BigDecimal deliveryFee, LocalDateTime changedAt) {
