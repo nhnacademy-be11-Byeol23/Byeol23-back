@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.memberset.member.service.MemberService;
 
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,6 @@ public class MemberController implements MemberApi{
 
 	/**
 	 * 회원가입 요청 <br>
-	 * (현재는 아무 것도 반환하지 않는다)
 	 * @param request MemberCreateRequest
 	 * @return 201(CREATED)
 	 */

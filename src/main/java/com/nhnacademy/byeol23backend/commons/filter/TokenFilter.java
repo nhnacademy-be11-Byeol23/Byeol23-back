@@ -1,4 +1,4 @@
-package com.nhnacademy.byeol23backend.filter;
+package com.nhnacademy.byeol23backend.commons.filter;
 
 import java.io.IOException;
 

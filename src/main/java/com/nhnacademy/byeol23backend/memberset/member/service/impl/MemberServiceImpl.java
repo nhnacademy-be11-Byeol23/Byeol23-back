@@ -82,7 +82,7 @@ public class MemberServiceImpl implements MemberService {
 				member.getBirthDate(),
 				member.getCurrentPoint(),
 				member.getMemberRole(),
-				member.getGrade()
+				member.getGrade().getGradeName()
 		);
 	}
 

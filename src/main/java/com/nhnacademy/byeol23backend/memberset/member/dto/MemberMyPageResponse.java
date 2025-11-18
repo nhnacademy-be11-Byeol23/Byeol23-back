@@ -15,6 +15,6 @@ public record MemberMyPageResponse(
         LocalDate birthDate,
         BigDecimal currentPoint,
         Role memberRole,
-        Grade grade
+        String gradeName
 ) {
 }
