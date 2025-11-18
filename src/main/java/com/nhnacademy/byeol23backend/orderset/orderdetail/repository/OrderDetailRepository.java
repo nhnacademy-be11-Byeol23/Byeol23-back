@@ -14,4 +14,5 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
 	@Query("SELECT od from OrderDetail od JOIN FETCH od.book WHERE od.order = :order")
 	List<OrderDetail> findAllByOrderWithBook(@Param("order") Order order);
 
+	List<OrderDetail> findAllByBook_BookId(Long bookBookId);
 }
