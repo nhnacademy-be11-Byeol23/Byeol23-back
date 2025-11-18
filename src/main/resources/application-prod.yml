@@ -65,3 +65,19 @@ management:
       enabled: false  # Elasticsearch
     db:
       enabled: false  # 데이터베이스 (Quartz용)
+
+book:
+  outbox:
+    exchange: byeol23.book.outbox.exchange
+    queue: byeol23.book.outbox.queue
+    routing-key: byeol23.book.outbox.key
+
+  reindex:
+    exchange: byeol23.book.reindex.status.exchange
+    queue: byeol23.book.reindex.status.queue
+    routing-key: byeol23.book.reindex.status.key
+
+  embedding:
+    exchange: byeol23.book.embedding.exchange
+    queue: byeol23.book.embedding.queue
+    routing-key: byeol23.book.embedding.key
