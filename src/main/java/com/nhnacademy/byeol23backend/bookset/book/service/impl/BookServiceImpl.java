@@ -1,22 +1,11 @@
 package com.nhnacademy.byeol23backend.bookset.book.service.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import com.nhnacademy.byeol23backend.bookset.book.document.BookDocument;
-import com.nhnacademy.byeol23backend.bookset.book.event.BookDocumentAddEvent;
-import com.nhnacademy.byeol23backend.bookset.book.event.BookDocumentDeleteEvent;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
+import com.nhnacademy.byeol23backend.bookset.book.domain.BookStatus;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookCreateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookResponse;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockResponse;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.event.ViewCountIncreaseEvent;
 import com.nhnacademy.byeol23backend.bookset.book.exception.BookNotFoundException;
@@ -37,6 +26,9 @@ import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
 import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.Contributor;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.AllContributorResponse;
+import com.nhnacademy.byeol23backend.bookset.outbox.BookOutbox;
+import com.nhnacademy.byeol23backend.bookset.outbox.event.BookOutboxEvent;
+import com.nhnacademy.byeol23backend.bookset.outbox.repository.BookOutboxRepository;
 import com.nhnacademy.byeol23backend.bookset.publisher.domain.Publisher;
 import com.nhnacademy.byeol23backend.bookset.publisher.domain.dto.AllPublishersInfoResponse;
 import com.nhnacademy.byeol23backend.bookset.publisher.exception.PublisherNotFoundException;
@@ -44,9 +36,17 @@ import com.nhnacademy.byeol23backend.bookset.publisher.repository.PublisherRepos
 import com.nhnacademy.byeol23backend.bookset.tag.domain.Tag;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.AllTagsInfoResponse;
 import com.nhnacademy.byeol23backend.image.dto.GetUrlResponse;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -64,6 +64,7 @@ public class BookServiceImpl implements BookService {
 	private final BookTagService bookTagService;
 	private final BookContributorService bookContributorService;
 	private final BookImageServiceImpl bookImageService;
+    private final BookOutboxRepository bookOutboxRepository;
 
 	@Override
 	@Transactional
@@ -82,33 +83,12 @@ public class BookServiceImpl implements BookService {
 		bookContributorService.createBookContributors(savedBook, createRequest.contributorIds());
 		log.info("새로운 도서가 생성되었습니다. ID: {}", savedBook.getBookId());
 
-        List<Category> categories = book.getBookCategories().stream().map(BookCategory::getCategory).toList();
-        List<Tag> tags = book.getBookTags() == null ? List.of() : book.getBookTags().stream().map(BookTag::getTag).toList();
+        Long bookId = savedBook.getBookId();
+        BookOutbox savedOutBox = bookOutboxRepository.save(new BookOutbox(bookId, BookOutbox.EventType.ADD));
 
-        Map<String, List<Contributor>> contributorMap = book.getBookContributors().stream()
-                .map(BookContributor::getContributor)
-                .collect(Collectors.groupingBy(Contributor::getContributorRole));
-
-        BookDocument bookDocument = BookDocument.builder()
-                .id(String.valueOf(savedBook.getBookId()))
-                .title(savedBook.getBookName())
-                .author(contributorMap.get("저자").stream().map(Contributor::getContributorName).toList())
-                .translator(contributorMap.getOrDefault("역자", List.of()).stream().map(Contributor::getContributorName).toList())
-                .isbn(book.getIsbn())
-                .regularPrice(book.getRegularPrice().intValue())
-                .salePrice(book.getSalePrice().intValue())
-                .publisher(book.getPublisher().getPublisherName())
-                .publishedAt(book.getPublishDate())
-                .tagNames(tags.stream().map(Tag::getTagName).toList())
-                .pathIds(categories.stream().map(Category::getPathId).toList())
-                .pathNames(categories.stream().map(Category::getPathName).toList())
-                .viewCount(book.getViewCount())
-                .reviewCount(0)
-                .ratingAverage(0.0f)
-                .isSoldOut(book.getStock() == 0)
-                .build();
-        log.info("도서 문서 저장 이벤트 발행: {}", bookDocument.getId());
-        eventPublisher.publishEvent(new BookDocumentAddEvent(bookDocument));
+        Long outboxId = savedOutBox.getId();
+        log.info("[추가] 도서 아웃박스 이벤트 발행: {}", outboxId);
+        eventPublisher.publishEvent(new BookOutboxEvent(outboxId));
 
 		return toResponse(savedBook);
 	}
@@ -118,6 +98,14 @@ public class BookServiceImpl implements BookService {
 		Book book = bookRepository.findById(bookId)
 			.orElseThrow(() -> new BookNotFoundException("존재하지 않는 도서입니다: " + bookId));
 		return toResponse(book);
+	}
+
+	@Override
+	public BookStockResponse getBookStock(Long bookId) {
+		Book book = bookRepository.findById(bookId)
+			.orElseThrow(() -> new BookNotFoundException("존재하지 않는 도서입니다: " + bookId));
+
+		return new BookStockResponse(book.getBookId(), book.getBookName(), book.getStock());
 	}
 
 	@Override
@@ -136,7 +124,10 @@ public class BookServiceImpl implements BookService {
 
 		Publisher publisher = publisherRepository.findById(updateRequest.publisherId())
 			.orElseThrow(() -> new PublisherNotFoundException("존재하지 않는 출판사 ID입니다: " + updateRequest.publisherId()));
-
+		if (updateRequest.bookStatus() == BookStatus.SOLDOUT) {
+			book.setStock(0);
+			log.info("품절 시 재고 0 처리");
+		}
 		book.updateBook(updateRequest, publisher);
 		bookCategoryService.updateBookCategories(book, updateRequest.categoryIds());
 		bookTagService.updateBookTags(book, updateRequest.tagIds());
@@ -144,6 +135,16 @@ public class BookServiceImpl implements BookService {
 		log.info("도서 정보가 수정되었습니다. ID: {}", book.getBookId());
 
 		return toResponse(book);
+	}
+
+	@Override
+	@Transactional
+	public void updateBookStock(Long bookId, BookStockUpdateRequest request) {
+		Book book = bookRepository.findById(bookId)
+			.orElseThrow(() -> new BookNotFoundException("존재하지 않는 도서입니다: " + bookId));
+
+		book.setStock(request.stock());
+		log.info("도서 재고가 수정되었습니다. ID: {}", bookId);
 	}
 
 	@Override
@@ -157,7 +158,11 @@ public class BookServiceImpl implements BookService {
 		bookContributorRepository.deleteByBookId(bookId);
 		log.info("도서가 삭제 처리되었습니다. ID: {}", bookId);
 
-        eventPublisher.publishEvent(new BookDocumentDeleteEvent(String.valueOf(bookId)));
+        BookOutbox savedOutBox = bookOutboxRepository.save(new BookOutbox(bookId, BookOutbox.EventType.DELETE));
+        Long outboxId = savedOutBox.getId();
+
+        log.info("[삭제] 도서 아웃박스 이벤트 발행: {}", outboxId);
+        eventPublisher.publishEvent(new BookOutboxEvent(outboxId));
 	}
 
 	@Override
@@ -254,8 +259,13 @@ public class BookServiceImpl implements BookService {
 		return bookResponseList;
 	}
 
-	private BookResponse toResponse(Book book, List<Category> categories, List<Tag> tags,
-		List<Contributor> contributors) {
+    @Override
+    public Book getBookWithPublisher(Long bookId) {
+        return bookRepository.queryBookWithPublisherById(bookId);
+    }
+
+    private BookResponse toResponse(Book book, List<Category> categories, List<Tag> tags,
+                                    List<Contributor> contributors) {
 		List<CategoryLeafResponse> categoryResponses = categories.stream()
 			.map(category -> new CategoryLeafResponse(
 				category.getCategoryId(),
