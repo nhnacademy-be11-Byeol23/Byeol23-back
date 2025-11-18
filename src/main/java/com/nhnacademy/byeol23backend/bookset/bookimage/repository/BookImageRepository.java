@@ -7,12 +7,13 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.nhnacademy.byeol23backend.bookset.bookimage.domain.BookImage;
 import com.nhnacademy.byeol23backend.image.dto.ImageUrlProjection;
+import org.springframework.data.repository.query.Param;
 
 public interface BookImageRepository extends JpaRepository<BookImage, Long> {
-	@Query(
-		"SELECT new com.nhnacademy.byeol23backend.image.dto.ImageUrlProjection(bi.bookImageId, bi.bookImageUrl) " +
-			"FROM BookImage bi " +
-			"WHERE bi.book.bookId = :bookId"
-	)
-	List<ImageUrlProjection> findUrlsAndIdsByBookId(Long bookId);
+    @Query(
+            "SELECT new com.nhnacademy.byeol23backend.image.dto.ImageUrlProjection(bi.bookImageId, bi.bookImageUrl) " +
+                    "FROM BookImage bi " +
+                    "WHERE bi.book.bookId = :bookId"
+    )
+    List<ImageUrlProjection> findUrlsAndIdsByBookId(@Param("bookId") Long bookId);
 }
