@@ -47,7 +47,12 @@ spring:
             tablePrefix: BACK_QRTZ_
             isClustered: true
             clusterCheckinInterval: 30000
-
+  rabbitmq:
+    host: ${RABBITMQ_HOST:s4.java21.net}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:admin}
+    password: ${RABBITMQ_PASSWORD:nhnacademy123!}
+    virtual-host: ${RABBITMQ_VIRTUAL_HOST:byeol23}
 
 jwt:
   public-key: ${JWT_PUBLIC_KEY}
