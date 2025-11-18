@@ -31,13 +31,20 @@ public class Contributor {
 	@Setter
 	private String contributorName;
 
+	@Enumerated(EnumType.STRING)
 	@Column(name = "contributor_role", nullable = false, length = 10)
-	@Getter
-	@Setter
-	private String contributorRole;
+	private ContributorRole contributorRole;
 
-	public Contributor(ContributorCreateRequest contributorCreateRequest){
+	public Contributor(ContributorCreateRequest contributorCreateRequest) {
 		this.contributorName = contributorCreateRequest.contributorName();
 		this.contributorRole = contributorCreateRequest.contributorRole();
+	}
+
+	public void setContributorRole(String contributorRole) {
+		this.contributorRole = ContributorRole.from(contributorRole);
+	}
+
+	public String getContributorRole() {
+		return this.contributorRole.getLabel();
 	}
 }

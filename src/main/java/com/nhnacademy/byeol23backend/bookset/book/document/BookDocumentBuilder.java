@@ -31,24 +31,25 @@ public class BookDocumentBuilder {
         Map<String, List<Contributor>> contributorMap = bookContributorService.getContributorsByBookId(bookId).stream().collect(Collectors.groupingBy(Contributor::getContributorRole));
         List<Tag> tags = bookTagService.getTagsByBookId(bookId);
 
-        return BookDocument.builder()
-                .id(String.valueOf(book.getBookId()))
-                .title(book.getBookName())
-                .description(book.getDescription())
-                .author(contributorMap.get("저자").stream().map(Contributor::getContributorName).toList())
-                .translator(contributorMap.getOrDefault("역자", List.of()).stream().map(Contributor::getContributorName).toList())
-                .isbn(book.getIsbn())
-                .regularPrice(book.getRegularPrice().intValue())
-                .salePrice(book.getSalePrice().intValue())
-                .publisher(book.getPublisher().getPublisherName())
-                .publishedAt(book.getPublishDate())
-                .tagNames(tags.stream().map(Tag::getTagName).toList())
-                .pathIds(categories.stream().map(Category::getPathId).toList())
-                .pathNames(categories.stream().map(Category::getPathName).toList())
-                .viewCount(book.getViewCount())
-                .reviewCount(0)
-                .ratingAverage(0.0f)
-                .bookStatus(book.getBookStatus().name())
-                .build();
-    }
+		return BookDocument.builder()
+			.id(String.valueOf(book.getBookId()))
+			.title(book.getBookName())
+			.description(book.getDescription())
+			.author(contributorMap.getOrDefault("저자", List.of()).stream().map(Contributor::getContributorName).toList())
+			.translator(
+				contributorMap.getOrDefault("역자", List.of()).stream().map(Contributor::getContributorName).toList())
+			.isbn(book.getIsbn())
+			.regularPrice(book.getRegularPrice().intValue())
+			.salePrice(book.getSalePrice().intValue())
+			.publisher(book.getPublisher().getPublisherName())
+			.publishedAt(book.getPublishDate())
+			.tagNames(tags.stream().map(Tag::getTagName).toList())
+			.pathIds(categories.stream().map(Category::getPathId).toList())
+			.pathNames(categories.stream().map(Category::getPathName).toList())
+			.viewCount(book.getViewCount())
+			.reviewCount(0)
+			.ratingAverage(0.0f)
+			.bookStatus(book.getBookStatus().name())
+			.build();
+	}
 }
