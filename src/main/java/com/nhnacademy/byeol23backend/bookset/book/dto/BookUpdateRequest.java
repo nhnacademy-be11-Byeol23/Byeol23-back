@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.nhnacademy.byeol23backend.bookset.book.domain.BookStatus;
+
 public record BookUpdateRequest(
 	String bookName,
 	String toc,
@@ -14,8 +16,7 @@ public record BookUpdateRequest(
 	BigDecimal salePrice,
 	LocalDate publishDate,
 	Boolean isPack,
-	String bookStatus,
-	Integer stock,
+	BookStatus bookStatus,
 	Long publisherId,
 	List<Long> categoryIds,
 	List<Long> tagIds,

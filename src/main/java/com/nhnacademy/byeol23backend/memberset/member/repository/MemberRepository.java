@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.memberset.member.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -20,5 +21,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     boolean existsByPhoneNumberAndMemberIdNot(String phoneNumber, Long memberId);
     boolean existsByEmailAndMemberIdNot(String email, Long memberId);
 
-
+	Optional<Member> getReferenceByMemberId(Long memberId);
 }

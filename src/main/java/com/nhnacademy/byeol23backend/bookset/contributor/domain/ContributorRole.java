@@ -2,7 +2,6 @@ package com.nhnacademy.byeol23backend.bookset.contributor.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @RequiredArgsConstructor
@@ -12,7 +11,8 @@ public enum ContributorRole {
 	private final String label;
 
 	public static ContributorRole from(String value) {
-		if (value == null) throw new IllegalArgumentException("role is null");
+		if (value == null)
+			throw new IllegalArgumentException("role is null");
 		String v = value.trim();
 		for (var r : values()) {
 			if (r.name().equalsIgnoreCase(v)) {

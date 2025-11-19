@@ -9,7 +9,7 @@ import com.nhnacademy.byeol23backend.pointset.pointpolicy.dto.ReservedPolicy;
 import com.nhnacademy.byeol23backend.pointset.pointpolicy.domain.PointPolicy;
 
 public interface PointService {
-	PointHistory offsetPointsByReserved(Member member, ReservedPolicy reservedPolicy, BigDecimal orderAmount);
+	PointHistory offsetPointsByReserved(Member member, ReservedPolicy reservedPolicy);
 
 	PointHistory offsetPointsWithPolicy(Member member, PointPolicy pointPolicy);
 

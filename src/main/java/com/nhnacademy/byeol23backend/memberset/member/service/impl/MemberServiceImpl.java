@@ -17,6 +17,7 @@ import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
 import com.nhnacademy.byeol23backend.memberset.member.service.MemberService;
+import com.nhnacademy.byeol23backend.utils.JwtParser;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -126,6 +127,12 @@ public class MemberServiceImpl implements MemberService {
 	public void updateMemberPoint(Long memberId, BigDecimal point) {
 		Member member = findMemberById(memberId);
 		member.updatePoint(point);
+	}
+
+	@Override
+	public Member getMemberProxy(Long memberId) {
+		return memberRepository.getReferenceByMemberId(memberId)
+			.orElseThrow(() -> new MemberNotFoundException(memberId + "에 해당하는 멤버를 찾을 수 없습니다."));
 	}
 
 	/**
