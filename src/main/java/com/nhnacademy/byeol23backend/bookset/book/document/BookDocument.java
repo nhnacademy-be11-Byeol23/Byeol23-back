@@ -66,6 +66,9 @@ public class BookDocument {
     @Field(type = FieldType.Keyword)
     private String bookStatus;
 
+    @Field(type = FieldType.Keyword, index = false)
+    private String imageUrl;
+
     @Setter
     @Field(type = FieldType.Dense_Vector, dims = 1024)
     private float[] embedding;
