@@ -83,13 +83,6 @@ public class BookServiceImpl implements BookService {
 		bookContributorService.createBookContributors(savedBook, createRequest.contributorIds());
 		log.info("새로운 도서가 생성되었습니다. ID: {}", savedBook.getBookId());
 
-        Long bookId = savedBook.getBookId();
-        BookOutbox savedOutBox = bookOutboxRepository.save(new BookOutbox(bookId, BookOutbox.EventType.ADD));
-
-        Long outboxId = savedOutBox.getId();
-        log.info("[추가] 도서 아웃박스 이벤트 발행: {}", outboxId);
-        eventPublisher.publishEvent(new BookOutboxEvent(outboxId));
-
 		return toResponse(savedBook);
 	}
 

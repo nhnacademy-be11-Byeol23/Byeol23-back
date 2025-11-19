@@ -11,7 +11,7 @@ import com.nhnacademy.byeol23backend.bookset.category.service.CategoryCacheServi
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryCommandService;
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryQueryService;
 import com.nhnacademy.byeol23backend.config.WebConfig;
-import com.nhnacademy.byeol23backend.filter.TokenFilter;
+import com.nhnacademy.byeol23backend.commons.filter.TokenFilter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
