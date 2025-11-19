@@ -60,7 +60,8 @@ public class MemberController implements MemberApi {
 	@GetMapping
 	public ResponseEntity<MemberMyPageResponse> getMember(
 		@CookieValue(name = "Access-Token", required = false) String accessToken) {
-		return ResponseEntity.ok(memberService.getMember(accessToken));
+		Long memberId = jwtParser.parseToken(accessToken).get("memberId", Long.class);
+		return ResponseEntity.ok(memberService.getMember(memberId));
 	}
 
 	/**
