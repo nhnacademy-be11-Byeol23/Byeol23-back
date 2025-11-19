@@ -1,5 +1,7 @@
 package com.nhnacademy.byeol23backend.memberset.member.controller;
 
+import com.nhnacademy.byeol23backend.commons.aop.RequireRole;
+import com.nhnacademy.byeol23backend.memberset.member.domain.Role;
 import com.nhnacademy.byeol23backend.memberset.member.dto.*;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

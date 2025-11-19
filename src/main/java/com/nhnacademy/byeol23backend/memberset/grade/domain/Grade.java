@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Entity
@@ -19,6 +20,7 @@ public class Grade {
 	@Column(name = "grade_id")
 	private Long gradeId;
 
+	@Setter
 	@Column(name = "grade_name", nullable = false, length = 10)
 	private String gradeName;
 
