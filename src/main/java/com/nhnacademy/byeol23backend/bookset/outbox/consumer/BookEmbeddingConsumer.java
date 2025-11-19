@@ -18,7 +18,7 @@ public class BookEmbeddingConsumer {
     private final EmbeddingService embeddingService;
     private final ElasticsearchOperations elasticsearchOperations;
 
-    @RabbitListener(queues = "${book.embedding.queue}")
+    @RabbitListener(queues = "${book.embedding.queue}", autoStartup = "true")
     public void consume(Long bookId) {
         BookDocument bookDocument = bookDocumentBuilder.buildWithOutEmbedding(bookId);
         log.info("임베딩 하지 않은 도서 문서 빌드: {}", bookDocument.getTitle());
