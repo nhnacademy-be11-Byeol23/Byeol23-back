@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.nhnacademy.byeol23backend.memberset.grade.domain.Grade;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateRequest;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateRequest;
 import jakarta.persistence.*;
 import lombok.Getter;

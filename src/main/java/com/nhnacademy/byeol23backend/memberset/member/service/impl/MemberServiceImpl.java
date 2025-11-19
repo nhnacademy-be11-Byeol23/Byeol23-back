@@ -2,18 +2,24 @@ package com.nhnacademy.byeol23backend.memberset.member.service.impl;
 
 import java.math.BigDecimal;
 
-import com.nhnacademy.byeol23backend.cartset.cart.service.CartService;
-import com.nhnacademy.byeol23backend.memberset.grade.repository.GradeRepository;
-import com.nhnacademy.byeol23backend.memberset.member.domain.Status;
-import com.nhnacademy.byeol23backend.memberset.member.dto.*;
-import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateEmailException;
-import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicatePhoneNumberException;
-import com.nhnacademy.byeol23backend.memberset.member.exception.IncorrectPasswordException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.nhnacademy.byeol23backend.cartset.cart.service.CartService;
+import com.nhnacademy.byeol23backend.memberset.grade.repository.GradeRepository;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
+import com.nhnacademy.byeol23backend.memberset.member.domain.Status;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateRequest;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberMyPageResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateRequest;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateRequest;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateResponse;
+import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateEmailException;
+import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicatePhoneNumberException;
+import com.nhnacademy.byeol23backend.memberset.member.exception.IncorrectPasswordException;
 import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
 import com.nhnacademy.byeol23backend.memberset.member.service.MemberService;
@@ -31,6 +37,7 @@ public class MemberServiceImpl implements MemberService {
 	private final PasswordEncoder passwordEncoder;
 	private final GradeRepository gradeRepository;
 	private final CartService cartService;
+	private final JwtParser jwtParser;
 
 	/**
 	 * 회원을 저장하는 함수
@@ -44,16 +51,16 @@ public class MemberServiceImpl implements MemberService {
 		createValidation(request.loginId(), request.nickname(), request.phoneNumber(), request.email());
 
 		Member newMember = Member.create(
-				request.loginId(),
-				passwordEncoder.encode(request.loginPassword()),
-				request.memberName(),
-				request.nickname(),
-				request.phoneNumber(),
-				request.email(),
-				request.birthDate(),
-				request.memberRole(),
-				request.joinedFrom(),
-				gradeRepository.findByGradeName("일반")
+			request.loginId(),
+			passwordEncoder.encode(request.loginPassword()),
+			request.memberName(),
+			request.nickname(),
+			request.phoneNumber(),
+			request.email(),
+			request.birthDate(),
+			request.memberRole(),
+			request.joinedFrom(),
+			gradeRepository.findByGradeName("일반")
 		);
 		memberRepository.save(newMember);
 		cartService.createCart(newMember);
@@ -64,26 +71,28 @@ public class MemberServiceImpl implements MemberService {
 
 	/**
 	 * 회원을 조회하고 회원 정보를 반환하는 함수
-	 * @param memberId Long
+	 * @param token String
 	 * @return MemberMyPageResponse
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public MemberMyPageResponse getMember(Long memberId) {
+	public MemberMyPageResponse getMember(String token) {
+		Long memberId = jwtParser.parseToken(token).get("memberId", Long.class);
+
 		Member member = findMemberById(memberId);
 
 		log.info("회원을 조회하였습니다. {}", member);
 
 		return new MemberMyPageResponse(
-				member.getLoginId(),
-				member.getMemberName(),
-				member.getNickname(),
-				member.getPhoneNumber(),
-				member.getEmail(),
-				member.getBirthDate(),
-				member.getCurrentPoint(),
-				member.getMemberRole(),
-				member.getGrade()
+			member.getLoginId(),
+			member.getMemberName(),
+			member.getNickname(),
+			member.getPhoneNumber(),
+			member.getEmail(),
+			member.getBirthDate(),
+			member.getCurrentPoint(),
+			member.getMemberRole(),
+			member.getGrade().getGradeName()
 		);
 	}
 
@@ -111,7 +120,7 @@ public class MemberServiceImpl implements MemberService {
 	@Transactional
 	public MemberPasswordUpdateResponse updateMemberPassword(Long memberId, MemberPasswordUpdateRequest request) {
 		Member member = findMemberById(memberId);
-		if(!passwordEncoder.matches(request.currentPassword(), member.getLoginPassword())) {
+		if (!passwordEncoder.matches(request.currentPassword(), member.getLoginPassword())) {
 			throw new IncorrectPasswordException("비밀번호가 일치하지 않습니다.");
 		} else {
 			member.updatePassword(passwordEncoder.encode(request.newPassword()));
@@ -143,7 +152,7 @@ public class MemberServiceImpl implements MemberService {
 	public void reactivateMember(Long memberId) {
 		Member member = findMemberById(memberId);
 
-		if(member.getStatus() == Status.INACTIVE) {
+		if (member.getStatus() == Status.INACTIVE) {
 			member.updateStatus(Status.ACTIVE);
 		}
 	}
@@ -158,7 +167,7 @@ public class MemberServiceImpl implements MemberService {
 	public void deleteMember(Long memberId) {
 		Member member = findMemberById(memberId);
 
-		if(member.getStatus() != Status.WITHDRAWN) {
+		if (member.getStatus() != Status.WITHDRAWN) {
 			member.updateStatus(Status.WITHDRAWN);
 		}
 
@@ -171,35 +180,35 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	private void createValidation(String loginId, String nickname, String phoneNumber, String email) {
-		if(loginId != null && memberRepository.existsByLoginId(loginId)) {
+		if (loginId != null && memberRepository.existsByLoginId(loginId)) {
 			throw new DuplicateEmailException("이미 사용 중인 아이디입니다.");
 		}
 
-		if(nickname != null && memberRepository.existsByNickname(nickname)) {
+		if (nickname != null && memberRepository.existsByNickname(nickname)) {
 			throw new DuplicateEmailException("이미 사용 중인 닉네임입니다.");
 		}
 
-		if(email != null && memberRepository.existsByEmail(email)) {
+		if (email != null && memberRepository.existsByEmail(email)) {
 			throw new DuplicateEmailException("이미 사용 중인 이메일입니다.");
 		}
 
-		if(phoneNumber != null && memberRepository.existsByPhoneNumber(phoneNumber)) {
+		if (phoneNumber != null && memberRepository.existsByPhoneNumber(phoneNumber)) {
 			throw new DuplicatePhoneNumberException("이미 사용 중인 휴대전화입니다.");
 		}
 	}
 
 	private void updateValidation(String nickname, String phoneNumber, String email, Long memberId) {
 
-		if(nickname != null &&
+		if (nickname != null &&
 			memberRepository.existsByPhoneNumberAndMemberIdNot(nickname, memberId)) {
 			throw new DuplicatePhoneNumberException("이미 사용 중인 닉네임입니다.");
 		}
 
-		if(email != null &&
+		if (email != null &&
 			memberRepository.existsByEmailAndMemberIdNot(email, memberId)) {
 			throw new DuplicateEmailException("이미 사용 중인 이메일입니다.");
 		}
-		if(phoneNumber != null &&
+		if (phoneNumber != null &&
 			memberRepository.existsByPhoneNumberAndMemberIdNot(phoneNumber, memberId)) {
 			throw new DuplicatePhoneNumberException("이미 사용 중인 휴대전화입니다.");
 		}
