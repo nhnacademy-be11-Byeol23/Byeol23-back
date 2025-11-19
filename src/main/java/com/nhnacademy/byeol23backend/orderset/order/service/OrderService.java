@@ -28,4 +28,6 @@ public interface OrderService {
 	PointOrderResponse createOrderWithPoints(String orderNumber);
 
 	void updateBulkOrderStatus(OrderBulkUpdateRequest request);
+
+	Page<OrderDetailResponse> getOrders(String token, Pageable pageable);
 }

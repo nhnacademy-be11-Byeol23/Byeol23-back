@@ -90,4 +90,11 @@ public class OrderController {
 		return ResponseEntity.ok().build();
 	}
 
+	@GetMapping("/members")
+	public ResponseEntity<Page<OrderDetailResponse>> getOrders(@CookieValue(name = "Access-Token") String token,
+		Pageable pageable) {
+		Page<OrderDetailResponse> responses = orderService.getOrders(token, pageable);
+		return ResponseEntity.ok(responses);
+	}
+
 }
