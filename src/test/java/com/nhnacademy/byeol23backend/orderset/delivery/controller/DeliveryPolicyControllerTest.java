@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.byeol23backend.bookset.book.interceptor.GuestIdCookieInterceptor;
 import com.nhnacademy.byeol23backend.bookset.book.interceptor.ViewerIdInterceptor;
 import com.nhnacademy.byeol23backend.config.WebConfig;
-import com.nhnacademy.byeol23backend.filter.TokenFilter;
+import com.nhnacademy.byeol23backend.commons.filter.TokenFilter;
 import com.nhnacademy.byeol23backend.orderset.delivery.domain.dto.DeliveryPolicyCreateRequest;
 import com.nhnacademy.byeol23backend.orderset.delivery.domain.dto.DeliveryPolicyCreateResponse;
 import com.nhnacademy.byeol23backend.orderset.delivery.domain.dto.DeliveryPolicyInfoResponse;

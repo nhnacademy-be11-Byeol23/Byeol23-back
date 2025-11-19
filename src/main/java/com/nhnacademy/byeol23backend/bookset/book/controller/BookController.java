@@ -24,6 +24,8 @@ import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockResponse;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.service.BookService;
+import com.nhnacademy.byeol23backend.commons.aop.RequireRole;
+import com.nhnacademy.byeol23backend.memberset.member.domain.Role;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
