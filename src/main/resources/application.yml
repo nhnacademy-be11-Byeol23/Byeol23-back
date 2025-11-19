@@ -36,7 +36,7 @@ logging:
     org.apache.commons.dbcp2: DEBUG
 
 tossPayment:
-  secretKey: ${TOSS_SECRET_KEY}
+  secretKey: ${TOSS_SECRET_KEY:test_sk_26DlbXAaV0wkDZNmNMJ43qY50Q9R}
 
 eureka:
   client:

@@ -1,6 +1,5 @@
 package com.nhnacademy.byeol23backend.memberset;
 
-
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -34,6 +33,7 @@ import com.nhnacademy.byeol23backend.memberset.member.exception.IncorrectPasswor
 import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
 import com.nhnacademy.byeol23backend.memberset.member.service.impl.MemberServiceImpl;
+import com.nhnacademy.byeol23backend.utils.JwtParser;
 
 @ExtendWith(MockitoExtension.class)
 public class MemberServiceTest {
@@ -48,6 +48,9 @@ public class MemberServiceTest {
 
 	@Mock
 	CartService cartService;
+
+	@Mock
+	JwtParser jwtParser;
 
 	@InjectMocks
 	MemberServiceImpl memberService;
