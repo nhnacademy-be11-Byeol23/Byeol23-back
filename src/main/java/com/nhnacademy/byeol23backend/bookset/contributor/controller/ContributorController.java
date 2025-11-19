@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.AllContributorResponse;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorCreateRequest;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorCreateResponse;
+import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorFindOrCreateRequest;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorInfoResponse;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorUpdateResponse;
@@ -43,6 +44,17 @@ public class ContributorController {
 		return ResponseEntity.created(uri).body(response);
 	}
 
+	@PostMapping("/find-or-create")
+	public ResponseEntity<AllContributorResponse> findOrCreateContributor(
+	    @RequestBody ContributorFindOrCreateRequest request) {
+	    Long contributorId = contributorService.findOrCreateContributor(
+	        request.contributorName(), 
+	        request.contributorRole()
+	    );
+	    ContributorInfoResponse infoResponse = contributorService.getContributorByContributorId(contributorId);
+	    return ResponseEntity.ok(new AllContributorResponse(infoResponse.contributor()));
+	}
+
 	@DeleteMapping("/{contributor-id}")
 	public ResponseEntity<Void> deleteContributorByContributorId(@PathVariable(name = "contributor-id") Long contributorId){
 		contributorService.deleteContributorByContributorId(contributorId);
@@ -60,5 +72,4 @@ public class ContributorController {
 		Page<AllContributorResponse> contributors = contributorService.getAllContributors(page, size);
 		return ResponseEntity.ok(contributors);
 	}
-
 }

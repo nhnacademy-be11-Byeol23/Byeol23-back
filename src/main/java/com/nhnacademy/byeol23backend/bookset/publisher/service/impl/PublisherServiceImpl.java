@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class PublisherServiceImpl implements PublisherService {
@@ -58,5 +60,22 @@ public class PublisherServiceImpl implements PublisherService {
 	@Override
 	public Page<AllPublishersInfoResponse> getAllPublishers(Pageable pageable) {
 		return publisherRepository.findAll(pageable).map(AllPublishersInfoResponse::new);
+	}
+
+	@Override
+	public Optional<AllPublishersInfoResponse> findPublisherByName(String publisherName) {
+		return publisherRepository.findByPublisherName(publisherName)
+			.map(AllPublishersInfoResponse::new);
+	}
+
+	@Override
+	public AllPublishersInfoResponse findOrCreatePublisher(String publisherName) {
+		return publisherRepository.findByPublisherName(publisherName)
+			.map(AllPublishersInfoResponse::new)
+			.orElseGet(() -> {
+				PublisherCreateRequest request = new PublisherCreateRequest(publisherName);
+				PublisherCreateResponse response = createPublisher(request);
+				return new AllPublishersInfoResponse(response.publisher());
+			});
 	}
 }

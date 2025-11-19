@@ -20,6 +20,11 @@ spring:
     hibernate:
       ddl-auto: validate
 
+  elasticsearch:
+    uris: http://${ES_HOST:s4.java21.net}:${ES_PORT:9200}
+    username: ${ES_USERNAME:elastic}
+    password: ${ES_PASSWORD:nhnacademy123!}
+
   profiles:
     active: dev
 

@@ -20,6 +20,8 @@ import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateRe
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateRequest;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateResponse;
 import com.nhnacademy.byeol23backend.memberset.member.service.MemberService;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareRequest;
+import com.nhnacademy.byeol23backend.utils.JwtParser;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/members")
 public class MemberController implements MemberApi {
 	private final MemberService memberService;
+	private final JwtParser jwtParser;
 
 	/**
 	 * 회원가입 요청 <br>
@@ -45,12 +48,15 @@ public class MemberController implements MemberApi {
 
 	/**
 	 * 마이 페이지 요청
-	 * @param token String
+	 *
+	 * @param request
+	 * @param accessToken
 	 * @return 200(OK) / MemberMyPageResponse
 	 */
 	@GetMapping
-	public ResponseEntity<MemberMyPageResponse> getMember(@CookieValue(name = "Access-Token") String token) {
-		return ResponseEntity.ok(memberService.getMember(token));
+	public ResponseEntity<MemberMyPageResponse> getMember(@CookieValue(name = "Access-Token", required = false) String accessToken) {
+		Long memberId = jwtParser.parseToken(accessToken).get("memberId", Long.class);
+		return ResponseEntity.ok(memberService.getMember(memberId));
 	}
 
 	/**
@@ -59,27 +65,30 @@ public class MemberController implements MemberApi {
 	 * @param request MemberUpdateRequest
 	 * @return 200(OK) / MemberUpdateResponse
 	 */
-	@PutMapping("/{member-id}")
+	@PutMapping
 	public ResponseEntity<MemberUpdateResponse> updateMember(
-		@PathVariable(value = "member-id") Long memberId,
-		@Valid @RequestBody MemberUpdateRequest request
-	) {
+			@Valid @RequestBody MemberUpdateRequest request,
+			@CookieValue(name = "Access-Token", required = false) String accessToken
+		) {
+		Long memberId = jwtParser.parseToken(accessToken).get("memberId", Long.class);
 		return ResponseEntity.ok(memberService.updateMember(memberId, request));
 	}
 
-	@PutMapping("/{member-id}/password")
+	@PutMapping("/password")
 	public ResponseEntity<MemberPasswordUpdateResponse> updateMemberPassword(
-		@PathVariable(value = "member-id") Long memberId,
-		@Valid @RequestBody MemberPasswordUpdateRequest request
+			@Valid @RequestBody  MemberPasswordUpdateRequest request,
+			@CookieValue(name = "Access-Token", required = false) String accessToken
 	) {
+		Long memberId = jwtParser.parseToken(accessToken).get("memberId", Long.class);
 		return ResponseEntity.ok(memberService.updateMemberPassword(memberId, request));
 	}
 
-	@PutMapping("/{member-id}/reactivate")
+	@PutMapping("/reactivate")
 	public ResponseEntity<Void> reactivateMember(
-		@PathVariable(value = "member-id") Long memberId,
-		@Valid @RequestBody MemberPasswordUpdateRequest request
+			@CookieValue(name = "Access-Token", required = false) String accessToken,
+			@Valid @RequestBody  MemberPasswordUpdateRequest request
 	) {
+		Long memberId = jwtParser.parseToken(accessToken).get("memberId", Long.class);
 		memberService.reactivateMember(memberId);
 		return ResponseEntity.noContent().build();
 	}
@@ -89,8 +98,11 @@ public class MemberController implements MemberApi {
 	 * @param memberId Long
 	 * @return 204(NO CONTENT)
 	 */
-	@DeleteMapping("/{member-id}")
-	public ResponseEntity<Void> deleteMember(@PathVariable(value = "member-id") Long memberId) {
+	@DeleteMapping
+	public ResponseEntity<Void> deleteMember(
+		@CookieValue(name = "Access-Token", required = false) String accessToken
+	) {
+		Long memberId = jwtParser.parseToken(accessToken).get("memberId", Long.class);
 		memberService.deleteMember(memberId);
 		return ResponseEntity.noContent().build();
 	}
