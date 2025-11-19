@@ -190,41 +190,39 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public List<OrderDetailResponse> getOrders(String token) {
+	public Page<OrderDetailResponse> getOrders(String token, Pageable pageable) {
 		Long memberId = accessTokenParser(token);
 
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new MemberNotFoundException("해당 아디디의 회원을 찾을 수 없습니다.: " + memberId));
 
-		List<Order> orderList = orderRepository.findByMemberAndOrderStatusNot(member, "대기");
+		Page<Order> orderList = orderRepository.findByMemberAndOrderStatusNot(member, "대기", pageable);
 
-		return orderList.stream()
-			.map(order -> {
-				List<OrderDetail> orderDetailsForThisOrder = orderDetailRepository.findByOrder(order);
+		return orderList.map(order -> {
+			List<OrderDetail> orderDetailsForThisOrder = orderDetailRepository.findByOrder(order);
 
-				List<BookOrderInfoResponse> bookOrderInfos = orderDetailsForThisOrder.stream()
-					.map(detail -> new BookOrderInfoResponse(
-						detail.getBook().getBookId(),
-						detail.getBook().getBookName(),
-						detail.getQuantity(),
-						detail.getOrderPrice()
-					))
-					.toList();
+			List<BookOrderInfoResponse> bookOrderInfos = orderDetailsForThisOrder.stream()
+				.map(detail -> new BookOrderInfoResponse(
+					detail.getBook().getBookId(),
+					detail.getBook().getBookName(),
+					detail.getQuantity(),
+					detail.getOrderPrice()
+				))
+				.toList();
 
-				return new OrderDetailResponse(
-					order.getOrderNumber(),
-					order.getOrderedAt(),
-					order.getOrderStatus(),
-					order.getActualOrderPrice(),
-					order.getReceiver(),
-					order.getReceiverPhone(),
-					order.getReceiverAddress(),
-					order.getReceiverAddressDetail(),
-					order.getPostCode(),
-					bookOrderInfos // <-- 해당 주문에 속한 상품 목록
-				);
-			})
-			.toList();
+			return new OrderDetailResponse(
+				order.getOrderNumber(),
+				order.getOrderedAt(),
+				order.getOrderStatus(),
+				order.getActualOrderPrice(),
+				order.getReceiver(),
+				order.getReceiverPhone(),
+				order.getReceiverAddress(),
+				order.getReceiverAddressDetail(),
+				order.getPostCode(),
+				bookOrderInfos // <-- 해당 주문에 속한 상품 목록
+			);
+		});
 	}
 
 	@Transactional
