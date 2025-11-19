@@ -8,16 +8,36 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateRequest;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberMyPageResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateRequest;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateRequest;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateResponse;
 import com.nhnacademy.byeol23backend.memberset.member.service.MemberService;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareRequest;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/members")
-public class MemberController implements MemberApi{
+public class MemberController implements MemberApi {
 	private final MemberService memberService;
 	private final JwtParser jwtParser;
 
@@ -32,7 +52,6 @@ public class MemberController implements MemberApi{
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(createdMember);
 	}
-
 
 	/**
 	 * 마이 페이지 요청
@@ -81,7 +100,6 @@ public class MemberController implements MemberApi{
 		return ResponseEntity.noContent().build();
 	}
 
-
 	/**
 	 * 회원 삭제에 관한 요청을 처리한다.
 	 * @param memberId Long
@@ -95,8 +113,6 @@ public class MemberController implements MemberApi{
 		memberService.deleteMember(memberId);
 		return ResponseEntity.noContent().build();
 	}
-
-
 
 }
 

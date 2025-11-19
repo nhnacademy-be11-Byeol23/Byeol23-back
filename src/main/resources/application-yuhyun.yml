@@ -15,10 +15,15 @@ spring:
 
   data:
     redis:
-      host: ${REDIS_HOST:s4.java21.net}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:*N2vya7H@muDTwdNMR!}
-      database: ${REDIS_DATABASE:321}
+      host: localhost
+      port: 6379
+
+
+
+  elasticsearch:
+    uris: http://${ES_HOST:s4.java21.net}:${ES_PORT:9200}
+    username: ${ES_USERNAME:elastic}
+    password: ${ES_PASSWORD:nhnacademy123!}
 
   jpa:
     hibernate:
@@ -78,11 +83,3 @@ book:
     exchange: byeol23.book.embedding.exchange
     queue: byeol23.book.embedding.queue
     routing-key: byeol23.book.embedding.key
-
-management:
-  health:
-    redis:
-      enabled: false
-
-    elasticsearch:
-      enabled: false
