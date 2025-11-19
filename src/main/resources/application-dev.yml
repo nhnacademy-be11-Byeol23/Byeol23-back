@@ -20,11 +20,6 @@ spring:
       password: ${REDIS_PASSWORD:*N2vya7H@muDTwdNMR!}
       database: ${REDIS_DATABASE:321}
 
-  elasticsearch:
-    uris: http://${ES_HOST:s4.java21.net}:${ES_PORT:9200}
-    username: ${ES_USERNAME:elastic}
-    password: ${ES_PASSWORD:nhnacademy123!}
-
   jpa:
     hibernate:
       ddl-auto: validate
