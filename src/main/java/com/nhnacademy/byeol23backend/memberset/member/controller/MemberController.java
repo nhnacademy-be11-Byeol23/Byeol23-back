@@ -1,5 +1,13 @@
 package com.nhnacademy.byeol23backend.memberset.member.controller;
 
+import com.nhnacademy.byeol23backend.commons.aop.RequireRole;
+import com.nhnacademy.byeol23backend.memberset.member.domain.Role;
+import com.nhnacademy.byeol23backend.memberset.member.dto.*;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -35,7 +43,6 @@ public class MemberController implements MemberApi {
 
 	/**
 	 * 회원가입 요청 <br>
-	 * (현재는 아무 것도 반환하지 않는다)
 	 * @param request MemberCreateRequest
 	 * @return 201(CREATED)
 	 */

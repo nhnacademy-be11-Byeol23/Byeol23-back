@@ -26,6 +26,7 @@ public class JwtParser {
     public Claims parseToken(String token) {
         return Jwts.parser()
                 .verifyWith(publicKey)
+                .clockSkewSeconds(60)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
