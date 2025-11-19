@@ -14,7 +14,7 @@ import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateResponse;
 public interface MemberService {
 	MemberCreateResponse createMember(MemberCreateRequest request);
 
-	MemberMyPageResponse getMember(String token);
+	MemberMyPageResponse getMember(Long memberId);
 
 	MemberUpdateResponse updateMember(Long memberId, MemberUpdateRequest request);
 
