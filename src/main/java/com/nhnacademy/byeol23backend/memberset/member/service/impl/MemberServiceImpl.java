@@ -76,8 +76,8 @@ public class MemberServiceImpl implements MemberService {
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public MemberMyPageResponse getMember(String token) {
-		Long memberId = jwtParser.parseToken(token).get("memberId", Long.class);
+	public MemberMyPageResponse getMember(Long memberId) {
+
 
 		Member member = findMemberById(memberId);
 
