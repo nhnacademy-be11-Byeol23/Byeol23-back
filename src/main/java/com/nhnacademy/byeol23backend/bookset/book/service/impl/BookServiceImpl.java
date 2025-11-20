@@ -32,9 +32,12 @@ import com.nhnacademy.byeol23backend.bookset.publisher.repository.PublisherRepos
 import com.nhnacademy.byeol23backend.bookset.tag.domain.Tag;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.AllTagsInfoResponse;
 import com.nhnacademy.byeol23backend.image.dto.GetUrlResponse;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -166,77 +169,58 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	public List<BookResponse> getBooks(Pageable pageable) {
-		List<Book> bookList = bookRepository.findAll();
-		if (bookList.isEmpty()) {
-			return new ArrayList<>();
+	public Page<BookResponse> getBooks(Pageable pageable) {
+		// Book만 페이징으로 조회 (Publisher는 ManyToOne이라 문제없음)
+		Page<Book> bookPage = bookRepository.findAll(pageable);
+
+		if (bookPage.isEmpty()) {
+			return Page.empty(pageable);
 		}
 
-		List<Long> bookIdList = new ArrayList<>();
-		for (Book bookItem : bookList) {
-			Long bookId = bookItem.getBookId();
-			bookIdList.add(bookId);
-		}
-		List<BookCategory> bookCategoryList = bookCategoryRepository.findByBookIdsWithCategory(bookIdList);
-		Map<Long, List<Category>> bookIdToCategoryListMap = new HashMap<>();
-		List<BookTag> bookTagList = bookTagRepository.findByBookIdsWithTag(bookIdList);
-		Map<Long, List<Tag>> bookIdToTagListMap = new HashMap<>();
-		List<BookContributor> bookContributorList = bookContributorRepository.findByBookIdsWithContributor(bookIdList);
-		Map<Long, List<Contributor>> bookIdToContributorListMap = new HashMap<>();
+		List<Book> bookList = bookPage.getContent();
+		List<Long> bookIds = bookList.stream()
+			.map(Book::getBookId)
+			.toList();
 
-		for (BookCategory bookCategoryItem : bookCategoryList) {
-			Book bookFromCategory = bookCategoryItem.getBook();
-			Long bookIdFromCategory = bookFromCategory.getBookId();
-			Category categoryFromBookCategory = bookCategoryItem.getCategory();
-			if (!bookIdToCategoryListMap.containsKey(bookIdFromCategory)) {
-				List<Category> newCategoryList = new ArrayList<>();
-				bookIdToCategoryListMap.put(bookIdFromCategory, newCategoryList);
-			}
-			List<Category> existingCategoryList = bookIdToCategoryListMap.get(bookIdFromCategory);
-			existingCategoryList.add(categoryFromBookCategory);
-		}
-		log.info("도서별 카테고리 정보 조회 완료");
+		// JOIN FETCH로 Category, Tag, Contributor를 한 번에 조회
+		List<BookCategory> bookCategories = bookCategoryRepository.findByBookIdsWithCategory(bookIds);
+		List<BookTag> bookTags = bookTagRepository.findByBookIdsWithTag(bookIds);
+		List<BookContributor> bookContributors = bookContributorRepository.findByBookIdsWithContributor(bookIds);
 
-		for (BookTag bookTagItem : bookTagList) {
-			Book bookFromTag = bookTagItem.getBook();
-			Long bookIdFromTag = bookFromTag.getBookId();
-			Tag tagFromBookTag = bookTagItem.getTag();
-			if (!bookIdToTagListMap.containsKey(bookIdFromTag)) {
-				List<Tag> newTagList = new ArrayList<>();
-				bookIdToTagListMap.put(bookIdFromTag, newTagList);
-			}
-			List<Tag> existingTagList = bookIdToTagListMap.get(bookIdFromTag);
-			existingTagList.add(tagFromBookTag);
-		}
-		log.info("도서별 태그 정보 조회 완료");
+		// BookId별로 그룹화
+		java.util.Map<Long, List<Category>> categoryMap = bookCategories.stream()
+			.collect(java.util.stream.Collectors.groupingBy(
+				bc -> bc.getBook().getBookId(),
+				java.util.stream.Collectors.mapping(BookCategory::getCategory, java.util.stream.Collectors.toList())
+			));
+		java.util.Map<Long, List<Tag>> tagMap = bookTags.stream()
+			.collect(java.util.stream.Collectors.groupingBy(
+				bt -> bt.getBook().getBookId(),
+				java.util.stream.Collectors.mapping(BookTag::getTag, java.util.stream.Collectors.toList())
+			));
+		java.util.Map<Long, List<Contributor>> contributorMap = bookContributors.stream()
+			.collect(java.util.stream.Collectors.groupingBy(
+				bc -> bc.getBook().getBookId(),
+				java.util.stream.Collectors.mapping(BookContributor::getContributor,
+					java.util.stream.Collectors.toList())
+			));
 
-		for (BookContributor bookContributorItem : bookContributorList) {
-			Book bookFromContributor = bookContributorItem.getBook();
-			Long bookIdFromContributor = bookFromContributor.getBookId();
-			Contributor contributorFromBookContributor = bookContributorItem.getContributor();
-			if (!bookIdToContributorListMap.containsKey(bookIdFromContributor)) {
-				List<Contributor> newContributorList = new ArrayList<>();
-				bookIdToContributorListMap.put(bookIdFromContributor, newContributorList);
-			}
-			List<Contributor> existingContributorList = bookIdToContributorListMap.get(bookIdFromContributor);
-			existingContributorList.add(contributorFromBookContributor);
-		}
-		log.info("도서별 기여자 정보 조회 완료");
+		// @BatchSize가 BookImage를 자동으로 배치 로딩
+		List<BookResponse> bookResponseList = bookList.stream()
+			.map(book -> {
+				List<Category> categories = categoryMap.getOrDefault(book.getBookId(), new ArrayList<>());
+				List<Tag> tags = tagMap.getOrDefault(book.getBookId(), new ArrayList<>());
+				List<Contributor> contributors = contributorMap.getOrDefault(book.getBookId(), new ArrayList<>());
+				List<GetUrlResponse> images = book.getBookImageUrls().stream()
+					.map(image -> new GetUrlResponse(image.getBookImageId(), image.getBookImageUrl()))
+					.toList();
 
-		List<BookResponse> bookResponseList = new ArrayList<>();
+				return toResponse(book, categories, tags, contributors);
+			})
+			.toList();
 
-		for (Book bookItem : bookList) {
-			Long currentBookId = bookItem.getBookId();
-			List<Category> categoryListForBook = bookIdToCategoryListMap.getOrDefault(currentBookId, new ArrayList<>());
-			List<Tag> tagListForBook = bookIdToTagListMap.getOrDefault(currentBookId, new ArrayList<>());
-			List<Contributor> contributorListForBook = bookIdToContributorListMap.getOrDefault(currentBookId,
-				new ArrayList<>());
-			BookResponse bookResponse = toResponse(bookItem, categoryListForBook, tagListForBook,
-				contributorListForBook);
-			bookResponseList.add(bookResponse);
-		}
-		log.info("도서 조회가 완료되었습니다.");
-		return bookResponseList;
+		log.info("도서 조회가 완료되었습니다. (페이지: {}, 크기: {})", pageable.getPageNumber(), pageable.getPageSize());
+		return new PageImpl<>(bookResponseList, pageable, bookPage.getTotalElements());
 	}
 
 	@Override
@@ -259,10 +243,10 @@ public class BookServiceImpl implements BookService {
 		return bookResponseList;
 	}
 
-    @Override
-    public Book getBookWithPublisher(Long bookId) {
-        return bookRepository.queryBookWithPublisherById(bookId);
-    }
+	@Override
+	public Book getBookWithPublisher(Long bookId) {
+		return bookRepository.queryBookWithPublisherById(bookId);
+	}
 
     @Override
     public BookReview getBookReview(Long bookId) {
@@ -285,9 +269,7 @@ public class BookServiceImpl implements BookService {
 			.map(AllContributorResponse::new)
 			.toList();
 
-		Publisher publisher = publisherRepository.findById(book.getPublisher().getPublisherId())
-			.orElseThrow(() -> new PublisherNotFoundException(
-				"해당 아이디의 출판사를 찾을 수 없습니다.: " + book.getPublisher().getPublisherId()));
+		Publisher publisher = book.getPublisher();
 
 		AllPublishersInfoResponse publisherResponse = new AllPublishersInfoResponse(publisher.getPublisherId(),
 			publisher.getPublisherName());

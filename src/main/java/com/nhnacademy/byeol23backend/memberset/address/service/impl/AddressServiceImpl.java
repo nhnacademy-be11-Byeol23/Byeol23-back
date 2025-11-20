@@ -1,94 +1,114 @@
 package com.nhnacademy.byeol23backend.memberset.address.service.impl;
 
-import org.springframework.stereotype.Service;
+import java.util.List;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.nhnacademy.byeol23backend.memberset.address.domain.Address;
+import com.nhnacademy.byeol23backend.memberset.address.dto.AddressInfoResponse;
+import com.nhnacademy.byeol23backend.memberset.address.dto.AddressRequest;
+import com.nhnacademy.byeol23backend.memberset.address.dto.AddressResponse;
+import com.nhnacademy.byeol23backend.memberset.address.exception.AddressCountOverException;
+import com.nhnacademy.byeol23backend.memberset.address.exception.AddressNotFoundException;
+import com.nhnacademy.byeol23backend.memberset.address.repository.AddressRepository;
 import com.nhnacademy.byeol23backend.memberset.address.service.AddressService;
+import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
+import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
+import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
+import com.nhnacademy.byeol23backend.utils.JwtParser;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class AddressServiceImpl implements AddressService {
-	// private final AddressRepository addressRepository;
-	// 아카데미에서 제일로 잘생기고 공부 잘 하고 멋있고 만능 스포츠맨인 사람 -- 정답은 가장 아래에
-	// public Address getAddress(Long memberId) {
-	// 	return addressRepository.findById()
-	// 		.orElseThrow(() -> new IllegalArgumentException("Address not found with id: " + addressId));
-	// }
-	//
-	// public List<Address> getAddressesByMember(Member member) {
-	// 	return addressRepository.findByMember(member);
-	// }
-	//
-	// @Transactional
-	// public Address saveAddress(Member member, AddAddressRequest addressRequest) {
-	// 	List<Address> existingAddresses = addressRepository.findByMember(member);
-	// 	if (existingAddresses.size() >= 5) {
-	// 		throw new AddressAlreadyMaxException("주소 최대 저장 개수를 초과하였습니다.");
-	// 	}
-	// 	boolean isFirstAddress = existingAddresses.isEmpty();
-	// 	for (Address address : existingAddresses) {
-	// 		if (address.getPostCode().equals(addressRequest.getPostCode())) {
-	// 			throw new UnregistableAddress("Address with the same post code already exists");
-	// 		}
-	// 	}
-	//
-	// 	Address address = Address.builder()
-	// 		.postCode(addressRequest.getPostCode())
-	// 		.addressInfo(addressRequest.getAddressInfo())
-	// 		.addressDetail(addressRequest.getAddressDetail())
-	// 		.addressExtra(addressRequest.getAddressExtra())
-	// 		.addressAlias(addressRequest.getAddressAlias())
-	// 		.isDefault(isFirstAddress)
-	// 		.member(member) // 나중에 회원 엔티티로 설정 필요
-	// 		.build();
-	// 	return addressRepository.save(address);
-	// }
-	//
-	// @Transactional
-	// public void deleteAddress(Member member, Long addressId) {
-	// 	Address address = addressRepository.findByAddressIdAndMember(addressId, member)
-	// 		.orElseThrow(() -> new IllegalArgumentException("Address not found with id: " + addressId));
-	// 	if (Boolean.TRUE.equals(address.getIsDefault())) {
-	// 		throw new UserInvalidControlException("Default address cannot be deleted", IllegalArgumentException.class);
-	// 	}
-	// 	addressRepository.delete(address);
-	// }
-	//
-	// @Transactional
-	// public void setDefaultAddress(Member member, Long addressId) {
-	// 	Address target = addressRepository.findByAddressIdAndMember(addressId, member)
-	// 		.orElseThrow(() -> new IllegalArgumentException("Address not found with id: " + addressId));
-	//
-	// 	Optional<Address> currentDefaultOpt = addressRepository.findByMemberAndIsDefaultTrue(member);
-	// 	if (currentDefaultOpt.isPresent()) {
-	// 		Address currentDefault = currentDefaultOpt.get();
-	// 		if (!Objects.equals(currentDefault.getAddressId(), target.getAddressId())) {
-	// 			currentDefault.setIsDefault(false);
-	// 			addressRepository.save(currentDefault);
-	// 		}
-	// 	}
-	// 	target.setIsDefault(true);
-	// 	addressRepository.save(target);
-	// }
-	//
-	// @Transactional
-	// public Address updateAddress(Member member, Long addressId, UpdateAddressRequest req) {
-	// 	Address address = addressRepository.findByAddressIdAndMember(addressId, member)
-	// 		.orElseThrow(() -> new IllegalArgumentException("Address not found with id: " + addressId));
-	//
-	// 	if (req.getPostCode() != null)
-	// 		address.setPostCode(req.getPostCode());
-	// 	if (req.getAddressInfo() != null)
-	// 		address.setAddressInfo(req.getAddressInfo());
-	// 	if (req.getAddressDetail() != null)
-	// 		address.setAddressDetail(req.getAddressDetail());
-	// 	if (req.getAddressExtra() != null)
-	// 		address.setAddressExtra(req.getAddressExtra());
-	// 	if (req.getAddressAlias() != null)
-	// 		address.setAddressAlias(req.getAddressAlias());
-	//
-	// 	return addressRepository.save(address);
-	// }
+	private final AddressRepository addressRepository;
+	private final MemberRepository memberRepository;
+	private final JwtParser jwtParser;
+
+	@Override
+	@Transactional
+	public AddressResponse createOrder(String token, AddressRequest request) {
+		Member member = getMember(token);
+
+		// 주소는 10개 이하로
+		if (addressRepository.countAddressesByMember(member) > 10) {
+			throw new AddressCountOverException("주소의 개수는 10개를 넘을 수 없습니다.");
+		}
+
+		if (request.isDefault()) { //생성 시에 기본 배송지 설정이 true이면
+			addressRepository.updateDefaultAddressFalseByMember(member);
+		}
+
+		Address address = Address.of(request.postCode(), request.addressInfo(), request.addressDetail(),
+			request.addressExtra(), request.addressAlias(), request.isDefault(), member);
+
+		addressRepository.save(address);
+
+		return new AddressResponse(address.getAddressId(), address.getPostCode(), address.getAddressInfo(),
+			address.getAddressDetail(), address.getAddressExtra(), address.getAddressAlias(), address.getIsDefault());
+	}
+
+	@Override
+	@Transactional
+	public void updateAddress(AddressRequest request) {
+		Address address = addressRepository.findById(request.addressId())
+			.orElseThrow(() -> new AddressNotFoundException("해당 아이디의 주소를 찾을 수 없습니다.: " + request.addressId()));
+
+		address.updateAddress(request);
+		log.debug("수정 후 주소: {}", address);
+	}
+
+	@Override
+	public List<AddressInfoResponse> getAddresses(String token) {
+		Member member = getMember(token);
+
+		List<Address> addresses = addressRepository.findByMemberOrderByIsDefaultDesc(member);
+
+		return addresses.stream()
+			.map(address -> new AddressInfoResponse(
+				address.getAddressId(),
+				address.getPostCode(),
+				address.getAddressInfo(),
+				address.getAddressDetail(),
+				address.getAddressExtra(),
+				address.getAddressAlias(),
+				address.getIsDefault()
+			))
+			.toList();
+	}
+
+	@Override
+	@Transactional
+	public void deleteAddress(Long addressId) {
+		addressRepository.deleteById(addressId);
+	}
+
+	@Override
+	@Transactional
+	public void setDefaultAddress(Long addressId) {
+		Address newDefaultAddress = addressRepository.findById(addressId)
+			.orElseThrow(() -> new AddressNotFoundException("해당 주소를 찾을 수 없습니다: " + addressId));
+
+		Member member = newDefaultAddress.getMember();
+		if (member == null) {
+			throw new MemberNotFoundException("주소에 연결된 회원을 찾을 수 없습니다.: " + member.getMemberId());
+		}
+
+		addressRepository.updateDefaultAddressFalseByMember(member);
+
+		newDefaultAddress.setIsDefault(true);
+	}
+
+	private Member getMember(String token) {
+		Long memberId = jwtParser.parseToken(token).get("memberId", Long.class);
+		log.debug("멤버 아이디(주소 생성, 토큰 파싱 후): {}", memberId);
+		return memberRepository.findById(memberId)
+			.orElseThrow(() -> new MemberNotFoundException("해당 아이디의 회원을 찾을 수 없습니다.: " + memberId));
+
+	}
 }
-//그 이름 바로 윤.빈

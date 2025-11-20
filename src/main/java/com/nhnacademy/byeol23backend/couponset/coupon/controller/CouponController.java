@@ -10,10 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/coupon")
 @RequiredArgsConstructor
 public class CouponController {
+//    @GetMapping("")
 
-    @GetMapping("/categories")
-    public ResponseEntity<Void> getCategoryList(){
 
-        return ResponseEntity.ok().build();
-    }
 }

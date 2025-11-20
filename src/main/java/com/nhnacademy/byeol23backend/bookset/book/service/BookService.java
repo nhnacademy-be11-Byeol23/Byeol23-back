@@ -1,10 +1,11 @@
 package com.nhnacademy.byeol23backend.bookset.book.service;
 
-import java.util.List;
-
 import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import com.nhnacademy.byeol23backend.bookset.book.dto.*;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface BookService {
 	BookResponse createBook(BookCreateRequest createRequest);
@@ -17,11 +18,11 @@ public interface BookService {
 
 	void deleteBook(Long bookId);
 
-	List<BookResponse> getBooks(Pageable pageable);
+	Page<BookResponse> getBooks(Pageable pageable);
 
 	List<BookResponse> getBooksByIds(List<Long> bookIds);
 
-    Book getBookWithPublisher(Long bookId);
+	Book getBookWithPublisher(Long bookId);
 
 	void updateBookStock(Long bookId, BookStockUpdateRequest request);
 
