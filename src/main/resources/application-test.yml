@@ -9,7 +9,7 @@ spring:
     password:
   data:
     redis:
-      host: ${REDIS_HOST:s4.java21.net}
+      host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:*N2vya7H@muDTwdNMR!}
       database: ${REDIS_DATABASE:321}

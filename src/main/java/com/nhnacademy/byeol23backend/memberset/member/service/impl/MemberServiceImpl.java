@@ -23,7 +23,6 @@ import com.nhnacademy.byeol23backend.memberset.member.exception.IncorrectPasswor
 import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
 import com.nhnacademy.byeol23backend.memberset.member.service.MemberService;
-import com.nhnacademy.byeol23backend.utils.JwtParser;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +36,6 @@ public class MemberServiceImpl implements MemberService {
 	private final PasswordEncoder passwordEncoder;
 	private final GradeRepository gradeRepository;
 	private final CartService cartService;
-	private final JwtParser jwtParser;
 
 	/**
 	 * 회원을 저장하는 함수
@@ -71,13 +69,12 @@ public class MemberServiceImpl implements MemberService {
 
 	/**
 	 * 회원을 조회하고 회원 정보를 반환하는 함수
-	 * @param token String
+	 * @param memberId Long
 	 * @return MemberMyPageResponse
 	 */
 	@Override
 	@Transactional(readOnly = true)
 	public MemberMyPageResponse getMember(Long memberId) {
-
 
 		Member member = findMemberById(memberId);
 
@@ -140,8 +137,7 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public Member getMemberProxy(Long memberId) {
-		return memberRepository.getReferenceByMemberId(memberId)
-			.orElseThrow(() -> new MemberNotFoundException(memberId + "에 해당하는 멤버를 찾을 수 없습니다."));
+		return null;
 	}
 
 	/**
