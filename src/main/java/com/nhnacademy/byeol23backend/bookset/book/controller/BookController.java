@@ -2,6 +2,7 @@ package com.nhnacademy.byeol23backend.bookset.book.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -67,11 +68,11 @@ public class BookController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<BookResponse>> getBooks(@RequestParam(value = "page", defaultValue = "0") int page,
-		@RequestParam(value = "size", defaultValue = "10") int size
+	public ResponseEntity<Page<BookResponse>> getBooks(@RequestParam(value = "page", defaultValue = "0") int page,
+		@RequestParam(value = "size", defaultValue = "20") int size
 	) {
 		Pageable pageable = PageRequest.of(page, size);
-		List<BookResponse> books = bookService.getBooks(pageable);
+		Page<BookResponse> books = bookService.getBooks(pageable);
 		return ResponseEntity.ok(books);
 	}
 
