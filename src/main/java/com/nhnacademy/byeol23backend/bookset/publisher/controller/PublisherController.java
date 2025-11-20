@@ -44,7 +44,7 @@ public class PublisherController {
 	public ResponseEntity<PublisherCreateResponse> createPublisher(
 		@RequestBody PublisherCreateRequest publisherCreateRequest) {
 		PublisherCreateResponse response = publisherService.createPublisher(publisherCreateRequest);
-		URI uri = URI.create("/api/publishers/" + publisherCreateRequest.publisherName());
+		URI uri = URI.create("/api/pub/" + publisherCreateRequest.publisherName());
 		return ResponseEntity.created(uri).body(response);
 	}
 
