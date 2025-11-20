@@ -1,6 +1,8 @@
 package com.nhnacademy.byeol23backend.couponset.categorycoupon.domain;
 
+import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
+import com.nhnacademy.byeol23backend.couponset.bookcoupon.domain.BookCouponPolicy;
 import com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.CouponPolicy;
 
 import jakarta.persistence.Column;
@@ -13,7 +15,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Entity
 @Table(name = "category_coupon_policy")
 public class CategoryCouponPolicy {
@@ -29,4 +33,13 @@ public class CategoryCouponPolicy {
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "coupon_policy_id", nullable = false)
 	private CouponPolicy couponPolicy;
+
+	private CategoryCouponPolicy(CouponPolicy couponPolicy, Category category) {
+		this.category = category;
+		this.couponPolicy = couponPolicy;
+	}
+
+	public static CategoryCouponPolicy createFromDto(CouponPolicy couponPolicy, Category category){
+		return new CategoryCouponPolicy(couponPolicy, category);
+	}
 }
