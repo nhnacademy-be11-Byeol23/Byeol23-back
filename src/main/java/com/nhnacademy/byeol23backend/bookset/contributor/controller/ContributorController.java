@@ -26,7 +26,7 @@ import com.nhnacademy.byeol23backend.bookset.contributor.service.ContributorServ
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/contributors")
+@RequestMapping("/api/cont")
 @RequiredArgsConstructor
 public class ContributorController {
 	private final ContributorService contributorService;

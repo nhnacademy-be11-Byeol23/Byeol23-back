@@ -28,7 +28,7 @@ import com.nhnacademy.byeol23backend.bookset.publisher.service.PublisherService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/publishers")
+@RequestMapping("/api/pub")
 @RequiredArgsConstructor
 public class PublisherController {
 	private final PublisherService publisherService;
