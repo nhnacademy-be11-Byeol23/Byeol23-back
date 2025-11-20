@@ -11,47 +11,39 @@ import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import com.nhnacademy.byeol23backend.bookset.book.service.BookService;
 import com.nhnacademy.byeol23backend.bookset.bookcategory.service.BookCategoryService;
 import com.nhnacademy.byeol23backend.bookset.bookcontributor.service.BookContributorService;
-import com.nhnacademy.byeol23backend.bookset.bookimage.service.BookImageServiceImpl;
 import com.nhnacademy.byeol23backend.bookset.booktag.service.BookTagService;
 import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.Contributor;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.Tag;
-import com.nhnacademy.byeol23backend.image.dto.ImageUrlProjection;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class BookDocumentBuilder {
-    private final BookService bookService;
-    private final BookCategoryService bookCategoryService;
-    private final BookContributorService bookContributorService;
-    private final BookTagService bookTagService;
-    private final BookImageServiceImpl bookImageService;
+	private final BookService bookService;
+	private final BookCategoryService bookCategoryService;
+	private final BookContributorService bookContributorService;
+	private final BookTagService bookTagService;
 
-    @Transactional(readOnly = true)
-    public BookDocument buildWithOutEmbedding(Long bookId) {
-        log.info("bookId: {}", bookId);
-        Book book = bookService.getBookWithPublisher(bookId);
-        List<Category> categories = bookCategoryService.getCategoriesByBookId(bookId);
-        Map<String, List<Contributor>> contributorMap = bookContributorService.getContributorsByBookId(bookId).stream().collect(Collectors.groupingBy(Contributor::getContributorRole));
-        List<Tag> tags = bookTagService.getTagsByBookId(bookId);
-        ImageUrlProjection bookImage = bookImageService.getImageUrlsById(bookId).stream().findFirst().orElse(null);
-        log.info("bookImage: {}", bookImage);
-        String imageUrl = bookImage != null ? bookImage.getImageUrl() : null;
-        log.info("image url: {}", imageUrl);
+	@Transactional(readOnly = true)
+	public BookDocument buildWithOutEmbedding(Long bookId) {
+		Book book = bookService.getBookWithPublisher(bookId);
+		List<Category> categories = bookCategoryService.getCategoriesByBookId(bookId);
+		Map<String, List<Contributor>> contributorMap = bookContributorService.getContributorsByBookId(bookId)
+			.stream()
+			.collect(Collectors.groupingBy(Contributor::getContributorRole));
+		List<Tag> tags = bookTagService.getTagsByBookId(bookId);
 
-        return BookDocument.builder()
+		return BookDocument.builder()
 			.id(String.valueOf(book.getBookId()))
 			.title(book.getBookName())
 			.description(book.getDescription())
-			.author(contributorMap.getOrDefault("저자", List.of()).stream().map(Contributor::getContributorName).toList())
-			.translator(contributorMap.getOrDefault("역자", List.of()).stream().map(Contributor::getContributorName).toList())
+			.author(contributorMap.get("저자").stream().map(Contributor::getContributorName).toList())
+			.translator(
+				contributorMap.getOrDefault("역자", List.of()).stream().map(Contributor::getContributorName).toList())
 			.isbn(book.getIsbn())
 			.regularPrice(book.getRegularPrice().intValue())
 			.salePrice(book.getSalePrice().intValue())
@@ -64,7 +56,6 @@ public class BookDocumentBuilder {
 			.reviewCount(0)
 			.ratingAverage(0.0f)
 			.bookStatus(book.getBookStatus().name())
-            .imageUrl(imageUrl)
 			.build();
 	}
 }

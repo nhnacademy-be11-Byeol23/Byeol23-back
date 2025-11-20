@@ -1,15 +1,9 @@
 package com.nhnacademy.byeol23backend.memberset.member.controller;
 
-import com.nhnacademy.byeol23backend.commons.aop.RequireRole;
-import com.nhnacademy.byeol23backend.memberset.member.domain.Role;
-import com.nhnacademy.byeol23backend.memberset.member.dto.*;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +23,6 @@ import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateResponse;
 import com.nhnacademy.byeol23backend.memberset.member.service.MemberService;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
