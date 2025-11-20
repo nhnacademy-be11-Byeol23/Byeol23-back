@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -38,12 +37,13 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
                 couponPolicyCreateRequest.criterionPrice(),
                 couponPolicyCreateRequest.discountRate(),
                 couponPolicyCreateRequest.discountLimit(),
-                couponPolicyCreateRequest.discountAmount());
+                couponPolicyCreateRequest.discountAmount(),
+                couponPolicyCreateRequest.couponPolicyType());
         CouponPolicy savedPolicy = couponPolicyRepository.save(couponPolicy);
 
 
         //도서 or 카테고리 쿠폰정책 생성
-        if(couponPolicyCreateRequest.couponScope().equals("BOOK")){
+        if(couponPolicyCreateRequest.couponPolicyType().equals("BOOK")){
             Book book = bookRepository.findById(couponPolicyCreateRequest.bookId()).orElseThrow();
             bookCouponRepository.save(BookCouponPolicy.createFromDto(savedPolicy, book));
         }else{
