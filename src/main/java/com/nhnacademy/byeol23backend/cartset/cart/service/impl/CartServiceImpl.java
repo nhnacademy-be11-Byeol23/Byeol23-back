@@ -1,5 +1,7 @@
 package com.nhnacademy.byeol23backend.cartset.cart.service.impl;
 
+import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.AllContributorResponse;
+import com.nhnacademy.byeol23backend.bookset.publisher.domain.dto.AllPublishersInfoResponse;
 import com.nhnacademy.byeol23backend.cartset.cart.domain.Cart;
 import com.nhnacademy.byeol23backend.cartset.cart.domain.dto.CartResponse;
 import com.nhnacademy.byeol23backend.cartset.cart.exception.CartNotFoundException;
@@ -47,24 +49,42 @@ public class CartServiceImpl implements CartService {
         Cart cart = cartRepository.findCartWithBooksByMemberId(memberId)
                 .orElseThrow(() -> new CartNotFoundException("장바구니가 존재하지 않습니다: " + memberId));
 
-        List<CartBookResponse> bookResponses = new ArrayList<>();
+        List<CartBookResponse> bookResponses = cart.getCartBooks().stream()
+                .map(cb -> {
+                    Map<Long, String> imageUrls =
+                            imageServiceGate.getImageUrlsById(cb.getBook().getBookId(), ImageDomain.BOOK);
+                    String imageUrl = imageUrls.values().stream().findFirst().orElse(null);
 
-        for (CartBook cb: cart.getCartBooks()) {
+                    AllPublishersInfoResponse publisherDto =
+                            new AllPublishersInfoResponse(
+                                    cb.getBook().getPublisher().getPublisherId(),
+                                    cb.getBook().getPublisher().getPublisherName()
+                            );
 
-            Map<Long, String> imageUrls = imageServiceGate.getImageUrlsById(cb.getBook().getBookId(), ImageDomain.BOOK);
-            String imageUrl = imageUrls.values().stream().findFirst().orElse(null);
+                    List<AllContributorResponse> contributorDtos =
+                            cb.getBook().getBookContributors().stream()
+                                    .map(bc -> new AllContributorResponse(
+                                            bc.getContributor().getContributorId(),
+                                            bc.getContributor().getContributorName(),
+                                            bc.getContributor().getContributorRole()
+                                    ))
+                                    .toList();
 
-            CartBookResponse response = new CartBookResponse(
-                    cb.getCartBookId(),
-                    cb.getBook().getBookId(),
-                    cb.getBook().getBookName(),
-                    cb.getBook().getSalePrice(),
-                    cb.getBook().getRegularPrice(),
-                    cb.getQuantity(),
-                    imageUrl
-            );
-            bookResponses.add(response);
-        }
+                    return new CartBookResponse(
+                            cb.getCartBookId(),
+                            cb.getBook().getBookId(),
+                            cb.getBook().getBookName(),
+                            imageUrl,
+                            cb.getBook().isPack(),
+                            cb.getBook().getRegularPrice(),
+                            cb.getBook().getSalePrice(),
+                            publisherDto,
+                            cb.getQuantity(),
+                            contributorDtos,
+                            null
+                    );
+                })
+                .toList();
 
         // 배송비 정책 조회
         DeliveryPolicyInfoResponse deliveryPolicy = deliveryPolicyService.getCurrentDeliveryPolicy();
