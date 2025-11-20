@@ -31,5 +31,5 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderReposi
 		"AND o.deliverySentDate <= :targetDate")
 	int updateInDeliveryOrdersToCompleted(@Param("targetDate") LocalDate targetDate);
 
-	Page<Order> findByMemberAndOrderStatusNot(Member member, String orderStatus, Pageable pageable);
+	Page<Order> findByMemberAndOrderStatusNotOrderByOrderedAtDesc(Member member, String orderStatus, Pageable pageable);
 }

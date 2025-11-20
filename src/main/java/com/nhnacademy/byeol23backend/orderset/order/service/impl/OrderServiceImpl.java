@@ -196,7 +196,8 @@ public class OrderServiceImpl implements OrderService {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new MemberNotFoundException("해당 아디디의 회원을 찾을 수 없습니다.: " + memberId));
 
-		Page<Order> orderList = orderRepository.findByMemberAndOrderStatusNot(member, "대기", pageable);
+		Page<Order> orderList = orderRepository.findByMemberAndOrderStatusNotOrderByOrderedAtDesc(member, "대기",
+			pageable);
 
 		return orderList.map(order -> {
 			List<OrderDetail> orderDetailsForThisOrder = orderDetailRepository.findByOrder(order);
