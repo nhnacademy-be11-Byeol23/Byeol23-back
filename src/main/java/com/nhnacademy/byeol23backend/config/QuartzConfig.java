@@ -1,5 +1,6 @@
 package com.nhnacademy.byeol23backend.config;
 
+import com.nhnacademy.byeol23backend.bookset.book.job.BookDocumentViewCountSyncJob;
 import com.nhnacademy.byeol23backend.bookset.book.job.BookViewCountSyncJob;
 import org.quartz.*;
 import org.springframework.context.annotation.Bean;
@@ -25,9 +26,29 @@ public class QuartzConfig {
 			.forJob(bookViewCountSyncJobDetail())
 			.withIdentity("bookViewCountSyncTrigger")
 			.withSchedule(
-				CronScheduleBuilder.cronSchedule("0 0/10 * * * ?").withMisfireHandlingInstructionFireAndProceed())
+				CronScheduleBuilder.cronSchedule("0 0 * * * ?").withMisfireHandlingInstructionFireAndProceed())
 			.build();
 	}
+
+    @Bean
+    public JobDetail bookDocumentViewCountSyncJobDetail() {
+        return JobBuilder.newJob(BookDocumentViewCountSyncJob.class)
+                .withIdentity("bookDocumentViewCountSyncJob")
+                .withDescription("도서 문서 조회수 동기화 작업")
+                .storeDurably()
+                .build();
+    }
+
+    @Bean
+    public Trigger bookDocumentViewCountSyncTrigger() {
+        return TriggerBuilder.newTrigger()
+                .forJob(bookDocumentViewCountSyncJobDetail())
+                .withIdentity("bookDocumentViewCountSyncTrigger")
+                .withSchedule(
+                        CronScheduleBuilder.cronSchedule("0 0/10 * * * ?").withMisfireHandlingInstructionFireAndProceed()
+                )
+                .build();
+    }
 
 	@Bean
 	public JobDetail deliveryCompletedJobDetail() {
