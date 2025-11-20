@@ -66,7 +66,7 @@ public class Book {
 
 	private LocalDate publishDate;
 
-	@Column(name = "is_pack", nullable = false, columnDefinition = "tinyint")
+	@Column(name = "is_pack", nullable = false)
 	private boolean isPack;
 
 	@Column(name = "book_status", nullable = false, length = 10)
@@ -81,7 +81,7 @@ public class Book {
 	@JoinColumn(name = "publisher_id", nullable = false)
 	private Publisher publisher;
 
-	@Column(name = "is_deleted", nullable = false, columnDefinition = "tinyint")
+	@Column(name = "is_deleted", nullable = false)
 	private boolean isDeleted;
 
 	@Column(name = "view_count", columnDefinition = "BIGINT DEFAULT 0")

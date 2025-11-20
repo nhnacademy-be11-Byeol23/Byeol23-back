@@ -57,8 +57,6 @@ class BookCategoryRepositoryTest {
 		ReflectionTestUtils.setField(testBookCategory, "bookCategoryId", 1L);
 	}
 
-	// ========== existsByCategoryPathIdLike 테스트 ==========
-
 	@Test
 	@DisplayName("existsByCategoryPathIdLike - pathId로 시작하는 카테고리가 존재하는 경우 true 반환")
 	void existsByCategoryPathIdLike_WhenExists_ReturnsTrue() {
@@ -103,8 +101,6 @@ class BookCategoryRepositoryTest {
 		assertThat(exists).isTrue();
 		verify(bookCategoryRepository, times(1)).existsByCategoryPathIdLike(pathId);
 	}
-
-	// ========== findCategoriesByBookId 테스트 ==========
 
 	@Test
 	@DisplayName("findCategoriesByBookId - 도서 ID로 카테고리 조회 성공")
@@ -161,8 +157,6 @@ class BookCategoryRepositoryTest {
 		verify(bookCategoryRepository, times(1)).findCategoriesByBookId(bookId);
 	}
 
-	// ========== deleteByBookId 테스트 ==========
-
 	@Test
 	@DisplayName("deleteByBookId - 도서 ID로 BookCategory 삭제 성공")
 	void deleteByBookId_Success() {
@@ -190,8 +184,6 @@ class BookCategoryRepositoryTest {
 		// then
 		verify(bookCategoryRepository, times(1)).deleteByBookId(bookId);
 	}
-
-	// ========== 기본 CRUD 테스트 ==========
 
 	@Test
 	@DisplayName("save - BookCategory 저장 테스트")
