@@ -44,6 +44,6 @@ public class BookOutbox {
     }
 
     public enum EventType {
-        ADD, UPDATE, DELETE;
+        ADD, UPDATE, UPDATE_IMAGE, DELETE;
     }
 }

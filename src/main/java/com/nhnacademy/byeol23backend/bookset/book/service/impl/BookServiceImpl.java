@@ -1,22 +1,8 @@
 package com.nhnacademy.byeol23backend.bookset.book.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import com.nhnacademy.byeol23backend.bookset.book.domain.BookStatus;
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookCreateRequest;
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookResponse;
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockResponse;
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockUpdateRequest;
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookUpdateRequest;
+import com.nhnacademy.byeol23backend.bookset.book.dto.*;
 import com.nhnacademy.byeol23backend.bookset.book.event.ViewCountIncreaseEvent;
 import com.nhnacademy.byeol23backend.bookset.book.exception.BookNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.book.exception.ISBNAlreadyExistException;
@@ -49,6 +35,17 @@ import com.nhnacademy.byeol23backend.image.dto.GetUrlResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -66,7 +63,7 @@ public class BookServiceImpl implements BookService {
 	private final BookTagService bookTagService;
 	private final BookContributorService bookContributorService;
 	private final BookImageServiceImpl bookImageService;
-	private final BookOutboxRepository bookOutboxRepository;
+    private final BookOutboxRepository bookOutboxRepository;
 
 	@Override
 	@Transactional
@@ -75,7 +72,7 @@ public class BookServiceImpl implements BookService {
 			throw new ISBNAlreadyExistException("이미 존재하는 ISBN입니다: " + createRequest.isbn());
 		}
 		Publisher publisher = publisherRepository.findById(createRequest.publisherId())
-			.orElseThrow(() -> new PublisherNotFoundException("존재하지 않는 출판사 ID입니다: " + createRequest.publisherId()));
+				.orElseThrow(() -> new PublisherNotFoundException("존재하지 않는 출판사 ID입니다: " + createRequest.publisherId()));
 
 		Book book = new Book();
 		book.createBook(createRequest, publisher);
@@ -85,24 +82,11 @@ public class BookServiceImpl implements BookService {
 		bookContributorService.createBookContributors(savedBook, createRequest.contributorIds());
 		log.info("새로운 도서가 생성되었습니다. ID: {}", savedBook.getBookId());
 
-		Long bookId = savedBook.getBookId();
+        BookOutbox savedOutBox = bookOutboxRepository.save(new BookOutbox(savedBook.getBookId(), BookOutbox.EventType.ADD));
+        Long outboxId = savedOutBox.getId();
 
-		if (createRequest.imageUrl() != null && !createRequest.imageUrl().isBlank()) {
-			try {
-				bookImageService.saveImageUrl(bookId, createRequest.imageUrl());
-				log.info("도서 이미지 URL 저장 완료: bookId={}, imageUrl={}", bookId, createRequest.imageUrl());
-			} catch (Exception e) {
-				log.error("도서 이미지 URL 저장 실패: bookId={}, imageUrl={}", bookId, createRequest.imageUrl(), e);
-				throw new RuntimeException("도서 이미지 저장에 실패했습니다.", e);
-			}
-		}
-
-		BookOutbox savedOutBox = bookOutboxRepository.save(new BookOutbox(bookId, BookOutbox.EventType.ADD));
-
-		Long outboxId = savedOutBox.getId();
-		log.info("[추가] 도서 아웃박스 이벤트 발행: {}", outboxId);
-		eventPublisher.publishEvent(new BookOutboxEvent(outboxId));
-
+        log.info("[추가] 도서 아웃박스 이벤트 발행: {}", outboxId);
+        eventPublisher.publishEvent(new BookOutboxEvent(outboxId));
 		return toResponse(savedBook);
 	}
 
@@ -137,7 +121,8 @@ public class BookServiceImpl implements BookService {
 
 		Publisher publisher = publisherRepository.findById(updateRequest.publisherId())
 			.orElseThrow(() -> new PublisherNotFoundException("존재하지 않는 출판사 ID입니다: " + updateRequest.publisherId()));
-		if (updateRequest.bookStatus() == BookStatus.SOLDOUT) {
+
+        if (updateRequest.bookStatus() == BookStatus.SOLDOUT) {
 			book.setStock(0);
 			log.info("품절 시 재고 0 처리");
 		}
@@ -145,8 +130,13 @@ public class BookServiceImpl implements BookService {
 		bookCategoryService.updateBookCategories(book, updateRequest.categoryIds());
 		bookTagService.updateBookTags(book, updateRequest.tagIds());
 		bookContributorService.updateBookContributors(book, updateRequest.contributorIds());
-		log.info("도서 정보가 수정되었습니다. ID: {}", book.getBookId());
+        log.info("도서 정보가 수정되었습니다. ID: {}", book.getBookId());
 
+        BookOutbox bookOutbox = bookOutboxRepository.save(new BookOutbox(bookId, BookOutbox.EventType.UPDATE));
+        Long outboxId = bookOutbox.getId();
+
+        log.info("[수정] 도서 아웃박스 이벤트 발행: {}", outboxId);
+        eventPublisher.publishEvent(new BookOutboxEvent(outboxId));
 		return toResponse(book);
 	}
 
@@ -171,11 +161,11 @@ public class BookServiceImpl implements BookService {
 		bookContributorRepository.deleteByBookId(bookId);
 		log.info("도서가 삭제 처리되었습니다. ID: {}", bookId);
 
-		BookOutbox savedOutBox = bookOutboxRepository.save(new BookOutbox(bookId, BookOutbox.EventType.DELETE));
-		Long outboxId = savedOutBox.getId();
+        BookOutbox bookOutbox = bookOutboxRepository.save(new BookOutbox(bookId, BookOutbox.EventType.DELETE));
+        Long outboxId = bookOutbox.getId();
 
-		log.info("[삭제] 도서 아웃박스 이벤트 발행: {}", outboxId);
-		eventPublisher.publishEvent(new BookOutboxEvent(outboxId));
+        log.info("[삭제] 도서 아웃박스 이벤트 발행: {}", outboxId);
+        eventPublisher.publishEvent(new BookOutboxEvent(outboxId));
 	}
 
 	@Override
@@ -225,7 +215,7 @@ public class BookServiceImpl implements BookService {
 					.map(image -> new GetUrlResponse(image.getBookImageId(), image.getBookImageUrl()))
 					.toList();
 
-				return toResponse(book, categories, tags, contributors, images);
+				return toResponse(book, categories, tags, contributors);
 			})
 			.toList();
 
@@ -258,8 +248,13 @@ public class BookServiceImpl implements BookService {
 		return bookRepository.queryBookWithPublisherById(bookId);
 	}
 
-	private BookResponse toResponse(Book book, List<Category> categories, List<Tag> tags,
-		List<Contributor> contributors, List<GetUrlResponse> images) {
+    @Override
+    public BookReview getBookReview(Long bookId) {
+        return bookRepository.queryBookReview(bookId);
+    }
+
+    private BookResponse toResponse(Book book, List<Category> categories, List<Tag> tags,
+                                    List<Contributor> contributors) {
 		List<CategoryLeafResponse> categoryResponses = categories.stream()
 			.map(category -> new CategoryLeafResponse(
 				category.getCategoryId(),
@@ -270,7 +265,7 @@ public class BookServiceImpl implements BookService {
 
 		List<AllTagsInfoResponse> tagResponses = tags.stream().map(AllTagsInfoResponse::new).toList();
 
-		List<AllContributorResponse> contributorResonses = contributors.stream()
+		List<AllContributorResponse> contributorResponses = contributors.stream()
 			.map(AllContributorResponse::new)
 			.toList();
 
@@ -278,6 +273,10 @@ public class BookServiceImpl implements BookService {
 
 		AllPublishersInfoResponse publisherResponse = new AllPublishersInfoResponse(publisher.getPublisherId(),
 			publisher.getPublisherName());
+
+		List<GetUrlResponse> imageResponses = bookImageService.getImageUrlsById(book.getBookId()).stream()
+			.map(projection -> new GetUrlResponse(projection.getUrlId(), projection.getImageUrl()))
+			.toList();
 
 		return new BookResponse(
 			book.getBookId(),
@@ -295,8 +294,8 @@ public class BookServiceImpl implements BookService {
 			book.isDeleted(),
 			categoryResponses,
 			tagResponses,
-			contributorResonses,
-			images
+			contributorResponses,
+			imageResponses
 		);
 	}
 
@@ -304,9 +303,6 @@ public class BookServiceImpl implements BookService {
 		List<Category> categories = bookCategoryService.getCategoriesByBookId(book.getBookId());
 		List<Tag> tags = bookTagService.getTagsByBookId(book.getBookId());
 		List<Contributor> contributors = bookContributorService.getContributorsByBookId(book.getBookId());
-		List<GetUrlResponse> images = book.getBookImageUrls().stream()
-			.map(image -> new GetUrlResponse(image.getBookImageId(), image.getBookImageUrl()))
-			.toList();
-		return toResponse(book, categories, tags, contributors, images);
+		return toResponse(book, categories, tags, contributors);
 	}
 }

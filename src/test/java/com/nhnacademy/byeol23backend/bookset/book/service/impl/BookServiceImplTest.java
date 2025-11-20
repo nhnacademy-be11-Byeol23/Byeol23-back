@@ -323,6 +323,9 @@ class BookServiceImplTest {
 		Category category1 = new Category("국내도서", null);
 		ReflectionTestUtils.setField(category1, "categoryId", 1L);
 
+        BookOutbox mockOutbox = new BookOutbox(1L, BookOutbox.EventType.UPDATE);
+        ReflectionTestUtils.setField(mockOutbox, "id", 100L);
+
 		given(bookRepository.findById(bookId)).willReturn(Optional.of(existingBook));
 		given(publisherRepository.findById(2L)).willReturn(Optional.of(newPublisher));
 		doNothing().when(bookCategoryService).updateBookCategories(any(Book.class), anyList());
@@ -331,10 +334,10 @@ class BookServiceImplTest {
 		given(bookCategoryService.getCategoriesByBookId(bookId)).willReturn(List.of(category1));
 		given(bookTagService.getTagsByBookId(bookId)).willReturn(List.of());
 		given(bookContributorService.getContributorsByBookId(bookId)).willReturn(List.of());
+        when(bookOutboxRepository.save(any())).thenReturn(mockOutbox);
 
 		// when
 		BookResponse result = bookService.updateBook(bookId, updateRequest);
-
 		// then
 		assertThat(result).isNotNull();
 		assertThat(result.bookId()).isEqualTo(bookId);
@@ -372,6 +375,9 @@ class BookServiceImplTest {
 		ReflectionTestUtils.setField(existingBook, "publisher", publisher);
 		ReflectionTestUtils.setField(existingBook, "stock", 10);
 
+        BookOutbox mockOutbox = new BookOutbox(1L, BookOutbox.EventType.UPDATE);
+        ReflectionTestUtils.setField(mockOutbox, "id", 100L);
+
 		given(bookRepository.findById(bookId)).willReturn(Optional.of(existingBook));
 		given(publisherRepository.findById(1L)).willReturn(Optional.of(publisher));
 		doNothing().when(bookCategoryService).updateBookCategories(any(Book.class), anyList());
@@ -380,6 +386,7 @@ class BookServiceImplTest {
 		given(bookCategoryService.getCategoriesByBookId(bookId)).willReturn(List.of());
 		given(bookTagService.getTagsByBookId(bookId)).willReturn(List.of());
 		given(bookContributorService.getContributorsByBookId(bookId)).willReturn(List.of());
+        when(bookOutboxRepository.save(any())).thenReturn(mockOutbox);
 
 		// when
 		BookResponse result = bookService.updateBook(bookId, updateRequest);
