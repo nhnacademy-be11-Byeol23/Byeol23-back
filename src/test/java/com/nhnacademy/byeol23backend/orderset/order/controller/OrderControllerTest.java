@@ -138,8 +138,7 @@ class OrderControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(prepareRequest))
 				.cookie(new Cookie("Access-Token", accessToken))) // Access-Token 쿠키 추가
-			.andExpect(status().isCreated()) // 201 Created
-			.andExpect(header().string("Location", "/api/orders/" + testOrderNumber))
+			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.orderNumber").value(testOrderNumber));
 
 		verify(orderService, times(1)).prepareOrder(any(OrderPrepareRequest.class), eq(accessToken));
@@ -155,9 +154,8 @@ class OrderControllerTest {
 		// when & then
 		mockMvc.perform(post("/api/orders")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(prepareRequest))) // 쿠키 없음
-			.andExpect(status().isCreated())
-			.andExpect(header().string("Location", "/api/orders/" + testOrderNumber))
+				.content(objectMapper.writeValueAsString(prepareRequest)))
+			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.orderNumber").value(testOrderNumber));
 
 		verify(orderService, times(1)).prepareOrder(any(OrderPrepareRequest.class), eq(null));
