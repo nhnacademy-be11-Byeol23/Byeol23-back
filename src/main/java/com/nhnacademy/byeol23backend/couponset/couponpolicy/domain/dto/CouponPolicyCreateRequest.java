@@ -7,6 +7,9 @@ public record CouponPolicyCreateRequest(
         BigDecimal criterionPrice,
         Integer discountRate,
         BigDecimal discountLimit,
-        BigDecimal discountAmount
+        BigDecimal discountAmount,
+        String couponScope,
+        Long categoryIds,
+        Long bookId
 ) {
 }
