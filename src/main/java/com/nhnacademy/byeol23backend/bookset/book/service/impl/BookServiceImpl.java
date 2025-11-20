@@ -2,11 +2,7 @@ package com.nhnacademy.byeol23backend.bookset.book.service.impl;
 
 import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import com.nhnacademy.byeol23backend.bookset.book.domain.BookStatus;
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookCreateRequest;
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookResponse;
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockResponse;
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockUpdateRequest;
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookUpdateRequest;
+import com.nhnacademy.byeol23backend.bookset.book.dto.*;
 import com.nhnacademy.byeol23backend.bookset.book.event.ViewCountIncreaseEvent;
 import com.nhnacademy.byeol23backend.bookset.book.exception.BookNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.book.exception.ISBNAlreadyExistException;
@@ -83,6 +79,11 @@ public class BookServiceImpl implements BookService {
 		bookContributorService.createBookContributors(savedBook, createRequest.contributorIds());
 		log.info("새로운 도서가 생성되었습니다. ID: {}", savedBook.getBookId());
 
+        BookOutbox savedOutBox = bookOutboxRepository.save(new BookOutbox(savedBook.getBookId(), BookOutbox.EventType.ADD));
+        Long outboxId = savedOutBox.getId();
+
+        log.info("[추가] 도서 아웃박스 이벤트 발행: {}", outboxId);
+        eventPublisher.publishEvent(new BookOutboxEvent(outboxId));
 		return toResponse(savedBook);
 	}
 
@@ -117,7 +118,8 @@ public class BookServiceImpl implements BookService {
 
 		Publisher publisher = publisherRepository.findById(updateRequest.publisherId())
 			.orElseThrow(() -> new PublisherNotFoundException("존재하지 않는 출판사 ID입니다: " + updateRequest.publisherId()));
-		if (updateRequest.bookStatus() == BookStatus.SOLDOUT) {
+
+        if (updateRequest.bookStatus() == BookStatus.SOLDOUT) {
 			book.setStock(0);
 			log.info("품절 시 재고 0 처리");
 		}
@@ -125,8 +127,13 @@ public class BookServiceImpl implements BookService {
 		bookCategoryService.updateBookCategories(book, updateRequest.categoryIds());
 		bookTagService.updateBookTags(book, updateRequest.tagIds());
 		bookContributorService.updateBookContributors(book, updateRequest.contributorIds());
-		log.info("도서 정보가 수정되었습니다. ID: {}", book.getBookId());
+        log.info("도서 정보가 수정되었습니다. ID: {}", book.getBookId());
 
+        BookOutbox bookOutbox = bookOutboxRepository.save(new BookOutbox(bookId, BookOutbox.EventType.UPDATE));
+        Long outboxId = bookOutbox.getId();
+
+        log.info("[수정] 도서 아웃박스 이벤트 발행: {}", outboxId);
+        eventPublisher.publishEvent(new BookOutboxEvent(outboxId));
 		return toResponse(book);
 	}
 
@@ -151,8 +158,8 @@ public class BookServiceImpl implements BookService {
 		bookContributorRepository.deleteByBookId(bookId);
 		log.info("도서가 삭제 처리되었습니다. ID: {}", bookId);
 
-        BookOutbox savedOutBox = bookOutboxRepository.save(new BookOutbox(bookId, BookOutbox.EventType.DELETE));
-        Long outboxId = savedOutBox.getId();
+        BookOutbox bookOutbox = bookOutboxRepository.save(new BookOutbox(bookId, BookOutbox.EventType.DELETE));
+        Long outboxId = bookOutbox.getId();
 
         log.info("[삭제] 도서 아웃박스 이벤트 발행: {}", outboxId);
         eventPublisher.publishEvent(new BookOutboxEvent(outboxId));
@@ -257,6 +264,11 @@ public class BookServiceImpl implements BookService {
         return bookRepository.queryBookWithPublisherById(bookId);
     }
 
+    @Override
+    public BookReview getBookReview(Long bookId) {
+        return bookRepository.queryBookReview(bookId);
+    }
+
     private BookResponse toResponse(Book book, List<Category> categories, List<Tag> tags,
                                     List<Contributor> contributors) {
 		List<CategoryLeafResponse> categoryResponses = categories.stream()
@@ -269,7 +281,7 @@ public class BookServiceImpl implements BookService {
 
 		List<AllTagsInfoResponse> tagResponses = tags.stream().map(AllTagsInfoResponse::new).toList();
 
-		List<AllContributorResponse> contributorResonses = contributors.stream()
+		List<AllContributorResponse> contributorResponses = contributors.stream()
 			.map(AllContributorResponse::new)
 			.toList();
 
@@ -300,7 +312,7 @@ public class BookServiceImpl implements BookService {
 			book.isDeleted(),
 			categoryResponses,
 			tagResponses,
-			contributorResonses,
+			contributorResponses,
 			imageResponses
 		);
 	}

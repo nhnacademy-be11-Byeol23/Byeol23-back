@@ -3,13 +3,8 @@ package com.nhnacademy.byeol23backend.bookset.book.service;
 import java.util.List;
 
 import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
+import com.nhnacademy.byeol23backend.bookset.book.dto.*;
 import org.springframework.data.domain.Pageable;
-
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookCreateRequest;
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookResponse;
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockResponse;
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockUpdateRequest;
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookUpdateRequest;
 
 public interface BookService {
 	BookResponse createBook(BookCreateRequest createRequest);
@@ -31,4 +26,6 @@ public interface BookService {
 	void updateBookStock(Long bookId, BookStockUpdateRequest request);
 
 	BookStockResponse getBookStock(Long bookId);
+
+    BookReview getBookReview(Long bookId);
 }

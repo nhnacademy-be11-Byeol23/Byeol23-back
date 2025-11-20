@@ -86,3 +86,6 @@ management:
 
     elasticsearch:
       enabled: false
+
+tossPayment:
+  secretKey: test_sk_26DlbXAaV0wkDZNmNMJ43qY50Q9R

@@ -1,7 +1,10 @@
 package com.nhnacademy.byeol23backend.bookset.book.repository;
 
+import java.util.List;
 import java.util.Optional;
 
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookViewCount;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookReview;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -27,4 +30,14 @@ public interface BookRepository extends JpaRepository<Book, Long>, JdbcBookRepos
 
     @Query("select b from Book b join fetch b.publisher p where b.bookId = :bookId")
     Book queryBookWithPublisherById(@Param("bookId") Long bookId);
+
+    @Query(value = """
+select b.book_id as bookId, count(distinct r.review_id) as reviewCount, round(avg(r.review_rate), 1) as ratingAverage from books b 
+    left join order_details od on b.book_id = od.book_id 
+    left join reviews r on od.order_detail_id = r.order_detail_id where b.book_id = :bookId group by b.book_id
+    """, nativeQuery = true)
+    BookReview queryBookReview(@Param("bookId") Long bookId);
+
+    @Query("select new com.nhnacademy.byeol23backend.bookset.book.dto.BookViewCount(b.bookId, b.viewCount) from Book b")
+    List<BookViewCount> findAllBookViewCount();
 }
