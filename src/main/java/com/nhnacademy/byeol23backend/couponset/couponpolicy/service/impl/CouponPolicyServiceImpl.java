@@ -14,6 +14,8 @@ import com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.dto.CouponPol
 import com.nhnacademy.byeol23backend.couponset.couponpolicy.repository.CouponPolicyRepository;
 import com.nhnacademy.byeol23backend.couponset.couponpolicy.service.CouponPolicyService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,17 +56,17 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
     }
 
     @Override
-    public List<CouponPolicyInfoResponse> getCouponPolicies() {
-        List<CouponPolicy> couponPolicies = couponPolicyRepository.findAll();
+    public Page<CouponPolicyInfoResponse> getCouponPolicies(Pageable pageable) {
+        Page<CouponPolicy> couponPolicies = couponPolicyRepository.findAll(pageable);
 
-        return couponPolicies.stream()
-                .map(couponPolicy -> new CouponPolicyInfoResponse(
-                        couponPolicy.getCouponPolicyName(),
-                        couponPolicy.getCriterionPrice(),
-                        couponPolicy.getDiscountRate(),
-                        couponPolicy.getDiscountLimit(),
-                        couponPolicy.getDiscountAmount()
-                ))
-                .collect(Collectors.toList());
+        return couponPolicies.map(couponPolicy -> new CouponPolicyInfoResponse(
+                couponPolicy.getCouponPolicyId(),
+                couponPolicy.getCouponPolicyName(),
+                couponPolicy.getCriterionPrice(),
+                couponPolicy.getDiscountRate(),
+                couponPolicy.getDiscountLimit(),
+                couponPolicy.getDiscountAmount(),
+                couponPolicy.getCouponPolicyType())
+        );
     }
 }

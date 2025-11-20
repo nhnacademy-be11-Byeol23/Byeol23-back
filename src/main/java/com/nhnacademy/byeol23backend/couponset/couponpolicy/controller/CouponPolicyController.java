@@ -4,6 +4,8 @@ import com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.dto.CouponPol
 import com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.dto.CouponPolicyInfoResponse;
 import com.nhnacademy.byeol23backend.couponset.couponpolicy.service.CouponPolicyService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +24,8 @@ public class CouponPolicyController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CouponPolicyInfoResponse>> getCouponPolicies(){
-        List<CouponPolicyInfoResponse> couponPolicies = couponPolicyService.getCouponPolicies();
+    public ResponseEntity<Page<CouponPolicyInfoResponse>> getCouponPolicies(Pageable pageable){
+        Page<CouponPolicyInfoResponse> couponPolicies = couponPolicyService.getCouponPolicies(pageable);
         return ResponseEntity.ok().body(couponPolicies);
     }
 }
