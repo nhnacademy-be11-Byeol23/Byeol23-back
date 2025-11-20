@@ -1,13 +1,14 @@
 spring:
-  datasource:
+  datasource-data:
     url: ${PROD_DB_URL}
+    driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${PROD_DB_USERNAME}
     password: ${PROD_DB_PASSWORD}
     type: org.apache.commons.dbcp2.BasicDataSource
-    driver-class-name: com.mysql.cj.jdbc.Driver
     dbcp2:
       initial-size: 5
       max-total: 50
+
   datasource-quartz:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -21,6 +22,8 @@ spring:
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
       database: ${REDIS_DATABASE}
+
+
 
   jpa:
     hibernate:
@@ -46,7 +49,19 @@ spring:
             tablePrefix: BACK_QRTZ_
             isClustered: true
             clusterCheckinInterval: 30000
+  rabbitmq:
+    host: ${RABBITMQ_HOST:s4.java21.net}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:admin}
+    password: ${RABBITMQ_PASSWORD:nhnacademy123!}
+    virtual-host: ${RABBITMQ_VIRTUAL_HOST:byeol23}
 
+  ai:
+    ollama:
+      base-url: ${OLLAMA_BASE_URL:http://ollama.java21.net}
+      embedding:
+        options:
+          model: bge-m3
 
 jwt:
   public-key: ${JWT_PUBLIC_KEY}
@@ -54,3 +69,29 @@ jwt:
 logging:
   level:
     root: info
+
+management:
+  health:
+    # 헬스 체크 항목에서 개별 서비스 제외
+    redis:
+      enabled: false  # Redis
+    elasticsearch:
+      enabled: false  # Elasticsearch
+    db:
+      enabled: false  # 데이터베이스 (Quartz용)
+
+book:
+  outbox:
+    exchange: byeol23.book.outbox.exchange
+    queue: byeol23.book.outbox.queue
+    routing-key: byeol23.book.outbox.key
+
+  reindex:
+    exchange: byeol23.book.reindex.status.exchange
+    queue: byeol23.book.reindex.status.queue
+    routing-key: byeol23.book.reindex.status.key
+
+  embedding:
+    exchange: byeol23.book.embedding.exchange
+    queue: byeol23.book.embedding.queue
+    routing-key: byeol23.book.embedding.key

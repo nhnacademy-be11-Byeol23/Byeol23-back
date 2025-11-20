@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.bookset.bookcategory.service.impl;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,9 +33,7 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	@Override
 	@Transactional
 	public void createBookCategories(Book book, List<Long> categoryIds) {
-		if (categoryIds == null || categoryIds.isEmpty()) {
-			return;
-		}
+		validateCategoryIds(categoryIds);
 		List<Category> categories = categoryRepository.findAllById(categoryIds);
 
 		List<BookCategory> bookCategories = categories.stream()
@@ -48,6 +47,7 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 	@Override
 	@Transactional
 	public void updateBookCategories(Book book, List<Long> categoryIds) {
+		validateCategoryIds(categoryIds);
 		List<Category> oldCategories = getCategoriesByBookId(book.getBookId());
 		List<Long> oldCategoryIds = oldCategories.stream().map(Category::getCategoryId).toList();
 
@@ -84,5 +84,14 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 		}
 		
 		log.info("카테고리 수정 완료");
+	}
+
+	private void validateCategoryIds(List<Long> categoryIds) {
+		if (categoryIds == null || categoryIds.isEmpty()) {
+			throw new IllegalArgumentException("카테고리는 최소 한 개 이상 선택해야 합니다.");
+		}
+		if (categoryIds.stream().anyMatch(Objects::isNull)) {
+			throw new IllegalArgumentException("카테고리 ID에 null 값이 포함되어 있습니다.");
+		}
 	}
 }

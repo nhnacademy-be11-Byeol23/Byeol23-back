@@ -1,35 +1,42 @@
 package com.nhnacademy.byeol23backend.orderset.delivery.controller;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.byeol23backend.bookset.book.interceptor.GuestIdCookieInterceptor;
+import com.nhnacademy.byeol23backend.bookset.book.interceptor.ViewerIdInterceptor;
+import com.nhnacademy.byeol23backend.config.WebConfig;
+import com.nhnacademy.byeol23backend.commons.filter.TokenFilter;
+import com.nhnacademy.byeol23backend.orderset.delivery.domain.dto.DeliveryPolicyCreateRequest;
+import com.nhnacademy.byeol23backend.orderset.delivery.domain.dto.DeliveryPolicyCreateResponse;
+import com.nhnacademy.byeol23backend.orderset.delivery.domain.dto.DeliveryPolicyInfoResponse;
+import com.nhnacademy.byeol23backend.orderset.delivery.service.DeliveryPolicyService;
+import com.nhnacademy.byeol23backend.utils.JwtParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nhnacademy.byeol23backend.bookset.book.utils.JwtParser;
-import com.nhnacademy.byeol23backend.orderset.delivery.domain.dto.DeliveryPolicyCreateRequest;
-import com.nhnacademy.byeol23backend.orderset.delivery.domain.dto.DeliveryPolicyCreateResponse;
-import com.nhnacademy.byeol23backend.orderset.delivery.domain.dto.DeliveryPolicyInfoResponse;
-import com.nhnacademy.byeol23backend.orderset.delivery.service.DeliveryPolicyService;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 
-@WebMvcTest(DeliveryPolicyController.class)
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@WebMvcTest(value = DeliveryPolicyController.class,
+excludeFilters = @ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, classes = {TokenFilter.class, GuestIdCookieInterceptor.class, ViewerIdInterceptor.class, WebConfig.class}))
 class DeliveryPolicyControllerTest {
 
 	@Autowired
@@ -38,10 +45,10 @@ class DeliveryPolicyControllerTest {
 	@Autowired
 	private ObjectMapper objectMapper; // Java 객체 <-> JSON 변환
 
-	@MockBean
+	@MockitoBean
 	private DeliveryPolicyService deliveryPolicyService; // 가짜 서비스 레이어
 
-	@MockBean
+	@MockitoBean
 	private JwtParser jwtParser;
 
 	// 테스트용 공통 DTO

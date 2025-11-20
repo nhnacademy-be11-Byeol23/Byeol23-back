@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.bookset.category.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryTreeResponse;
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryCacheService;
@@ -24,13 +25,36 @@ public class RedisCategoryCacheService implements CategoryCacheService {
     @Override
     public void cacheCategoryTree2Depth() {
         List<CategoryTreeResponse> categories = categoryQueryService.getCategoriesWithChildren2Depth();
+        updateCategoryTree2Depth(categories);
+    }
+
+    @Override
+    public List<CategoryTreeResponse> getRootsWithChildren2Depth() {
+        String categoryTreeResponseJson = stringRedisTemplate.opsForValue().get(CATEGORY_TREE_KEY);
+        log.info("루트 카테고리 2계층 트리 캐시: {}", categoryTreeResponseJson);
+        if(categoryTreeResponseJson == null) {
+            log.info("루트 카테고리 2계층 트리 캐시 미스 -> DB 조회 후 캐시 저장");
+            List<CategoryTreeResponse> categories = categoryQueryService.getCategoriesWithChildren2Depth();
+            updateCategoryTree2Depth(categories);
+            return categories;
+        }
         try {
-            String jsonString = objectMapper.writeValueAsString(categories);
-            stringRedisTemplate.opsForValue().set(CATEGORY_TREE_KEY, jsonString);
-            log.info("루트 카테고르 2계층 트리 캐시 저장: {}", jsonString);
-        } catch (JsonProcessingException ignored) {
-            log.info("루트 카테고리 2계층 트리 JSON 직렬화 실패");
+            return objectMapper.readValue(categoryTreeResponseJson, new TypeReference<>() {});
+        } catch (JsonProcessingException e) {
+            log.error("루트 카테고리 2계층 트리 JSON 역직렬화 실패 -> DB 조회 후 캐시 저장");
+            List<CategoryTreeResponse> categories = categoryQueryService.getCategoriesWithChildren2Depth();
+            updateCategoryTree2Depth(categories);
+            return categories;
         }
     }
 
+    private void updateCategoryTree2Depth(List<CategoryTreeResponse> categories) {
+        try {
+            String categoryTreeResponseJson = objectMapper.writeValueAsString(categories);
+            stringRedisTemplate.opsForValue().set(CATEGORY_TREE_KEY, categoryTreeResponseJson);
+            log.info("루트 카테고리 2계층 트리 캐시 저장: {}", categoryTreeResponseJson);
+        } catch (JsonProcessingException ignored) {
+            log.error("루트 카테고리 2계층 트리 JSON 직렬화 실패");
+        }
+    }
 }

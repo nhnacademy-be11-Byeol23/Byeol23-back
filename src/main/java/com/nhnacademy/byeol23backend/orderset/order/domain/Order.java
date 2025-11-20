@@ -84,11 +84,13 @@ public class Order {
 	@JoinColumn(name = "point_history_id", nullable = true)
 	private PointHistory pointHistory;
 
-	private Order(String orderNumber, BigDecimal totalBookPrice, BigDecimal actualOrderPrice, LocalDateTime orderedAt,
+	private Order(String orderNumber, String orderPassword, BigDecimal totalBookPrice, BigDecimal actualOrderPrice,
+		LocalDateTime orderedAt,
 		String orderStatus, LocalDate deliveryDesiredDate, String receiver, String postCode, String receiverAddress,
-		String receiverAddressDetail, String receiverAddressExtra, String receiverPhone,
+		String receiverAddressDetail, String receiverAddressExtra, String receiverPhone, Member member,
 		DeliveryPolicy deliveryPolicy) {
 		this.orderNumber = orderNumber;
+		this.orderPassword = orderPassword;
 		this.totalBookPrice = totalBookPrice;
 		this.actualOrderPrice = actualOrderPrice;
 		this.orderedAt = orderedAt;
@@ -100,17 +102,19 @@ public class Order {
 		this.receiverAddressDetail = receiverAddressDetail;
 		this.receiverAddressExtra = receiverAddressExtra;
 		this.receiverPhone = receiverPhone;
+		this.member = member;
 		this.deliveryPolicy = deliveryPolicy;
 	}
 
-	public static Order of(String orderNumber, BigDecimal totalBookPrice, BigDecimal actualOrderPrice,
+	public static Order of(String orderNumber, String orderPassword, BigDecimal totalBookPrice,
+		BigDecimal actualOrderPrice,
 		LocalDate deliveryDesiredDate, String receiver, String postCode, String receiverAddress,
-		String receiverAddressDetail, String receiverAddressExtra, String receiverPhone,
+		String receiverAddressDetail, String receiverAddressExtra, String receiverPhone, Member member,
 		DeliveryPolicy deliveryPolicy) {
 
-		return new Order(orderNumber, totalBookPrice, actualOrderPrice, LocalDateTime.now(),
+		return new Order(orderNumber, orderPassword, totalBookPrice, actualOrderPrice, LocalDateTime.now(),
 			"대기", deliveryDesiredDate, receiver, postCode, receiverAddress, receiverAddressDetail, receiverAddressExtra,
-			receiverPhone, deliveryPolicy);
+			receiverPhone, member, deliveryPolicy);
 	}
 
 	public void updateOrderStatus(String orderStatus) {

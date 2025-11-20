@@ -4,6 +4,7 @@ import com.nhnacademy.byeol23backend.bookset.category.dto.*;
 import com.nhnacademy.byeol23backend.bookset.category.exception.CategoryDeleteReferencedByBookException;
 import com.nhnacademy.byeol23backend.bookset.category.exception.CategoryNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.category.exception.ErrorResponse;
+import com.nhnacademy.byeol23backend.bookset.category.service.CategoryCacheService;
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryCommandService;
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryQueryService;
 import jakarta.validation.ConstraintViolationException;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 public class CategoryController {
     private final CategoryQueryService categoryQueryService;
     private final CategoryCommandService categoryCommandService;
+    private final CategoryCacheService categoryCacheService;
 
     @PostMapping("/categories")
     @ResponseStatus(HttpStatus.CREATED)
@@ -59,9 +61,15 @@ public class CategoryController {
         return categoryQueryService.getSubCategories(parentId);
     }
 
-    @GetMapping("/categories")
+    @GetMapping("/categories/leaf")
     public List<CategoryLeafResponse> getLeafs() {
         return categoryQueryService.getLeafCategories();
+    }
+
+    @GetMapping("/categories/tree")
+    @ResponseStatus(HttpStatus.OK)
+    public List<CategoryTreeResponse> getRootsWithChildren2Depth() {
+        return categoryCacheService.getRootsWithChildren2Depth();
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

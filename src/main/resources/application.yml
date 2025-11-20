@@ -20,6 +20,11 @@ spring:
     hibernate:
       ddl-auto: validate
 
+  elasticsearch:
+    uris: http://${ES_HOST:s4.java21.net}:${ES_PORT:9200}
+    username: ${ES_USERNAME:elastic}
+    password: ${ES_PASSWORD:nhnacademy123!}
+
   profiles:
     active: dev
 
@@ -31,12 +36,12 @@ logging:
     org.apache.commons.dbcp2: DEBUG
 
 tossPayment:
-  secretKey: test_sk_26DlbXAaV0wkDZNmNMJ43qY50Q9R
+  secretKey: ${TOSS_SECRET_KEY:test_sk_26DlbXAaV0wkDZNmNMJ43qY50Q9R}
 
 eureka:
   client:
     healthcheck:
-      enabled: true
+      enabled: false
     register-with-eureka: true
     fetch-registry: true
     service-url:

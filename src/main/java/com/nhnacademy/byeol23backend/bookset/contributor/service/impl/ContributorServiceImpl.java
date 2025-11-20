@@ -1,6 +1,12 @@
 package com.nhnacademy.byeol23backend.bookset.contributor.service.impl;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.Contributor;
+import com.nhnacademy.byeol23backend.bookset.contributor.domain.ContributorRole;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.AllContributorResponse;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorCreateRequest;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorCreateResponse;
@@ -10,11 +16,6 @@ import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorU
 import com.nhnacademy.byeol23backend.bookset.contributor.exception.ContributorNotFound;
 import com.nhnacademy.byeol23backend.bookset.contributor.repository.ContributorRepository;
 import com.nhnacademy.byeol23backend.bookset.contributor.service.ContributorService;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,8 @@ public class ContributorServiceImpl implements ContributorService {
 
 	@Override
 	public ContributorCreateResponse createContributor(ContributorCreateRequest request) {
-		if (request == null) throw new IllegalArgumentException("request is null");
+		if (request == null)
+			throw new IllegalArgumentException("request is null");
 		if (request.contributorName() == null || request.contributorName().isBlank()) {
 			throw new IllegalArgumentException("name is required");
 		}
@@ -55,7 +57,8 @@ public class ContributorServiceImpl implements ContributorService {
 	@Override
 	@Transactional
 	public ContributorUpdateResponse updateContributor(Long contributorId, ContributorUpdateRequest request) {
-		if (request == null) throw new IllegalArgumentException("request is null");
+		if (request == null)
+			throw new IllegalArgumentException("request is null");
 		if (request.contributorName() == null || request.contributorName().isBlank()) {
 			throw new IllegalArgumentException("name is required");
 		}
@@ -63,7 +66,8 @@ public class ContributorServiceImpl implements ContributorService {
 			throw new IllegalArgumentException("contributorRole is required");
 		}
 
-		Contributor contributor = contributorRepository.findById(contributorId).orElseThrow(() -> new ContributorNotFound("해당 기여자 없음: " + contributorId));
+		Contributor contributor = contributorRepository.findById(contributorId)
+			.orElseThrow(() -> new ContributorNotFound("해당 기여자 없음: " + contributorId));
 		contributor.setContributorName(request.contributorName());
 		contributor.setContributorRole(request.contributorRole());
 		return new ContributorUpdateResponse(contributor);
@@ -73,5 +77,26 @@ public class ContributorServiceImpl implements ContributorService {
 	public Page<AllContributorResponse> getAllContributors(int page, int size) {
 		Pageable pageable = PageRequest.of(page, size);
 		return contributorRepository.findAll(pageable).map(AllContributorResponse::new);
+	}
+
+	@Override
+	@Transactional
+	public Long findOrCreateContributor(String contributorName, ContributorRole contributorRole) {
+		if (contributorName == null || contributorName.isBlank()) {
+			throw new IllegalArgumentException("contributorName은 null일 수 없다.");
+		}
+		// 이름과 역할로 기여자 찾기
+		return contributorRepository
+			.findByContributorNameAndContributorRole(contributorName, contributorRole)
+			.map(Contributor::getContributorId)
+			.orElseGet(() -> {
+				ContributorCreateRequest request = new ContributorCreateRequest(
+					contributorName,
+					contributorRole
+				);
+				Contributor contributor = new Contributor(request);
+				Contributor saved = contributorRepository.save(contributor);
+				return saved.getContributorId();
+			});
 	}
 }

@@ -3,7 +3,7 @@ package com.nhnacademy.byeol23backend.config;
 import com.nhnacademy.byeol23backend.bookset.book.interceptor.GuestIdCookieInterceptor;
 import com.nhnacademy.byeol23backend.bookset.book.interceptor.ViewerIdInterceptor;
 import com.nhnacademy.byeol23backend.bookset.book.resolver.ViewerIdResolver;
-import com.nhnacademy.byeol23backend.bookset.book.utils.JwtParser;
+import com.nhnacademy.byeol23backend.utils.JwtParser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -20,10 +20,12 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new GuestIdCookieInterceptor())
-                .addPathPatterns("/api/**");
+                .addPathPatterns("/api/books/*")
+                .order(0);
 
         registry.addInterceptor(new ViewerIdInterceptor(jwtParser))
-                .addPathPatterns("/api/books/*");
+                .addPathPatterns("/api/books/*")
+                .order(1);
     }
 
     @Override

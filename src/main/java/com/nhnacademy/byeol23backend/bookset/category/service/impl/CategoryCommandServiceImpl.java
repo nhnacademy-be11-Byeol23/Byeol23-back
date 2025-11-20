@@ -73,6 +73,7 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
         }
         categoryRepository.deleteById(id);
         log.info("카테고리 삭제:{}", id);
+        publisher.publishEvent(new CategoryTreeCacheUpdateEvent());
     }
 
     private void setCategoryPath(Category parent, Category child) {

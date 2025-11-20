@@ -1,10 +1,10 @@
 package com.nhnacademy.byeol23backend.bookset.book.interceptor;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.ResponseCookie;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.Arrays;
@@ -15,6 +15,7 @@ public class GuestIdCookieInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        if(!"GET".equalsIgnoreCase(request.getMethod())) return true;
         String authorization = request.getHeader("Authorization");
         if(StringUtils.isNoneBlank(authorization) && authorization.startsWith("Bearer ")) return true;
 
@@ -23,11 +24,13 @@ public class GuestIdCookieInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        Cookie cookie = createCookie();
+        String guestId = generateGuestId();
+        String cookie = createCookie(guestId);
+        response.addHeader("Set-Cookie", cookie);
 
-        response.addCookie(cookie);
+        request.setAttribute("guestId", guestId);
 
-        log.info("비회원 쿠키 생성: {}", cookie.getValue());
+        log.info("비회원 쿠키 생성: {}", guestId);
         return true;
     }
 
@@ -35,11 +38,7 @@ public class GuestIdCookieInterceptor implements HandlerInterceptor {
         return UUID.randomUUID().toString();
     }
 
-    private Cookie createCookie() {
-        Cookie cookie = new Cookie("guestId", generateGuestId());
-        cookie.setPath("/");
-        cookie.setMaxAge(3600);
-        cookie.setHttpOnly(true);
-        return cookie;
+    private String createCookie(String value) {
+        return ResponseCookie.from("guestId").value(value).httpOnly(true).sameSite("Lax").maxAge(3600).build().toString();
     }
 }

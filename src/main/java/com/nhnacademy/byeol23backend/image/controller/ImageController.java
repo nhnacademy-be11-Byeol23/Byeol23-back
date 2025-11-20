@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/images")
+@RequestMapping("/api/images")
 public class ImageController {
 	private final ImageServiceGate imageServiceGate;
 

@@ -5,6 +5,7 @@ import java.net.URI;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,10 +38,10 @@ public class OrderController {
 	private final OrderService orderService;
 
 	@PostMapping
-	public ResponseEntity<OrderPrepareResponse> prepareOrder(@Valid @RequestBody OrderPrepareRequest request) {
-		OrderPrepareResponse response = orderService.prepareOrder(request);
-		URI uri = URI.create("/api/orders/" + response.orderNumber());
-		return ResponseEntity.created(uri).body(response);
+	public ResponseEntity<OrderPrepareResponse> prepareOrder(@Valid @RequestBody OrderPrepareRequest request,
+		@CookieValue(name = "Access-Token", required = false) String accessToken) {
+		OrderPrepareResponse response = orderService.prepareOrder(request, accessToken);
+		return ResponseEntity.ok(response);
 	}
 
 	@PutMapping
@@ -86,6 +87,13 @@ public class OrderController {
 	public ResponseEntity<Void> updateBulkOrderStatus(@RequestBody OrderBulkUpdateRequest request) {
 		orderService.updateBulkOrderStatus(request);
 		return ResponseEntity.ok().build();
+	}
+
+	@GetMapping("/members")
+	public ResponseEntity<Page<OrderDetailResponse>> getOrders(@CookieValue(name = "Access-Token") String token,
+		Pageable pageable) {
+		Page<OrderDetailResponse> responses = orderService.getOrders(token, pageable);
+		return ResponseEntity.ok(responses);
 	}
 
 }

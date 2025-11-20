@@ -2,7 +2,7 @@ package com.nhnacademy.byeol23backend.bookset.book.controller;
 
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -21,12 +21,18 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nhnacademy.byeol23backend.bookset.book.annotation.ViewerId;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookCreateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookResponse;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockResponse;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.service.BookService;
+import com.nhnacademy.byeol23backend.commons.aop.RequireRole;
+import com.nhnacademy.byeol23backend.memberset.member.domain.Role;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/books")
 @RequiredArgsConstructor
@@ -43,6 +49,7 @@ public class BookController {
 
 	@GetMapping("/{bookId}")
 	public ResponseEntity<BookResponse> getBook(@PathVariable("bookId") Long bookId, @ViewerId String viewerId) {
+		log.info("viewerId: {}", viewerId);
 		BookResponse response = bookService.getBookAndIncreaseViewCount(bookId, viewerId);
 		return ResponseEntity.ok(response);
 	}
@@ -61,11 +68,11 @@ public class BookController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<BookResponse>> getBooks(@RequestParam(defaultValue = "0") int pageNo,
-		@RequestParam(defaultValue = "10") int pageSize
+	public ResponseEntity<Page<BookResponse>> getBooks(@RequestParam(value = "page", defaultValue = "0") int page,
+		@RequestParam(value = "size", defaultValue = "20") int size
 	) {
-		Pageable pageable = PageRequest.of(pageNo, pageSize);
-		List<BookResponse> books = bookService.getBooks(pageable);
+		Pageable pageable = PageRequest.of(page, size);
+		Page<BookResponse> books = bookService.getBooks(pageable);
 		return ResponseEntity.ok(books);
 	}
 
@@ -73,5 +80,17 @@ public class BookController {
 	public ResponseEntity<List<BookResponse>> getBooksByIds(@RequestParam("ids") List<Long> bookIds) {
 		List<BookResponse> books = bookService.getBooksByIds(bookIds);
 		return ResponseEntity.ok(books);
+	}
+
+	@GetMapping("/{book-id}/stock")
+	public ResponseEntity<BookStockResponse> getBookStock(@PathVariable("book-id") Long bookId) {
+		return ResponseEntity.ok(bookService.getBookStock(bookId));
+	}
+
+	@PutMapping("/{book-id}/stock")
+	public ResponseEntity<Void> updateBookStock(@PathVariable("book-id") Long bookId,
+		@RequestBody BookStockUpdateRequest request) {
+		bookService.updateBookStock(bookId, request);
+		return ResponseEntity.noContent().build();
 	}
 }

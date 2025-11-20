@@ -19,10 +19,12 @@ spring:
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:*N2vya7H@muDTwdNMR!}
       database: ${REDIS_DATABASE:321}
+
   jpa:
     hibernate:
       ddl-auto: validate
     defer-datasource-initialization: true
+
   quartz:
     job-store-type: memory
     properties:
@@ -32,9 +34,55 @@ spring:
             class: org.quartz.simpl.SimpleThreadPool
             threadCount: 4
 
+  rabbitmq:
+    host: ${RABBITMQ_HOST:s4.java21.net}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:admin}
+    password: ${RABBITMQ_PASSWORD:nhnacademy123!}
+    virtual-host: ${RABBITMQ_VIRTUAL_HOST:byeol23}
+
+  ai:
+    ollama:
+      base-url: ${OLLAMA_BASE_URL:http://ollama.java21.net}
+      embedding:
+        options:
+          model: bge-m3
+
 jwt:
   public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiNJoRcPJmLQ7Ii+hv78JNhtSgo7w7u8TS3PsftAMKBvkqpeAInmnpra1usEPhXTVWOyLLxL6yJAymKY8lzDf3I74T0F4GJiomkjjOdIT5TEAc5X3um+IuHxu7Qapr0BuKwBvT4FCBJ9jzPOCq8xkh2q/AWGfOTlPLjBmAVnp2NbbV4aI5cQR6D9a/extPX6hhAtq/NZqE665L/SVIXqPabu2Owpvn90O6HtNXzg6ytk7Rj4FBx6YLtqHy0QAf8/o/Zc1nr+ZHwSsDQ+am6Sp2ZmUl03ScerF7EMtfZyzUqY46RFNgUkhB7iJb2hZ3xYGtR9SUI+PDvt2Kz6AETewhQIDAQAB
 
 eureka:
   client:
-    enabled: true
+    healthcheck:
+      enabled: false
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://127.0.0.1:10338/dashboard/eureka
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.hostname}:${spring.application.instance_id:${server.port}}
+
+book:
+  outbox:
+    exchange: byeol23.dev.book.outbox.exchange
+    queue: byeol23.dev.book.outbox.queue
+    routing-key: byeol23.dev.book.outbox.key
+
+  reindex:
+    exchange: byeol23.dev.book.reindex.status.exchange
+    queue: byeol23.dev.book.reindex.status.queue
+    routing-key: byeol23.dev.book.reindex.status.key
+
+  embedding:
+    exchange: byeol23.dev.book.embedding.exchange
+    queue: byeol23.dev.book.embedding.queue
+    routing-key: byeol23.dev.book.embedding.key
+
+management:
+  health:
+    redis:
+      enabled: false
+
+    elasticsearch:
+      enabled: false

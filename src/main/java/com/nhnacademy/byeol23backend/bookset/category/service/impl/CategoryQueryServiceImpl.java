@@ -1,12 +1,11 @@
 package com.nhnacademy.byeol23backend.bookset.category.service.impl;
 
-import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse;
-import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryListResponse;
-import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryTreeResponse;
+import com.nhnacademy.byeol23backend.bookset.category.dto.*;
 import com.nhnacademy.byeol23backend.bookset.category.repository.CategoryRepository;
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -31,8 +30,14 @@ public class CategoryQueryServiceImpl implements CategoryQueryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryTreeResponse> getCategoriesWithChildren2Depth() {
         return categoryRepository.findRootCategoryEntities().stream()
                 .map(root -> CategoryTreeResponse.from(root, 2)).toList();
+    }
+
+    @Override
+    public List<SubCategoryIdListResponse> getSubCategoryIdsByPathId(String pathId) {
+        return categoryRepository.findSubCategoryIdsByPathId(pathId);
     }
 }

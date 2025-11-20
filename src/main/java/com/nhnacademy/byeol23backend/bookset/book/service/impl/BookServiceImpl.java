@@ -1,18 +1,21 @@
 package com.nhnacademy.byeol23backend.bookset.book.service.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
+import com.nhnacademy.byeol23backend.bookset.book.domain.BookStatus;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookCreateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookResponse;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockResponse;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.event.ViewCountIncreaseEvent;
 import com.nhnacademy.byeol23backend.bookset.book.exception.BookNotFoundException;
@@ -33,6 +36,9 @@ import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
 import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.Contributor;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.AllContributorResponse;
+import com.nhnacademy.byeol23backend.bookset.outbox.BookOutbox;
+import com.nhnacademy.byeol23backend.bookset.outbox.event.BookOutboxEvent;
+import com.nhnacademy.byeol23backend.bookset.outbox.repository.BookOutboxRepository;
 import com.nhnacademy.byeol23backend.bookset.publisher.domain.Publisher;
 import com.nhnacademy.byeol23backend.bookset.publisher.domain.dto.AllPublishersInfoResponse;
 import com.nhnacademy.byeol23backend.bookset.publisher.exception.PublisherNotFoundException;
@@ -60,6 +66,7 @@ public class BookServiceImpl implements BookService {
 	private final BookTagService bookTagService;
 	private final BookContributorService bookContributorService;
 	private final BookImageServiceImpl bookImageService;
+	private final BookOutboxRepository bookOutboxRepository;
 
 	@Override
 	@Transactional
@@ -68,7 +75,7 @@ public class BookServiceImpl implements BookService {
 			throw new ISBNAlreadyExistException("이미 존재하는 ISBN입니다: " + createRequest.isbn());
 		}
 		Publisher publisher = publisherRepository.findById(createRequest.publisherId())
-				.orElseThrow(() -> new PublisherNotFoundException("존재하지 않는 출판사 ID입니다: " + createRequest.publisherId()));
+			.orElseThrow(() -> new PublisherNotFoundException("존재하지 않는 출판사 ID입니다: " + createRequest.publisherId()));
 
 		Book book = new Book();
 		book.createBook(createRequest, publisher);
@@ -78,6 +85,24 @@ public class BookServiceImpl implements BookService {
 		bookContributorService.createBookContributors(savedBook, createRequest.contributorIds());
 		log.info("새로운 도서가 생성되었습니다. ID: {}", savedBook.getBookId());
 
+		Long bookId = savedBook.getBookId();
+
+		if (createRequest.imageUrl() != null && !createRequest.imageUrl().isBlank()) {
+			try {
+				bookImageService.saveImageUrl(bookId, createRequest.imageUrl());
+				log.info("도서 이미지 URL 저장 완료: bookId={}, imageUrl={}", bookId, createRequest.imageUrl());
+			} catch (Exception e) {
+				log.error("도서 이미지 URL 저장 실패: bookId={}, imageUrl={}", bookId, createRequest.imageUrl(), e);
+				throw new RuntimeException("도서 이미지 저장에 실패했습니다.", e);
+			}
+		}
+
+		BookOutbox savedOutBox = bookOutboxRepository.save(new BookOutbox(bookId, BookOutbox.EventType.ADD));
+
+		Long outboxId = savedOutBox.getId();
+		log.info("[추가] 도서 아웃박스 이벤트 발행: {}", outboxId);
+		eventPublisher.publishEvent(new BookOutboxEvent(outboxId));
+
 		return toResponse(savedBook);
 	}
 
@@ -86,6 +111,14 @@ public class BookServiceImpl implements BookService {
 		Book book = bookRepository.findById(bookId)
 			.orElseThrow(() -> new BookNotFoundException("존재하지 않는 도서입니다: " + bookId));
 		return toResponse(book);
+	}
+
+	@Override
+	public BookStockResponse getBookStock(Long bookId) {
+		Book book = bookRepository.findById(bookId)
+			.orElseThrow(() -> new BookNotFoundException("존재하지 않는 도서입니다: " + bookId));
+
+		return new BookStockResponse(book.getBookId(), book.getBookName(), book.getStock());
 	}
 
 	@Override
@@ -104,7 +137,10 @@ public class BookServiceImpl implements BookService {
 
 		Publisher publisher = publisherRepository.findById(updateRequest.publisherId())
 			.orElseThrow(() -> new PublisherNotFoundException("존재하지 않는 출판사 ID입니다: " + updateRequest.publisherId()));
-
+		if (updateRequest.bookStatus() == BookStatus.SOLDOUT) {
+			book.setStock(0);
+			log.info("품절 시 재고 0 처리");
+		}
 		book.updateBook(updateRequest, publisher);
 		bookCategoryService.updateBookCategories(book, updateRequest.categoryIds());
 		bookTagService.updateBookTags(book, updateRequest.tagIds());
@@ -112,6 +148,16 @@ public class BookServiceImpl implements BookService {
 		log.info("도서 정보가 수정되었습니다. ID: {}", book.getBookId());
 
 		return toResponse(book);
+	}
+
+	@Override
+	@Transactional
+	public void updateBookStock(Long bookId, BookStockUpdateRequest request) {
+		Book book = bookRepository.findById(bookId)
+			.orElseThrow(() -> new BookNotFoundException("존재하지 않는 도서입니다: " + bookId));
+
+		book.setStock(request.stock());
+		log.info("도서 재고가 수정되었습니다. ID: {}", bookId);
 	}
 
 	@Override
@@ -124,80 +170,67 @@ public class BookServiceImpl implements BookService {
 		bookTagRepository.deleteByBookId(bookId);
 		bookContributorRepository.deleteByBookId(bookId);
 		log.info("도서가 삭제 처리되었습니다. ID: {}", bookId);
+
+		BookOutbox savedOutBox = bookOutboxRepository.save(new BookOutbox(bookId, BookOutbox.EventType.DELETE));
+		Long outboxId = savedOutBox.getId();
+
+		log.info("[삭제] 도서 아웃박스 이벤트 발행: {}", outboxId);
+		eventPublisher.publishEvent(new BookOutboxEvent(outboxId));
 	}
 
 	@Override
-	public List<BookResponse> getBooks(Pageable pageable) {
-		List<Book> bookList = bookRepository.findAll();
-		if (bookList.isEmpty()) {
-			return new ArrayList<>();
+	public Page<BookResponse> getBooks(Pageable pageable) {
+		// Book만 페이징으로 조회 (Publisher는 ManyToOne이라 문제없음)
+		Page<Book> bookPage = bookRepository.findAll(pageable);
+
+		if (bookPage.isEmpty()) {
+			return Page.empty(pageable);
 		}
 
-		List<Long> bookIdList = new ArrayList<>();
-		for (Book bookItem : bookList) {
-			Long bookId = bookItem.getBookId();
-			bookIdList.add(bookId);
-		}
-		List<BookCategory> bookCategoryList = bookCategoryRepository.findByBookIdsWithCategory(bookIdList);
-		Map<Long, List<Category>> bookIdToCategoryListMap = new HashMap<>();
-		List<BookTag> bookTagList = bookTagRepository.findByBookIdsWithTag(bookIdList);
-		Map<Long, List<Tag>> bookIdToTagListMap = new HashMap<>();
-		List<BookContributor> bookContributorList = bookContributorRepository.findByBookIdsWithContributor(bookIdList);
-		Map<Long, List<Contributor>> bookIdToContributorListMap = new HashMap<>();
+		List<Book> bookList = bookPage.getContent();
+		List<Long> bookIds = bookList.stream()
+			.map(Book::getBookId)
+			.toList();
 
-		for (BookCategory bookCategoryItem : bookCategoryList) {
-			Book bookFromCategory = bookCategoryItem.getBook();
-			Long bookIdFromCategory = bookFromCategory.getBookId();
-			Category categoryFromBookCategory = bookCategoryItem.getCategory();
-			if (!bookIdToCategoryListMap.containsKey(bookIdFromCategory)) {
-				List<Category> newCategoryList = new ArrayList<>();
-				bookIdToCategoryListMap.put(bookIdFromCategory, newCategoryList);
-			}
-			List<Category> existingCategoryList = bookIdToCategoryListMap.get(bookIdFromCategory);
-			existingCategoryList.add(categoryFromBookCategory);
-		}
-		log.info("도서별 카테고리 정보 조회 완료");
+		// JOIN FETCH로 Category, Tag, Contributor를 한 번에 조회
+		List<BookCategory> bookCategories = bookCategoryRepository.findByBookIdsWithCategory(bookIds);
+		List<BookTag> bookTags = bookTagRepository.findByBookIdsWithTag(bookIds);
+		List<BookContributor> bookContributors = bookContributorRepository.findByBookIdsWithContributor(bookIds);
 
-		for (BookTag bookTagItem : bookTagList) {
-			Book bookFromTag = bookTagItem.getBook();
-			Long bookIdFromTag = bookFromTag.getBookId();
-			Tag tagFromBookTag = bookTagItem.getTag();
-			if (!bookIdToTagListMap.containsKey(bookIdFromTag)) {
-				List<Tag> newTagList = new ArrayList<>();
-				bookIdToTagListMap.put(bookIdFromTag, newTagList);
-			}
-			List<Tag> existingTagList = bookIdToTagListMap.get(bookIdFromTag);
-			existingTagList.add(tagFromBookTag);
-		}
-		log.info("도서별 태그 정보 조회 완료");
+		// BookId별로 그룹화
+		java.util.Map<Long, List<Category>> categoryMap = bookCategories.stream()
+			.collect(java.util.stream.Collectors.groupingBy(
+				bc -> bc.getBook().getBookId(),
+				java.util.stream.Collectors.mapping(BookCategory::getCategory, java.util.stream.Collectors.toList())
+			));
+		java.util.Map<Long, List<Tag>> tagMap = bookTags.stream()
+			.collect(java.util.stream.Collectors.groupingBy(
+				bt -> bt.getBook().getBookId(),
+				java.util.stream.Collectors.mapping(BookTag::getTag, java.util.stream.Collectors.toList())
+			));
+		java.util.Map<Long, List<Contributor>> contributorMap = bookContributors.stream()
+			.collect(java.util.stream.Collectors.groupingBy(
+				bc -> bc.getBook().getBookId(),
+				java.util.stream.Collectors.mapping(BookContributor::getContributor,
+					java.util.stream.Collectors.toList())
+			));
 
-		for (BookContributor bookContributorItem : bookContributorList) {
-			Book bookFromContributor = bookContributorItem.getBook();
-			Long bookIdFromContributor = bookFromContributor.getBookId();
-			Contributor contributorFromBookContributor = bookContributorItem.getContributor();
-			if (!bookIdToContributorListMap.containsKey(bookIdFromContributor)) {
-				List<Contributor> newContributorList = new ArrayList<>();
-				bookIdToContributorListMap.put(bookIdFromContributor, newContributorList);
-			}
-			List<Contributor> existingContributorList = bookIdToContributorListMap.get(bookIdFromContributor);
-			existingContributorList.add(contributorFromBookContributor);
-		}
-		log.info("도서별 기여자 정보 조회 완료");
+		// @BatchSize가 BookImage를 자동으로 배치 로딩
+		List<BookResponse> bookResponseList = bookList.stream()
+			.map(book -> {
+				List<Category> categories = categoryMap.getOrDefault(book.getBookId(), new ArrayList<>());
+				List<Tag> tags = tagMap.getOrDefault(book.getBookId(), new ArrayList<>());
+				List<Contributor> contributors = contributorMap.getOrDefault(book.getBookId(), new ArrayList<>());
+				List<GetUrlResponse> images = book.getBookImageUrls().stream()
+					.map(image -> new GetUrlResponse(image.getBookImageId(), image.getBookImageUrl()))
+					.toList();
 
-		List<BookResponse> bookResponseList = new ArrayList<>();
+				return toResponse(book, categories, tags, contributors, images);
+			})
+			.toList();
 
-		for (Book bookItem : bookList) {
-			Long currentBookId = bookItem.getBookId();
-			List<Category> categoryListForBook = bookIdToCategoryListMap.getOrDefault(currentBookId, new ArrayList<>());
-			List<Tag> tagListForBook = bookIdToTagListMap.getOrDefault(currentBookId, new ArrayList<>());
-			List<Contributor> contributorListForBook = bookIdToContributorListMap.getOrDefault(currentBookId,
-				new ArrayList<>());
-			BookResponse bookResponse = toResponse(bookItem, categoryListForBook, tagListForBook,
-				contributorListForBook);
-			bookResponseList.add(bookResponse);
-		}
-		log.info("도서 조회가 완료되었습니다.");
-		return bookResponseList;
+		log.info("도서 조회가 완료되었습니다. (페이지: {}, 크기: {})", pageable.getPageNumber(), pageable.getPageSize());
+		return new PageImpl<>(bookResponseList, pageable, bookPage.getTotalElements());
 	}
 
 	@Override
@@ -220,8 +253,13 @@ public class BookServiceImpl implements BookService {
 		return bookResponseList;
 	}
 
+	@Override
+	public Book getBookWithPublisher(Long bookId) {
+		return bookRepository.queryBookWithPublisherById(bookId);
+	}
+
 	private BookResponse toResponse(Book book, List<Category> categories, List<Tag> tags,
-		List<Contributor> contributors) {
+		List<Contributor> contributors, List<GetUrlResponse> images) {
 		List<CategoryLeafResponse> categoryResponses = categories.stream()
 			.map(category -> new CategoryLeafResponse(
 				category.getCategoryId(),
@@ -236,16 +274,10 @@ public class BookServiceImpl implements BookService {
 			.map(AllContributorResponse::new)
 			.toList();
 
-		Publisher publisher = publisherRepository.findById(book.getPublisher().getPublisherId())
-			.orElseThrow(() -> new PublisherNotFoundException(
-				"해당 아이디의 출판사를 찾을 수 없습니다.: " + book.getPublisher().getPublisherId()));
+		Publisher publisher = book.getPublisher();
 
 		AllPublishersInfoResponse publisherResponse = new AllPublishersInfoResponse(publisher.getPublisherId(),
 			publisher.getPublisherName());
-
-		List<GetUrlResponse> imageResponses = bookImageService.getImageUrlsById(book.getBookId()).stream()
-			.map(projection -> new GetUrlResponse(projection.getUrlId(), projection.getImageUrl()))
-			.toList();
 
 		return new BookResponse(
 			book.getBookId(),
@@ -264,7 +296,7 @@ public class BookServiceImpl implements BookService {
 			categoryResponses,
 			tagResponses,
 			contributorResonses,
-			imageResponses
+			images
 		);
 	}
 
@@ -272,6 +304,9 @@ public class BookServiceImpl implements BookService {
 		List<Category> categories = bookCategoryService.getCategoriesByBookId(book.getBookId());
 		List<Tag> tags = bookTagService.getTagsByBookId(book.getBookId());
 		List<Contributor> contributors = bookContributorService.getContributorsByBookId(book.getBookId());
-		return toResponse(book, categories, tags, contributors);
+		List<GetUrlResponse> images = book.getBookImageUrls().stream()
+			.map(image -> new GetUrlResponse(image.getBookImageId(), image.getBookImageUrl()))
+			.toList();
+		return toResponse(book, categories, tags, contributors, images);
 	}
 }
