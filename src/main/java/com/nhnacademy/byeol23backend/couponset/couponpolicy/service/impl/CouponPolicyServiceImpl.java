@@ -9,6 +9,7 @@ import com.nhnacademy.byeol23backend.couponset.bookcoupon.repository.BookCouponR
 import com.nhnacademy.byeol23backend.couponset.categorycoupon.domain.CategoryCouponPolicy;
 import com.nhnacademy.byeol23backend.couponset.categorycoupon.repository.CategoryCouponPolicyRepository;
 import com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.CouponPolicy;
+import com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.CouponPolicyType;
 import com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.dto.CouponPolicyCreateRequest;
 import com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.dto.CouponPolicyInfoResponse;
 import com.nhnacademy.byeol23backend.couponset.couponpolicy.repository.CouponPolicyRepository;
@@ -40,7 +41,7 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
                 couponPolicyCreateRequest.discountRate(),
                 couponPolicyCreateRequest.discountLimit(),
                 couponPolicyCreateRequest.discountAmount(),
-                couponPolicyCreateRequest.couponPolicyType());
+                CouponPolicyType.fromParameter(couponPolicyCreateRequest.couponPolicyType()));
         CouponPolicy savedPolicy = couponPolicyRepository.save(couponPolicy);
 
 
@@ -66,7 +67,7 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
                 couponPolicy.getDiscountRate(),
                 couponPolicy.getDiscountLimit(),
                 couponPolicy.getDiscountAmount(),
-                couponPolicy.getCouponPolicyType())
+                couponPolicy.getCouponPolicyType().getParameter())
         );
     }
 }
