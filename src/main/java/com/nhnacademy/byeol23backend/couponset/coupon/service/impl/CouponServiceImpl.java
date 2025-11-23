@@ -5,10 +5,13 @@ import com.nhnacademy.byeol23backend.couponset.coupon.dto.CouponIssueRequestDto;
 import com.nhnacademy.byeol23backend.couponset.coupon.service.CouponService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CouponServiceImpl implements CouponService {
     private final RabbitTemplate rabbitTemplate;
     private final CouponIssueRabbitProperties properties;
