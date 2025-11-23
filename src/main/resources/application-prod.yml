@@ -95,3 +95,9 @@ book:
     exchange: byeol23.book.embedding.exchange
     queue: byeol23.book.embedding.queue
     routing-key: byeol23.book.embedding.key
+
+coupon:
+  issue:
+    exchange: byeol23.prod.coupon.issue.exchange
+    queue: byeol23.prod.coupon.issue.queue
+    routing-key: byeol23.prod.coupon.issue.key

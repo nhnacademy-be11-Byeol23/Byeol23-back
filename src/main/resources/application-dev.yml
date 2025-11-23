@@ -79,6 +79,12 @@ book:
     queue: byeol23.dev.book.embedding.queue
     routing-key: byeol23.dev.book.embedding.key
 
+coupon:
+  issue:
+    exchange: byeol23.dev.coupon.issue.exchange
+    queue: byeol23.dev.coupon.issue.queue
+    routing-key: byeol23.dev.coupon.issue.key
+
 management:
   health:
     redis:
