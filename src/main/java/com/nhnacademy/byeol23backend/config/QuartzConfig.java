@@ -45,7 +45,7 @@ public class QuartzConfig {
                 .forJob(bookDocumentViewCountSyncJobDetail())
                 .withIdentity("bookDocumentViewCountSyncTrigger")
                 .withSchedule(
-                        CronScheduleBuilder.cronSchedule("0 0/10 * * * ?").withMisfireHandlingInstructionFireAndProceed()
+                        CronScheduleBuilder.weeklyOnDayAndHourAndMinute(1, 0, 0).withMisfireHandlingInstructionFireAndProceed()
                 )
                 .build();
     }
