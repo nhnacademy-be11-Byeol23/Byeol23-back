@@ -25,4 +25,10 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 		return orderDetailRepository.findById(orderDetailId)
 			.orElseThrow(() -> new IllegalArgumentException("No order detail found for id: " + orderDetailId));
 	}
+
+	@Override
+	public List<OrderDetail> getReviewableOrderDetailsByMemberId(Long memberId) {
+		return List.of();
+	}
+
 }

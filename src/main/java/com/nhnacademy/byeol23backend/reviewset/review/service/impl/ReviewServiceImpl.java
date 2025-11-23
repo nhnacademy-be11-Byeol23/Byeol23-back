@@ -63,7 +63,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	@Transactional
-	public void registerReview(String reviewContent, Byte reviewRate, Long orderDetailId, List<String> imageUrls) {
+	public Long registerReview(String reviewContent, Byte reviewRate, Long orderDetailId, List<String> imageUrls) {
 		OrderDetail orderDetail = orderDetailService.getOrderDetailById(orderDetailId);
 		Long memberId = orderDetail.getOrder().getMember().getMemberId();
 		Member member = memberService.getMemberProxy(memberId);
@@ -78,6 +78,7 @@ public class ReviewServiceImpl implements ReviewService {
 			memberProxy,
 			orderDetail
 		);
-		reviewRepository.save(review);
+		Review saved = reviewRepository.save(review);
+		return saved.getReviewId();
 	}
 }
