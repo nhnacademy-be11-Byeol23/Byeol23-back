@@ -2,6 +2,7 @@ package com.nhnacademy.byeol23backend.config;
 
 import com.nhnacademy.byeol23backend.bookset.book.job.BookDocumentViewCountSyncJob;
 import com.nhnacademy.byeol23backend.bookset.book.job.BookViewCountSyncJob;
+import com.nhnacademy.byeol23backend.memberset.member.job.InactiveMemberJob;
 import org.quartz.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,25 @@ import java.util.TimeZone;
 @Configuration
 public class QuartzConfig {
 
+    @Bean
+    public JobDetail inactiveMemberJobDetail() {
+        return JobBuilder.newJob(InactiveMemberJob.class)
+                .withIdentity("inactiveMemberJob")
+                .withDescription("마지막 로그인 날짜가 3개월 전인 회원 비활성화 작업")
+                .storeDurably()
+                .build();
+    }
+
+    @Bean
+    public Trigger inactiveMemberJobTrigger() {
+        return TriggerBuilder.newTrigger()
+                .forJob(inactiveMemberJobDetail())
+                .withIdentity("inactiveMemberJobTrigger")
+                .withSchedule(
+                        CronScheduleBuilder.cronSchedule("0 0 1 * * ?")
+                )
+                .build();
+    }
 	@Bean
 	public JobDetail bookViewCountSyncJobDetail() {
 		return JobBuilder.newJob(BookViewCountSyncJob.class)
@@ -26,7 +46,8 @@ public class QuartzConfig {
 			.forJob(bookViewCountSyncJobDetail())
 			.withIdentity("bookViewCountSyncTrigger")
 			.withSchedule(
-				CronScheduleBuilder.cronSchedule("0 0 * * * ?").withMisfireHandlingInstructionFireAndProceed())
+				CronScheduleBuilder.cronSchedule("0 0 * * * ?").withMisfireHandlingInstructionFireAndProceed()
+            )
 			.build();
 	}
 

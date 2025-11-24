@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.memberset.member.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateRequest;
@@ -28,4 +29,6 @@ public interface MemberService {
 
 	//member proxy
 	Member getMemberProxy(Long memberId);
+
+    void deactivateMembersNotLoggedInFor3Months();
 }
