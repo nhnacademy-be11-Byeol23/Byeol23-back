@@ -26,13 +26,8 @@ public record BookCreateRequest(
 	List<Long> categoryIds,
 	List<Long> tagIds,
 	List<Long> contributorIds,
-	List<MultipartFile> images,
-	String imageUrl
+	List<MultipartFile> images
 ) {
-	public BookCreateRequest {
-		if (images == null) {
-			images = List.of();
-		}
-	}
+
 }
 

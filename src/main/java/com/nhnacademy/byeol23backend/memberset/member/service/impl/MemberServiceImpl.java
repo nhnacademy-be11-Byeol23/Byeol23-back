@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.memberset.member.service.impl;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -137,7 +138,7 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public Member getMemberProxy(Long memberId) {
-		return null;
+		return memberRepository.getReferenceById(memberId);
 	}
 
 	/**
@@ -170,7 +171,15 @@ public class MemberServiceImpl implements MemberService {
 		log.info("{} 멤버가 탈퇴 처리 되었습니다.", memberId);
 	}
 
-	private Member findMemberById(Long memberId) {
+    @Override
+    @Transactional
+    public void deactivateMembersNotLoggedInFor3Months() {
+        LocalDateTime threshold = LocalDateTime.now().minusMonths(3);
+        memberRepository.deactivateMembersNotLoggedInFor3Months(threshold);
+        log.info("마지막 로그인 날짜가 3개월 이전인 회원 휴면 상태로 전환");
+    }
+
+    private Member findMemberById(Long memberId) {
 		return memberRepository.findById(memberId)
 			.orElseThrow(() -> new MemberNotFoundException(memberId + "에 해당하는 멤버를 찾을 수 없습니다."));
 	}

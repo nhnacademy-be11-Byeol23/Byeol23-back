@@ -66,8 +66,7 @@ class BookContributorRepositoryTest {
 			List.of(),
 			List.of(),
 			List.of(),
-			List.of(),
-			null
+			List.of()
 		);
 
 		testBook = new Book();
@@ -125,8 +124,7 @@ class BookContributorRepositoryTest {
 			List.of(),
 			List.of(),
 			List.of(),
-			List.of(),
-			null
+			List.of()
 		);
 
 		Book book2 = new Book();
@@ -181,8 +179,7 @@ class BookContributorRepositoryTest {
 			List.of(),
 			List.of(),
 			List.of(),
-			List.of(),
-			null
+			List.of()
 		);
 
 		Book book2 = new Book();
