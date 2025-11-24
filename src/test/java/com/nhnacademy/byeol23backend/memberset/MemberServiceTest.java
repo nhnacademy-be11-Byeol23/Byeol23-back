@@ -1,21 +1,5 @@
 package com.nhnacademy.byeol23backend.memberset;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Optional;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
 import com.nhnacademy.byeol23backend.cartset.cart.service.CartService;
 import com.nhnacademy.byeol23backend.memberset.grade.domain.Grade;
 import com.nhnacademy.byeol23backend.memberset.grade.repository.GradeRepository;
@@ -34,6 +18,27 @@ import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundEx
 import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
 import com.nhnacademy.byeol23backend.memberset.member.service.impl.MemberServiceImpl;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class MemberServiceTest {
@@ -427,4 +432,17 @@ public class MemberServiceTest {
 		assertThat(member.getCurrentPoint()).isEqualByComparingTo(newPoint);
 	}
 
+    @Test
+    @DisplayName("마지막 로그인 날짜가 3개월 전인 회원 휴면 전환")
+    void deactivateMembersNotLoggedInFor3Months_success() {
+        memberService.deactivateMembersNotLoggedInFor3Months();
+
+        ArgumentCaptor<LocalDateTime> captor = ArgumentCaptor.forClass(LocalDateTime.class);
+        verify(memberRepository, times(1)).deactivateMembersNotLoggedInFor3Months(captor.capture());
+
+        LocalDateTime threshold = captor.getValue();
+        LocalDateTime expected = LocalDateTime.now().minusMonths(3);
+        long diff = Duration.between(expected, threshold).abs().getSeconds();
+        Assertions.assertTrue(diff <= 3);
+    }
 }

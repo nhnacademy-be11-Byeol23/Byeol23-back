@@ -53,6 +53,7 @@ public class Member {
 	@Column(name = "latest_logined_at")
 	private LocalDateTime latestLoginAt;
 
+    @Setter
 	@Column(name = "joined_at", nullable = false)
 	private LocalDateTime joinedAt;
 
@@ -70,6 +71,7 @@ public class Member {
 	@Column(name = "member_role", nullable = false, length = 10)
 	private Role memberRole;
 
+    @Setter
 	@Enumerated(EnumType.STRING)
 	@Column(name = "joined_from", nullable = false, length = 50)
 	private RegistrationSource joinedFrom;
