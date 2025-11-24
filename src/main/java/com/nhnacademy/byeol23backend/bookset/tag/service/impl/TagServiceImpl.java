@@ -1,5 +1,6 @@
 package com.nhnacademy.byeol23backend.bookset.tag.service.impl;
 
+import com.nhnacademy.byeol23backend.bookset.booktag.repository.BookTagRepository;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.Tag;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.AllTagsInfoResponse;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.TagCreateRequest;
@@ -22,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TagServiceImpl implements TagService {
 	private final TagRepository tagRepository;
+	private final BookTagRepository bookTagRepository;
 
 	@Override
 	public TagCreateResponse createTag(TagCreateRequest request) {
@@ -41,6 +43,7 @@ public class TagServiceImpl implements TagService {
 	public void deleteTagByTagId(Long tagId) {
 		Tag tag = tagRepository.findTagByTagId(tagId)
 			.orElseThrow(() -> new TagNotFoundException("해당 아이디 태그를 찾을 수 없습니다: " + tagId));
+		bookTagRepository.deleteByTagId(tagId);
 		tagRepository.deleteTagByTagId(tagId);
 	}
 
