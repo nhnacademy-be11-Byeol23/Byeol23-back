@@ -19,7 +19,7 @@ public class CouponIssueConsumer {
             couponService.issueCoupon(request);
 
         } catch (Exception e) {
-//            throw new AmqpRejectAndDontRequeueException("영구적 오류로 판단, 메시지를 DLQ로 보냄");
+            throw new AmqpRejectAndDontRequeueException("영구적 오류로 판단, 메시지를 DLQ로 보냄");
         }
     }
 }

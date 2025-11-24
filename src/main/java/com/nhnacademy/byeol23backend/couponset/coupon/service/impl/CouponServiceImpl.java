@@ -30,7 +30,11 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
+    @Transactional
     public void issueCoupon(CouponIssueRequestDto request) {
-        couponRepository.issueCoupon(request);
+        int result = couponRepository.issueCouponToAllUsers(request.couponPolicyId(), request.couponName(), request.expiredDate());
+        if(result <= 0){
+            throw new RuntimeException("쿠폰 발급 실패");
+        }
     }
 }

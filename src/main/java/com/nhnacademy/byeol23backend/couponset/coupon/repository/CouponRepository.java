@@ -11,7 +11,7 @@ import java.time.LocalDate;
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
     @Modifying
     @Query(value = """
-            INSERT INTO Coupon (coupon_policy_id, member_id, expired_date, created_date)
+            INSERT INTO coupons (coupon_policy_id, member_id, expired_date, created_date)
             SELECT 
                 :policyId,
                 m.member_id,
