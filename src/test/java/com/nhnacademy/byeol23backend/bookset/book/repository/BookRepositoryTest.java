@@ -64,8 +64,7 @@ class BookRepositoryTest {
 			List.of(),
 			List.of(),
 			List.of(),
-			List.of(),
-			null
+			List.of()
 		);
 
 		testBook = new Book();
@@ -195,8 +194,7 @@ class BookRepositoryTest {
 			List.of(),
 			List.of(),
 			List.of(),
-			List.of(),
-			null
+			List.of()
 		);
 
 		Book newBook = new Book();
@@ -262,8 +260,7 @@ class BookRepositoryTest {
 			List.of(),
 			List.of(),
 			List.of(),
-			List.of(),
-			null
+			List.of()
 		);
 
 		Book book2 = new Book();
@@ -304,8 +301,7 @@ class BookRepositoryTest {
 			List.of(),
 			List.of(),
 			List.of(),
-			List.of(),
-			null
+			List.of()
 		);
 
 		Book book2 = new Book();

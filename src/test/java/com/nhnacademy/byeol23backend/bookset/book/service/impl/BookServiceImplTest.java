@@ -112,8 +112,7 @@ class BookServiceImplTest {
 			categoryIds,
 			tagIds,
 			contributorIds,
-			List.of(),
-			null
+			List.of()
 		);
 
 		Publisher mockPublisher = new Publisher("민음사");
@@ -187,8 +186,7 @@ class BookServiceImplTest {
 			List.of(1L),
 			List.of(1L),
 			List.of(1L),
-			List.of(),
-			null
+			List.of()
 		);
 
 		given(bookRepository.existsByIsbn("9781234567890")).willReturn(true);
@@ -221,8 +219,7 @@ class BookServiceImplTest {
 			List.of(1L),
 			List.of(1L),
 			List.of(1L),
-			List.of(),
-			null
+			List.of()
 		);
 
 		given(bookRepository.existsByIsbn("9781234567890")).willReturn(false);
@@ -323,8 +320,8 @@ class BookServiceImplTest {
 		Category category1 = new Category("국내도서", null);
 		ReflectionTestUtils.setField(category1, "categoryId", 1L);
 
-        BookOutbox mockOutbox = new BookOutbox(1L, BookOutbox.EventType.UPDATE);
-        ReflectionTestUtils.setField(mockOutbox, "id", 100L);
+		BookOutbox mockOutbox = new BookOutbox(1L, BookOutbox.EventType.UPDATE);
+		ReflectionTestUtils.setField(mockOutbox, "id", 100L);
 
 		given(bookRepository.findById(bookId)).willReturn(Optional.of(existingBook));
 		given(publisherRepository.findById(2L)).willReturn(Optional.of(newPublisher));
@@ -334,7 +331,7 @@ class BookServiceImplTest {
 		given(bookCategoryService.getCategoriesByBookId(bookId)).willReturn(List.of(category1));
 		given(bookTagService.getTagsByBookId(bookId)).willReturn(List.of());
 		given(bookContributorService.getContributorsByBookId(bookId)).willReturn(List.of());
-        when(bookOutboxRepository.save(any())).thenReturn(mockOutbox);
+		when(bookOutboxRepository.save(any())).thenReturn(mockOutbox);
 
 		// when
 		BookResponse result = bookService.updateBook(bookId, updateRequest);
@@ -375,8 +372,8 @@ class BookServiceImplTest {
 		ReflectionTestUtils.setField(existingBook, "publisher", publisher);
 		ReflectionTestUtils.setField(existingBook, "stock", 10);
 
-        BookOutbox mockOutbox = new BookOutbox(1L, BookOutbox.EventType.UPDATE);
-        ReflectionTestUtils.setField(mockOutbox, "id", 100L);
+		BookOutbox mockOutbox = new BookOutbox(1L, BookOutbox.EventType.UPDATE);
+		ReflectionTestUtils.setField(mockOutbox, "id", 100L);
 
 		given(bookRepository.findById(bookId)).willReturn(Optional.of(existingBook));
 		given(publisherRepository.findById(1L)).willReturn(Optional.of(publisher));
@@ -386,7 +383,7 @@ class BookServiceImplTest {
 		given(bookCategoryService.getCategoriesByBookId(bookId)).willReturn(List.of());
 		given(bookTagService.getTagsByBookId(bookId)).willReturn(List.of());
 		given(bookContributorService.getContributorsByBookId(bookId)).willReturn(List.of());
-        when(bookOutboxRepository.save(any())).thenReturn(mockOutbox);
+		when(bookOutboxRepository.save(any())).thenReturn(mockOutbox);
 
 		// when
 		BookResponse result = bookService.updateBook(bookId, updateRequest);
