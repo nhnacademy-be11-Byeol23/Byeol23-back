@@ -26,7 +26,7 @@ import com.nhnacademy.byeol23backend.bookset.contributor.service.ContributorServ
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/contributors")
+@RequestMapping("/api/cont")
 @RequiredArgsConstructor
 public class ContributorController {
 	private final ContributorService contributorService;
@@ -40,7 +40,7 @@ public class ContributorController {
 	@PostMapping
 	public ResponseEntity<ContributorCreateResponse> createContributor(@RequestBody ContributorCreateRequest request){
 		ContributorCreateResponse response = contributorService.createContributor(request);
-		URI uri = URI.create("/api/contributors/" + response.contributor().getContributorId());
+		URI uri = URI.create("/api/cont/" + response.contributor().getContributorId());
 		return ResponseEntity.created(uri).body(response);
 	}
 
