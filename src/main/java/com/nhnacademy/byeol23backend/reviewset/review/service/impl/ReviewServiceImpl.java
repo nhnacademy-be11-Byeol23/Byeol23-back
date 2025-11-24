@@ -63,8 +63,8 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	@Transactional
-	public Long registerReview(String reviewContent, Byte reviewRate, Long orderDetailId, List<String> imageUrls) {
-		OrderDetail orderDetail = orderDetailService.getOrderDetailById(orderDetailId);
+	public Long registerReview(String reviewContent, Byte reviewRate, String orderNumber, Long bookId) {
+		OrderDetail orderDetail = orderDetailService.getOrderDetailByOrderNumberAndBookId(orderNumber, bookId);
 		Long memberId = orderDetail.getOrder().getMember().getMemberId();
 		Member member = memberService.getMemberProxy(memberId);
 		pointService.offsetPointsByReserved(

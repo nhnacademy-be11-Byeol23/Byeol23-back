@@ -39,8 +39,8 @@ public class ReviewController {
 		Long id = reviewService.registerReview(
 			request.reviewContent(),
 			request.reviewRate(),
-			request.orderDetailId(),
-			request.imageUrls()
+			request.orderNumber(),
+			request.bookId()
 		);
 		return ResponseEntity.ok(id);
 	}
@@ -51,6 +51,5 @@ public class ReviewController {
 		List<OrderDetail> reviewableOrderDetails = orderDetailService.getReviewableOrderDetailsByMemberId(memberId);
 		return ResponseEntity.ok(reviewableOrderDetails);
 	}
-
 
 }

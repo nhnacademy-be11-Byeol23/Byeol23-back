@@ -8,4 +8,5 @@ public interface OrderDetailService {
 	List<OrderDetail> getOrderDetailsByBookId(Long bookId);
 	OrderDetail getOrderDetailById(Long orderDetailId);
 	List<OrderDetail> getReviewableOrderDetailsByMemberId(Long memberId);
+	OrderDetail getOrderDetailByOrderNumberAndBookId(String orderNumber, Long bookId);
 }
