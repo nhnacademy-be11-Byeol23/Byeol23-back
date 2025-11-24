@@ -137,7 +137,7 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public Member getMemberProxy(Long memberId) {
-		return null;
+		return memberRepository.getReferenceById(memberId);
 	}
 
 	/**

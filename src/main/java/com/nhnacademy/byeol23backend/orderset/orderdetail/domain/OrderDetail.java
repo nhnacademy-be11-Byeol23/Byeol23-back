@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import com.nhnacademy.byeol23backend.orderset.order.domain.Order;
 import com.nhnacademy.byeol23backend.orderset.packaging.domain.Packaging;
+import com.nhnacademy.byeol23backend.reviewset.review.domain.Review;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
