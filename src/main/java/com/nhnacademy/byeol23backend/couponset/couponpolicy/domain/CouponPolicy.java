@@ -2,12 +2,7 @@ package com.nhnacademy.byeol23backend.couponset.couponpolicy.domain;
 
 import java.math.BigDecimal;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -40,10 +35,11 @@ public class CouponPolicy {
     private Boolean isActive;
 
     @Column(name = "coupon_policy_type", nullable = false)
-    private String couponPolicyType;
+    @Convert(converter = CouponPolicyTypeConverter.class)
+    private CouponPolicyType couponPolicyType;
 
     public CouponPolicy(String couponPolicyName, BigDecimal criterionPrice, Integer discountRate,
-                        BigDecimal discountLimit, BigDecimal discountAmount, String couponPolicyType) {
+                        BigDecimal discountLimit, BigDecimal discountAmount, CouponPolicyType couponPolicyType) {
         this.couponPolicyName = couponPolicyName;
         this.criterionPrice = criterionPrice;
         this.discountRate = discountRate;
