@@ -66,8 +66,7 @@ class BookControllerTest {
 			categoryIds,
 			tagIds,
 			contributorIds,
-			List.of(),
-			null
+			List.of()
 		);
 
 		BookResponse response = new BookResponse(
@@ -137,8 +136,7 @@ class BookControllerTest {
 			List.of(),
 			List.of(),
 			List.of(),
-			List.of(),
-			null
+			List.of()
 		);
 
 		given(bookService.createBook(any(BookCreateRequest.class)))
