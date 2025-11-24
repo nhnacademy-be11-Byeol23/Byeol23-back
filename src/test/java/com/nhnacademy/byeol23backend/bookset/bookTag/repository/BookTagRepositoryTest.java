@@ -65,8 +65,7 @@ class BookTagRepositoryTest {
 			List.of(),
 			List.of(),
 			List.of(),
-			List.of(),
-			null
+			List.of()
 		);
 
 		testBook = new Book();
@@ -122,8 +121,7 @@ class BookTagRepositoryTest {
 			List.of(),
 			List.of(),
 			List.of(),
-			List.of(),
-			null
+			List.of()
 		);
 
 		Book book2 = new Book();
@@ -178,8 +176,7 @@ class BookTagRepositoryTest {
 			List.of(),
 			List.of(),
 			List.of(),
-			List.of(),
-			null
+			List.of()
 		);
 
 		Book book2 = new Book();
