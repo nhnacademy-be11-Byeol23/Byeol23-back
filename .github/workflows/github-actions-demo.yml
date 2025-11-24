@@ -27,7 +27,7 @@ jobs:
           mvn verify sonar:sonar \
             -Dsonar.projectKey=byeol23-back \
             -Dsonar.host.url=${{ env.SONAR_HOST_URL }} \
-            -Dsonar.token=${{ env.SONAR_TOKEN }
+            -Dsonar.token=${{ env.SONAR_TOKEN }}
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
