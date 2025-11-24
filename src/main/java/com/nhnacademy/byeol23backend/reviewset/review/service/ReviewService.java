@@ -6,6 +6,5 @@ import com.nhnacademy.byeol23backend.reviewset.review.dto.ReviewResponse;
 
 public interface ReviewService {
 	List<ReviewResponse> getReviewsByProductId(Long bookId);
-	void registerReview(String reviewContent, Byte reviewRate, Long orderDetailId, List<String> imageUrls);
-
+	Long registerReview(String reviewContent, Byte reviewRate, String orderNumber, Long bookId);
 }

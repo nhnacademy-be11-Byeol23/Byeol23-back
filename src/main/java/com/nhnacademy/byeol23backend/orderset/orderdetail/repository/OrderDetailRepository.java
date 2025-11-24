@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.orderset.orderdetail.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,4 +17,6 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
 
 	List<OrderDetail> findByOrder(Order order);
 	List<OrderDetail> findAllByBook_BookId(Long bookBookId);
+
+	Optional<OrderDetail> findByOrder_OrderNumberAndBook_BookId(String orderOrderNumber, Long bookBookId);
 }
