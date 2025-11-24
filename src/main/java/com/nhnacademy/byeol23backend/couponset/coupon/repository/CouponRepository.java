@@ -2,6 +2,30 @@ package com.nhnacademy.byeol23backend.couponset.coupon.repository;
 
 import com.nhnacademy.byeol23backend.couponset.coupon.domain.Coupon;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.time.LocalDate;
 
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
+    @Modifying
+    @Query(value = """
+            INSERT INTO Coupon (coupon_policy_id, member_id, expired_date, created_date)
+            SELECT 
+                :policyId,
+                m.member_id,
+                :expiredDate,
+                CURRENT_DATE()
+            FROM
+                members m
+            WHERE 
+                m.status = 'ACTIVE'; 
+            """,
+            nativeQuery = true)
+    int issueCouponToAllUsers(
+            @Param("policyId") Long policyId,
+            @Param("couponName") String couponName,
+            @Param("expiredDate") LocalDate expiredDate
+    );
 }

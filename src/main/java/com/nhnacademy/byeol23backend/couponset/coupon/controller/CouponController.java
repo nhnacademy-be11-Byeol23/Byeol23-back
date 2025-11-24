@@ -19,7 +19,7 @@ public class CouponController {
 
         couponService.sendIssueRequestToMQ(request);
 
-        return ResponseEntity.ok("쿠폰 발급 성공");
+        return ResponseEntity.ok("MQ message 생성 성공");
     }
 
 }
