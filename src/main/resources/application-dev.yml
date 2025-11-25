@@ -94,6 +94,11 @@ coupon:
     policy-id: 9
     coupon-name-template: "[생일 축하] {MONTH}월 혜택 쿠폰"
     validity-days: 30
+  welcome:
+    policy-id: 3
+    coupon-name-template: "[Welcome] 신규회원 쿠폰"
+
+
 
 management:
   health:

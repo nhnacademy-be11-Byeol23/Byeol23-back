@@ -60,6 +60,11 @@ coupon:
     policy-id: 777
     coupon-name-template: "[생일 축하] {MONTH}월 혜택 쿠폰"
     validity-days: 30
+
+  welcome:
+    policy-id: 3
+    coupon-name-template: "[Welcome] 신규회원 쿠폰"
+    validity-days: 30
 # 테스트 중에는 data.sql, schema.sql을 자동으로 실행하지 않는다.
 jwt:
   public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiNJoRcPJmLQ7Ii+hv78JNhtSgo7w7u8TS3PsftAMKBvkqpeAInmnpra1usEPhXTVWOyLLxL6yJAymKY8lzDf3I74T0F4GJiomkjjOdIT5TEAc5X3um+IuHxu7Qapr0BuKwBvT4FCBJ9jzPOCq8xkh2q/AWGfOTlPLjBmAVnp2NbbV4aI5cQR6D9a/extPX6hhAtq/NZqE665L/SVIXqPabu2Owpvn90O6HtNXzg6ytk7Rj4FBx6YLtqHy0QAf8/o/Zc1nr+ZHwSsDQ+am6Sp2ZmUl03ScerF7EMtfZyzUqY46RFNgUkhB7iJb2hZ3xYGtR9SUI+PDvt2Kz6AETewhQIDAQAB
