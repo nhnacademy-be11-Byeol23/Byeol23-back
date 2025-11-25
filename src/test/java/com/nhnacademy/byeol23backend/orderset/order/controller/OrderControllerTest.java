@@ -226,7 +226,8 @@ class OrderControllerTest {
 			receiverAddress,
 			receiverAddressDetail,
 			postCode,
-			items);
+			items,
+			new BigDecimal(3000));
 		given(orderService.getOrderByOrderNumber(eq(testOrderNumber))).willReturn(response);
 
 		// when & then

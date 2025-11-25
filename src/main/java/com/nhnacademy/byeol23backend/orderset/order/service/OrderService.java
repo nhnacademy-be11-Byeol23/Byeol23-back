@@ -3,6 +3,7 @@ package com.nhnacademy.byeol23backend.orderset.order.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.nhnacademy.byeol23backend.memberset.member.dto.NonmemberOrderRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderBulkUpdateRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelResponse;
@@ -30,4 +31,6 @@ public interface OrderService {
 	void updateBulkOrderStatus(OrderBulkUpdateRequest request);
 
 	Page<OrderDetailResponse> getOrders(String token, Pageable pageable);
+
+	OrderDetailResponse getNonMemberOrder(NonmemberOrderRequest request);
 }

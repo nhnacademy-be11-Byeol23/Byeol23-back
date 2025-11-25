@@ -1,8 +1,10 @@
 package com.nhnacademy.byeol23backend.orderset.order.service.impl;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 import org.springframework.data.domain.Page;
@@ -17,9 +19,11 @@ import com.nhnacademy.byeol23backend.bookset.book.dto.BookInfoRequest;
 import com.nhnacademy.byeol23backend.bookset.book.exception.BookNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
+import com.nhnacademy.byeol23backend.memberset.member.dto.NonmemberOrderRequest;
 import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
 import com.nhnacademy.byeol23backend.orderset.delivery.domain.DeliveryPolicy;
+import com.nhnacademy.byeol23backend.orderset.delivery.domain.dto.DeliveryPolicyInfoResponse;
 import com.nhnacademy.byeol23backend.orderset.delivery.exception.DeliveryPolicyNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.delivery.repository.DeliveryPolicyRepository;
 import com.nhnacademy.byeol23backend.orderset.order.domain.Order;
@@ -34,11 +38,13 @@ import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareRespo
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderSearchCondition;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.PointOrderResponse;
 import com.nhnacademy.byeol23backend.orderset.order.exception.OrderNotFoundException;
+import com.nhnacademy.byeol23backend.orderset.order.exception.OrderPasswordNotMatchException;
 import com.nhnacademy.byeol23backend.orderset.order.repository.OrderRepository;
 import com.nhnacademy.byeol23backend.orderset.order.service.OrderService;
 import com.nhnacademy.byeol23backend.orderset.orderdetail.domain.OrderDetail;
 import com.nhnacademy.byeol23backend.orderset.orderdetail.repository.OrderDetailRepository;
 import com.nhnacademy.byeol23backend.orderset.packaging.domain.Packaging;
+import com.nhnacademy.byeol23backend.orderset.packaging.domain.dto.PackagingInfoResponse;
 import com.nhnacademy.byeol23backend.orderset.packaging.exception.PackagingNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.packaging.repository.PackagingRepository;
 import com.nhnacademy.byeol23backend.orderset.payment.domain.Payment;
@@ -46,6 +52,8 @@ import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentCancelRe
 import com.nhnacademy.byeol23backend.orderset.payment.exception.PaymentNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.payment.repository.PaymentRepository;
 import com.nhnacademy.byeol23backend.orderset.payment.service.PaymentService;
+import com.nhnacademy.byeol23backend.pointset.pointhistories.domain.PointHistory;
+import com.nhnacademy.byeol23backend.pointset.pointhistories.repository.PointHistoryRepository;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
 
 import lombok.RequiredArgsConstructor;
@@ -70,6 +78,7 @@ public class OrderServiceImpl implements OrderService {
 	private static final String ORDER_NOT_FOUND_MESSAGE = "해당 주문 번호를 찾을 수 없습니다.: ";
 	private static final String PAYMENT_NOT_FOUND_MESSAGE = "해당 결제를 찾을 수 없습니다.: ";
 	private static final String DELIVERY_POLICY_NOT_FOUND_MESSAGE = "현재 배송 정책을 찾을 수 없습니다.";
+	private final PointHistoryRepository pointHistoryRepository;
 
 	@Override
 	@Transactional
@@ -155,14 +164,7 @@ public class OrderServiceImpl implements OrderService {
 		Order order = orderRepository.findOrderByOrderNumber(orderNumber)
 			.orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND_MESSAGE + orderNumber));
 
-		List<OrderDetail> orderDetails = orderDetailRepository.findAllByOrderWithBook(order);
-
-		List<BookOrderInfoResponse> bookOrderInfoResponses = mapOrderDetailsToInfoResponses(orderDetails);
-
-		return new OrderDetailResponse(order.getOrderNumber(), order.getOrderedAt(), order.getOrderStatus(),
-			order.getActualOrderPrice(),
-			order.getReceiver(), order.getReceiverPhone(), order.getReceiverAddress(), order.getReceiverAddressDetail(),
-			order.getPostCode(), bookOrderInfoResponses);
+		return mapOrderDetailsToOrderDetailResponse(order);
 	}
 
 	@Override
@@ -194,7 +196,7 @@ public class OrderServiceImpl implements OrderService {
 		Long memberId = accessTokenParser(token);
 
 		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new MemberNotFoundException("해당 아디디의 회원을 찾을 수 없습니다.: " + memberId));
+			.orElseThrow(() -> new MemberNotFoundException("해당 아이디의 회원을 찾을 수 없습니다.: " + memberId));
 
 		Page<Order> orderList = orderRepository.findByMemberAndOrderStatusNotOrderByOrderedAtDesc(member, "대기",
 			pageable);
@@ -202,13 +204,47 @@ public class OrderServiceImpl implements OrderService {
 		return orderList.map(order -> {
 			List<OrderDetail> orderDetailsForThisOrder = orderDetailRepository.findByOrder(order);
 
+			DeliveryPolicy deliveryPolicy = deliveryPolicyRepository.findById(
+					order.getDeliveryPolicy().getDeliveryPolicyId())
+				.orElseThrow(() -> new DeliveryPolicyNotFoundException(
+					"해당 아이디의 배달 정책을 찾을 수 없습니다.: " + order.getDeliveryPolicy().getDeliveryPolicyId()));
+
+			DeliveryPolicyInfoResponse delivery = new DeliveryPolicyInfoResponse(
+				deliveryPolicy.getFreeDeliveryCondition(),
+				deliveryPolicy.getDeliveryFee(), deliveryPolicy.getChangedAt());
+
+			BigDecimal usedPoints = BigDecimal.ZERO;
+
+			if (order.getPointHistory() != null && order.getPointHistory().getPointHistoryId() != null) {
+				PointHistory pointHistory = pointHistoryRepository.findById(order.getPointHistory().getPointHistoryId())
+					.orElse(null);
+				if (pointHistory != null && pointHistory.getPointAmount() != null) {
+					usedPoints = pointHistory.getPointAmount();
+				}
+			}
+
 			List<BookOrderInfoResponse> bookOrderInfos = orderDetailsForThisOrder.stream()
-				.map(detail -> new BookOrderInfoResponse(
-					detail.getBook().getBookId(),
-					detail.getBook().getBookName(),
-					detail.getQuantity(),
-					detail.getOrderPrice()
-				))
+				.map(detail -> {
+					Packaging packaging = detail.getPackaging();
+					PackagingInfoResponse packagingResponse = null;
+
+					if (packaging != null) {
+						packagingResponse = new PackagingInfoResponse(
+							packaging.getPackagingId(),
+							packaging.getPackagingName(),
+							packaging.getPackagingPrice(),
+							packaging.getPackagingImgUrl()
+						);
+					}
+
+					return new BookOrderInfoResponse(
+						detail.getBook().getBookId(),
+						detail.getBook().getBookName(),
+						detail.getQuantity(),
+						detail.getOrderPrice(),
+						packagingResponse
+					);
+				})
 				.toList();
 
 			return new OrderDetailResponse(
@@ -221,9 +257,23 @@ public class OrderServiceImpl implements OrderService {
 				order.getReceiverAddress(),
 				order.getReceiverAddressDetail(),
 				order.getPostCode(),
-				bookOrderInfos // <-- 해당 주문에 속한 상품 목록
+				bookOrderInfos, // <-- 해당 주문에 속한 상품 목록
+				delivery,
+				usedPoints
 			);
 		});
+	}
+
+	@Override
+	public OrderDetailResponse getNonMemberOrder(NonmemberOrderRequest request) {
+		Order order = orderRepository.findOrderByOrderNumber(request.orderNumber())
+			.orElseThrow(() -> new OrderNotFoundException("해당 주문 번호의 주문을 찾을 수 없습니다.: " + request.orderNumber()));
+
+		if (!verifyOrderPassword(request.orderPassword(), order.getOrderPassword())) {
+			throw new OrderPasswordNotMatchException("주문 비밀번호가 일치하지 않습니다.");
+		}
+
+		return mapOrderDetailsToOrderDetailResponse(order);
 	}
 
 	@Transactional
@@ -237,17 +287,67 @@ public class OrderServiceImpl implements OrderService {
 	@Transactional(readOnly = true)
 	protected List<BookOrderInfoResponse> mapOrderDetailsToInfoResponses(List<OrderDetail> orderDetails) {
 		return orderDetails.stream()
-			.map(orderDetail -> new BookOrderInfoResponse(
-				orderDetail.getBook().getBookId(),
-				orderDetail.getBook().getBookName(),
-				orderDetail.getQuantity(),
-				orderDetail.getOrderPrice()
-			))
+			.map(orderDetail -> {
+					Packaging packaging = orderDetail.getPackaging();
+					PackagingInfoResponse packagingInfoResponse = null;
+
+					if (!Objects.isNull(packaging)) {
+						packagingInfoResponse = new PackagingInfoResponse(
+							packaging.getPackagingId(),
+							packaging.getPackagingName(),
+							packaging.getPackagingPrice(),
+							packaging.getPackagingImgUrl()
+						);
+					}
+
+					return new BookOrderInfoResponse(
+						orderDetail.getBook().getBookId(),
+						orderDetail.getBook().getBookName(),
+						orderDetail.getQuantity(),
+						orderDetail.getOrderPrice(),
+						packagingInfoResponse
+					);
+				}
+			)
 			.toList();
+	}
+
+	@Transactional(readOnly = true)
+	protected OrderDetailResponse mapOrderDetailsToOrderDetailResponse(Order order) {
+		List<OrderDetail> orderDetails = orderDetailRepository.findAllByOrderWithBook(order);
+
+		List<BookOrderInfoResponse> bookOrderInfoResponses = mapOrderDetailsToInfoResponses(orderDetails);
+
+		DeliveryPolicy deliveryPolicy = deliveryPolicyRepository.findById(
+				order.getDeliveryPolicy().getDeliveryPolicyId())
+			.orElseThrow(() -> new DeliveryPolicyNotFoundException(
+				"해당 아이디의 배달 정책을 찾을 수 없습니다.: " + order.getDeliveryPolicy().getDeliveryPolicyId()));
+		DeliveryPolicyInfoResponse delivery = new DeliveryPolicyInfoResponse(deliveryPolicy.getFreeDeliveryCondition(),
+			deliveryPolicy.getDeliveryFee(), deliveryPolicy.getChangedAt());
+
+		PointHistory pointHistory = null;
+
+		if (order.getPointHistory() != null) {
+			pointHistory = pointHistoryRepository.findById(order.getPointHistory().getPointHistoryId())
+				.orElse(null);
+		}
+
+		BigDecimal usedPoints = (pointHistory != null && pointHistory.getPointAmount() != null)
+			? pointHistory.getPointAmount()
+			: BigDecimal.ZERO;
+
+		return new OrderDetailResponse(order.getOrderNumber(), order.getOrderedAt(), order.getOrderStatus(),
+			order.getActualOrderPrice(), order.getReceiver(), order.getReceiverPhone(), order.getReceiverAddress(),
+			order.getReceiverAddressDetail(), order.getPostCode(), bookOrderInfoResponses,
+			delivery, usedPoints);
 	}
 
 	private Long accessTokenParser(String accessToken) {
 		return jwtParser.parseToken(accessToken).get("memberId", Long.class);
+	}
+
+	private boolean verifyOrderPassword(String rawPassword, String storedHash) {
+		return passwordEncoder.matches(rawPassword, storedHash);
 	}
 
 }
