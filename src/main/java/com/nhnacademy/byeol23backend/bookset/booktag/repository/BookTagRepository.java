@@ -24,4 +24,8 @@ public interface BookTagRepository extends JpaRepository<BookTag, Long> {
 	@Modifying
 	@Query("delete from BookTag bt where bt.book.bookId = :bookId")
 	void deleteByBookId(@Param("bookId") Long bookId);
+
+	@Modifying
+	@Query("delete from BookTag bt where bt.tag.tagId = :tagId")
+	void deleteByTagId(@Param("tagId") Long tagId);
 }

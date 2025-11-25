@@ -1,16 +1,5 @@
 package com.nhnacademy.byeol23backend.bookset.book.domain;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
-
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookCreateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.bookcategory.domain.BookCategory;
@@ -18,23 +7,19 @@ import com.nhnacademy.byeol23backend.bookset.bookcontributor.domain.BookContribu
 import com.nhnacademy.byeol23backend.bookset.bookimage.domain.BookImage;
 import com.nhnacademy.byeol23backend.bookset.booktag.domain.BookTag;
 import com.nhnacademy.byeol23backend.bookset.publisher.domain.Publisher;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.type.SqlTypes;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -68,7 +53,7 @@ public class Book {
 
 	private LocalDate publishDate;
 
-	@Column(name = "is_pack", nullable = false, columnDefinition = "tinyint")
+	@Column(name = "is_pack", nullable = false, columnDefinition = "TINYINT")
 	private boolean isPack;
 
 	@Column(name = "book_status", nullable = false, length = 10)
@@ -83,7 +68,7 @@ public class Book {
 	@JoinColumn(name = "publisher_id", nullable = false)
 	private Publisher publisher;
 
-	@Column(name = "is_deleted", nullable = false, columnDefinition = "tinyint")
+	@Column(name = "is_deleted", nullable = false, columnDefinition = "TINYINT")
 	private boolean isDeleted;
 
 	@Column(name = "view_count", columnDefinition = "BIGINT DEFAULT 0")

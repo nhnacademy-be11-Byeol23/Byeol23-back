@@ -18,12 +18,14 @@ import org.springframework.context.annotation.Configuration;
 @EnableRabbit
 @RequiredArgsConstructor
 @EnableConfigurationProperties(value = {BookOutboxRabbitProperties.class, BookReindexRabbitProperties.class, BookEmbeddingRabbitProperties.class,
-        CouponIssueRabbitProperties.class})
+        CouponIssueRabbitProperties.class, CouponBulkRabbitProperties.class, CouponBirthdayRabbitProperties.class})
 public class RabbitMqConfig {
     private final BookOutboxRabbitProperties bookOutboxRabbitProperties;
     private final BookReindexRabbitProperties bookReindexRabbitProperties;
     private final BookEmbeddingRabbitProperties bookEmbeddingRabbitProperties;
     private final CouponIssueRabbitProperties couponIssueRabbitProperties;
+    private final CouponBulkRabbitProperties couponBulkRabbitProperties;
+    private final CouponBirthdayRabbitProperties couponBirthdayRabbitProperties;
 
     @Bean
     public MessageConverter messageConverter() {
@@ -97,15 +99,28 @@ public class RabbitMqConfig {
     }
 
     @Bean
-    public Queue couponIssueQueue() {
-        return new Queue(couponIssueRabbitProperties.queue(), true);
+    public Queue couponBulkQueue() {
+        return new Queue(couponBulkRabbitProperties.queue(), true);
     }
 
     @Bean
-    public Binding couponIssueBinding() {
+    public Binding couponBulkBinding() {
         return BindingBuilder
-                .bind(couponIssueQueue())
-                .to(couponIssueExchange())
-                .with(couponIssueRabbitProperties.routingKey());
+                .bind(couponBulkQueue())
+                .to(couponIssueExchange()) // Exchange 공유
+                .with(couponBulkRabbitProperties.routingKey());
+    }
+
+    @Bean
+    public Queue couponBirthdayQueue() {
+        return new Queue(couponBirthdayRabbitProperties.queue(), true);
+    }
+
+    @Bean
+    public Binding couponBirthdayBinding() {
+        return BindingBuilder
+                .bind(couponBirthdayQueue())
+                .to(couponIssueExchange()) // Exchange 공유
+                .with(couponBirthdayRabbitProperties.routingKey());
     }
 }

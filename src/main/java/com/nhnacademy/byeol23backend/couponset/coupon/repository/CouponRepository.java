@@ -11,9 +11,10 @@ import java.time.LocalDate;
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
     @Modifying
     @Query(value = """
-            INSERT INTO coupons (coupon_policy_id, member_id, expired_date, created_date)
+            INSERT INTO coupons (coupon_policy_id, coupon_name, member_id, expired_date, created_date)
             SELECT 
                 :policyId,
+                :couponName,
                 m.member_id,
                 :expiredDate,
                 CURRENT_DATE()
@@ -28,4 +29,16 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
             @Param("couponName") String couponName,
             @Param("expiredDate") LocalDate expiredDate
     );
+
+    boolean existsByMember_memberIdAndCouponPolicy_couponPolicyId(Long memberId, Long couponPolicyId);
+
+    @Modifying
+    @Query(value = """
+            INSERT INTO coupons (coupon_policy_id, coupon_name, member_id, expired_date, created_date)
+            VALUES (:policyId, :couponName, :memberId, :expiredDate, CURRENT_DATE())
+            """, nativeQuery = true)
+    int issueBirthdayCoupon(@Param("policyId") Long policyId,
+                            @Param("couponName") String couponName,
+                            @Param("memberId") Long memberId,
+                            @Param("expiredDate") LocalDate expiredDate);
 }

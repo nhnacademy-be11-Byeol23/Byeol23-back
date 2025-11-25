@@ -11,4 +11,5 @@ public interface BookTagService {
 	void createBookTags(Book book, List<Long> tagIds);
 
 	void updateBookTags(Book book, List<Long> tagIds);
+
 }
