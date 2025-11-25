@@ -1,32 +1,28 @@
 package com.nhnacademy.byeol23backend.memberset.member.service.impl;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.nhnacademy.byeol23backend.cartset.cart.service.CartService;
+import com.nhnacademy.byeol23backend.couponset.coupon.dto.BirthdayCouponIssueRequestDto;
 import com.nhnacademy.byeol23backend.memberset.grade.repository.GradeRepository;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Status;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberMyPageResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.*;
 import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateEmailException;
 import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicatePhoneNumberException;
 import com.nhnacademy.byeol23backend.memberset.member.exception.IncorrectPasswordException;
 import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
 import com.nhnacademy.byeol23backend.memberset.member.service.MemberService;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @Service
@@ -37,7 +33,17 @@ public class MemberServiceImpl implements MemberService {
 	private final PasswordEncoder passwordEncoder;
 	private final GradeRepository gradeRepository;
 	private final CartService cartService;
+	private final ApplicationEventPublisher eventPublisher;
 
+	@Value("${coupon.welcome.policy-id}")
+	private Long welcomeCouponPolicyId;
+
+	@Value("${coupon.welcome.coupon-name-template}")
+	private String welcomeCouponName;
+
+	@Value("${coupon.welcome.validity-days}")
+	private int validityDays;
+	
 	/**
 	 * 회원을 저장하는 함수
 	 * @param request MemberCreateRequest
@@ -64,6 +70,17 @@ public class MemberServiceImpl implements MemberService {
 		memberRepository.save(newMember);
 		cartService.createCart(newMember);
 		log.info("멤버 생성을 완료했습니다. {}", newMember.getMemberId());
+		
+		//회원가입 성공 시 (save 커밋 성공) 이벤트 발행
+		//이벤트 객체는 생일쿠폰 발급 시 사용한 dto 그대로 사용
+		eventPublisher.publishEvent(
+				new BirthdayCouponIssueRequestDto(
+				newMember.getMemberId(),
+				welcomeCouponPolicyId,
+				welcomeCouponName,
+				LocalDate.now().plusDays(validityDays)
+		)
+		);
 
 		return new MemberCreateResponse();
 	}
