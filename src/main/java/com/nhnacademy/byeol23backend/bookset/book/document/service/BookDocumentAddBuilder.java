@@ -9,6 +9,7 @@ import com.nhnacademy.byeol23backend.bookset.bookimage.service.BookImageServiceI
 import com.nhnacademy.byeol23backend.bookset.booktag.service.BookTagService;
 import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.Contributor;
+import com.nhnacademy.byeol23backend.bookset.contributor.domain.ContributorRole;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.Tag;
 import com.nhnacademy.byeol23backend.image.dto.ImageUrlProjection;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,7 @@ public class BookDocumentAddBuilder implements BookDocumentBuilder {
         log.info("도서 문서 추가 빌더: {}", bookId);
         Book book = bookService.getBookWithPublisher(bookId);
         List<Category> categories = bookCategoryService.getCategoriesByBookId(bookId);
-        Map<String, List<Contributor>> contributorMap = bookContributorService.getContributorsByBookId(bookId).stream().collect(Collectors.groupingBy(Contributor::getContributorRole));
+        Map<String, List<Contributor>> contributorMap = bookContributorService.getContributorsByBookId(bookId).stream().collect(Collectors.groupingBy(c -> c.getContributorRole().getLabel()));
         List<Tag> tags = bookTagService.getTagsByBookId(bookId);
 
 //        MQ에서 에러 뱉는거 잠시 막기 위해 수정

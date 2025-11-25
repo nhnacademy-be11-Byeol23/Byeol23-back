@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import com.nhnacademy.byeol23backend.bookset.tag.domain.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -15,4 +16,7 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
 	Optional<Tag> findTagByTagId(Long tagId);
 
  	Optional<Tag> findByTagId(Long tagId);
+
+	 @Query("select count(t) from Tag t where t.tagName = :tagName")
+	Long findTagByTagName(String tagName);
 }

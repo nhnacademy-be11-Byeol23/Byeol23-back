@@ -10,6 +10,7 @@ import com.nhnacademy.byeol23backend.bookset.bookimage.service.BookImageServiceI
 import com.nhnacademy.byeol23backend.bookset.booktag.service.BookTagService;
 import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.Contributor;
+import com.nhnacademy.byeol23backend.bookset.contributor.domain.ContributorRole;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ public class BookDocumentUpdateBuilder implements BookDocumentBuilder {
     public BookDocument build(Long bookId) {
         Book book = bookService.getBookWithPublisher(bookId);
         List<Category> categories = bookCategoryService.getCategoriesByBookId(bookId);
-        Map<String, List<Contributor>> contributorMap = bookContributorService.getContributorsByBookId(bookId).stream().collect(Collectors.groupingBy(Contributor::getContributorRole));
+        Map<String, List<Contributor>> contributorMap = bookContributorService.getContributorsByBookId(bookId).stream().collect(Collectors.groupingBy(c -> c.getContributorRole().getLabel()));
         List<Tag> tags = bookTagService.getTagsByBookId(bookId);
         String imageUrl = bookImageService.getImageUrlsById(bookId).getFirst().getImageUrl();
         BookReview bookReview = bookService.getBookReview(bookId);

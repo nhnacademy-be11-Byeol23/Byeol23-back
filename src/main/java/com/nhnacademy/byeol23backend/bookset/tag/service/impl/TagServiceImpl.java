@@ -8,6 +8,7 @@ import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.TagCreateResponse;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.TagInfoResponse;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.TagUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.TagUpdateResponse;
+import com.nhnacademy.byeol23backend.bookset.tag.exception.TagAlreadyExistsException;
 import com.nhnacademy.byeol23backend.bookset.tag.exception.TagNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.tag.repository.TagRepository;
 import com.nhnacademy.byeol23backend.bookset.tag.service.TagService;
@@ -27,6 +28,9 @@ public class TagServiceImpl implements TagService {
 
 	@Override
 	public TagCreateResponse createTag(TagCreateRequest request) {
+		if (tagRepository.findTagByTagName(request.tagName()) != 0){
+			throw new TagAlreadyExistsException("Tag가 이미 존재합니다.");
+		}
 		Tag tag = new Tag(request.tagName());
 		tagRepository.save(tag);
 		return new TagCreateResponse(tag);
@@ -50,6 +54,9 @@ public class TagServiceImpl implements TagService {
 	@Override
 	public TagUpdateResponse updateTagByTagId(Long tagId, TagUpdateRequest request) {
 		Tag tag = tagRepository.findByTagId(tagId).orElseThrow(() -> new TagNotFoundException("해당 아이디 태그를 찾을 수 없습니다: " + tagId));
+		if (tagRepository.findTagByTagName(request.tagName()) != 0){
+			throw new TagAlreadyExistsException("Tag가 이미 존재합니다.");
+		}
 		tag.setTagName(request.tagName());
 		tagRepository.save(tag);
 		return new TagUpdateResponse(tag);
