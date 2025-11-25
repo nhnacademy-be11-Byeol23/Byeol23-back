@@ -113,6 +113,6 @@ coupon:
     validity-days: 30
 
   welcome:
-    policy-id: 3
+    policy-id: 4
     coupon-name-template: "[Welcome] 신규회원 쿠폰"
     validity-days: 30

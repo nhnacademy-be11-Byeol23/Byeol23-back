@@ -1,7 +1,7 @@
 package com.nhnacademy.byeol23backend.memberset.member.service.impl;
 
 import com.nhnacademy.byeol23backend.cartset.cart.service.CartService;
-import com.nhnacademy.byeol23backend.couponset.coupon.dto.WelcomeCouponIssueEvent;
+import com.nhnacademy.byeol23backend.couponset.coupon.dto.BirthdayCouponIssueRequestDto;
 import com.nhnacademy.byeol23backend.memberset.grade.repository.GradeRepository;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Status;
@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
@@ -39,6 +40,9 @@ public class MemberServiceImpl implements MemberService {
 
 	@Value("${coupon.welcome.coupon-name-template}")
 	private String welcomeCouponName;
+
+	@Value("${coupon.welcome.validity-days}")
+	private int validityDays;
 	
 	/**
 	 * 회원을 저장하는 함수
@@ -68,8 +72,14 @@ public class MemberServiceImpl implements MemberService {
 		log.info("멤버 생성을 완료했습니다. {}", newMember.getMemberId());
 		
 		//회원가입 성공 시 (save 커밋 성공) 이벤트 발행
+		//이벤트 객체는 생일쿠폰 발급 시 사용한 dto 그대로 사용
 		eventPublisher.publishEvent(
-				new WelcomeCouponIssueEvent(newMember.getMemberId(), welcomeCouponPolicyId, welcomeCouponName)
+				new BirthdayCouponIssueRequestDto(
+				newMember.getMemberId(),
+				welcomeCouponPolicyId,
+				welcomeCouponName,
+				LocalDate.now().plusDays(validityDays)
+		)
 		);
 
 		return new MemberCreateResponse();

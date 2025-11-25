@@ -61,9 +61,3 @@ jwt:
     2ZmUl03ScerF7EMtfZyzUqY46RFNgUkhB7iJb2hZ3xYGtR9SUI+PDvt2Kz6AETew
     hQIDAQAB
     -----END PUBLIC KEY-----
-
-coupon:
-  birthday:
-    policy-id: 777
-    coupon-name-template: "[생일 쿠폰] {MONTH}월 혜택 쿠폰"
-    validity-days: 30
