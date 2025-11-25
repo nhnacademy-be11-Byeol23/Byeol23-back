@@ -108,6 +108,6 @@ coupon:
     queue: byeol23.prod.coupon.issue.birthday.queue
     routing-key: byeol23.prod.coupon.issue.birthday.key
 
-    policy-id: 9
+    policy-id: 2
     coupon-name-template: "[생일 축하] {MONTH}월 혜택 쿠폰"
     validity-days: 30
