@@ -2,8 +2,9 @@ package com.nhnacademy.byeol23backend.couponset.coupon.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-public record IssuedCouponInfoResponseDto(
+public record UsedCouponInfoResponseDto(
         Long couponPolicyId,
         Long couponId,
         String couponName,
@@ -12,7 +13,6 @@ public record IssuedCouponInfoResponseDto(
         BigDecimal discountLimit,
         BigDecimal criterionPrice,
         LocalDate createdDate,
-        LocalDate expiredDate,
-        Boolean status
+        LocalDateTime usedAt
 ) {
 }

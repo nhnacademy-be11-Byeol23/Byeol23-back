@@ -7,6 +7,7 @@ import com.nhnacademy.byeol23backend.couponset.coupon.domain.Coupon;
 import com.nhnacademy.byeol23backend.couponset.coupon.dto.BirthdayCouponIssueRequestDto;
 import com.nhnacademy.byeol23backend.couponset.coupon.dto.CouponIssueRequestDto;
 import com.nhnacademy.byeol23backend.couponset.coupon.dto.IssuedCouponInfoResponseDto;
+import com.nhnacademy.byeol23backend.couponset.coupon.dto.UsedCouponInfoResponseDto;
 import com.nhnacademy.byeol23backend.couponset.coupon.repository.CouponRepository;
 import com.nhnacademy.byeol23backend.couponset.coupon.service.CouponService;
 import com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.CouponPolicy;
@@ -109,7 +110,9 @@ public class CouponServiceImpl implements CouponService {
                             policy.getCouponPolicyId(),
                             coupon.getCouponId(),
                             coupon.getCouponName(),
+                            policy.getCouponPolicyType().getValue(),
                             discountStr,
+                            policy.getDiscountLimit(),
                             policy.getCriterionPrice(),
                             coupon.getCreatedDate(),
                             coupon.getExpiredDate(),
@@ -118,6 +121,39 @@ public class CouponServiceImpl implements CouponService {
                 })
                 .toList();
     }
+
+    @Override
+    public List<UsedCouponInfoResponseDto> getUsedCoupons(String token) {
+        Long memberId = accessTokenParser(token);
+
+        List<Coupon> couponList = couponRepository.findByMember_MemberIdAndUsedAtIsNotNull(memberId);
+
+        return couponList.stream()
+                .map(coupon -> {
+                    CouponPolicy policy = coupon.getCouponPolicy();
+
+                    String discountStr;
+                    if (policy.getDiscountAmount() != null) {
+                        discountStr = policy.getDiscountAmount() + "원";
+                    } else {
+                        discountStr = policy.getDiscountRate() + "%";
+                    }
+
+                    return new UsedCouponInfoResponseDto(
+                            policy.getCouponPolicyId(),
+                            coupon.getCouponId(),
+                            coupon.getCouponName(),
+                            policy.getCouponPolicyType().getValue(),
+                            discountStr,
+                            policy.getDiscountLimit(),
+                            policy.getCriterionPrice(),
+                            coupon.getCreatedDate(),
+                            coupon.getUsedAt()
+                    );
+                })
+                .toList();
+    }
+
 
     private Long accessTokenParser(String accessToken) {
         return jwtParser.parseToken(accessToken).get("memberId", Long.class);
