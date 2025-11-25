@@ -29,6 +29,7 @@ import com.nhnacademy.byeol23backend.bookset.book.domain.dto.BookOrderInfoRespon
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookInfoRequest;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
+import com.nhnacademy.byeol23backend.orderset.delivery.domain.dto.DeliveryPolicyInfoResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderBulkUpdateRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelResponse;
@@ -40,6 +41,7 @@ import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareRespo
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderSearchCondition;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.PointOrderResponse;
 import com.nhnacademy.byeol23backend.orderset.order.service.OrderService;
+import com.nhnacademy.byeol23backend.orderset.packaging.domain.dto.PackagingInfoResponse;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
 
 import io.jsonwebtoken.Claims;
@@ -215,25 +217,50 @@ class OrderControllerTest {
 	@Test
 	@DisplayName("GET /api/orders/{order-number} (주문 상세 조회)")
 	void getOrderByOrderNumber_Success() throws Exception {
+		// DeliveryPolicyInfoResponse (테스트용)
+		DeliveryPolicyInfoResponse mockDeliveryPolicy = new DeliveryPolicyInfoResponse(
+			new BigDecimal("50000.00"), // freeDeliveryCondition
+			new BigDecimal("3000.00"),  // deliveryFee
+			LocalDateTime.now()         // changedAt
+		);
+
+		// PackagingInfoResponse가 필요하다면 이와 같이 Mock 객체를 생성해야 합니다.
+		// BookOrderInfoResponse의 5번째 인자(Packaging)가 null인 경우를 대비하여 Mock 객체 생성
+		PackagingInfoResponse mockPackaging = new PackagingInfoResponse(
+			1L, "기본 포장", new BigDecimal("0.00"), "default-url"
+		);
+
+		// BookOrderInfoResponse 리스트 (테스트용)
+		List<BookOrderInfoResponse> mockItems = List.of(
+			new BookOrderInfoResponse(100L, "테스트 도서 A", 2, new BigDecimal("4500.00"), mockPackaging)
+		);
+
 		// given
-		// OrderDetailResponse DTO 구조를 모르므로 필요한 필드로 응답 생성
-		OrderDetailResponse response = new OrderDetailResponse(testOrderNumber,
+		// OrderDetailResponse DTO 구조에 맞춰 12개 인자를 모두 전달하도록 수정
+		OrderDetailResponse response = new OrderDetailResponse(
+			testOrderNumber,
 			LocalDateTime.now(),
 			"결제 완료",
-			actualOrderPrice,
-			receiver,
-			receiverPhone,
-			receiverAddress,
-			receiverAddressDetail,
-			postCode,
-			items,
-			new BigDecimal(3000));
+			actualOrderPrice, // 이미 정의된 변수 사용 가정
+			receiver,         // 이미 정의된 변수 사용 가정
+			receiverPhone,    // 이미 정의된 변수 사용 가정
+			receiverAddress,  // 이미 정의된 변수 사용 가정
+			receiverAddressDetail, // 이미 정의된 변수 사용 가정
+			postCode,         // 이미 정의된 변수 사용 가정
+			mockItems,        // List<BookOrderInfoResponse>
+			mockDeliveryPolicy, // DeliveryPolicyInfoResponse 추가
+			new BigDecimal(3000) // usedPoints
+		);
+
+		// given(orderService.getOrderByOrderNumber(...))를 사용하셨으므로, Mocking을 유지합니다.
 		given(orderService.getOrderByOrderNumber(eq(testOrderNumber))).willReturn(response);
 
 		// when & then
-		mockMvc.perform(get("/api/orders/{order-number}", testOrderNumber))
+		mockMvc.perform(get("/api/orders/{order-number}", testOrderNumber)
+				// 응답 타입을 JSON으로 명시적으로 요청합니다.
+				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.orderNumber").value(testOrderNumber));
+			.andExpect(jsonPath("$.orderNumber").value(testOrderNumber)); // JSON 응답 검증
 
 		verify(orderService, times(1)).getOrderByOrderNumber(testOrderNumber);
 	}
