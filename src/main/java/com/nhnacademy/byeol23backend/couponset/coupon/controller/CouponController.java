@@ -22,4 +22,10 @@ public class CouponController {
         return ResponseEntity.ok("쿠폰 발급 요청 성공");
     }
 
+    @GetMapping()
+    public ResponseEntity<Void> getCoupons(@CookieValue("Access-Token") String token){
+        couponService.getCoupons(token);
+        return ResponseEntity.ok().build();
+    }
+
 }

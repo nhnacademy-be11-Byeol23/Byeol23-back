@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
     @Modifying
@@ -41,4 +42,6 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
                             @Param("couponName") String couponName,
                             @Param("memberId") Long memberId,
                             @Param("expiredDate") LocalDate expiredDate);
+
+    List<Coupon> findByMember_MemberId(Long memberMemberId);
 }

@@ -11,4 +11,6 @@ public interface CouponService {
     void issueCoupon(CouponIssueRequestDto request);
 
     void issueBirthdayCoupon(BirthdayCouponIssueRequestDto request);
+
+    void getCoupons(String token);
 }

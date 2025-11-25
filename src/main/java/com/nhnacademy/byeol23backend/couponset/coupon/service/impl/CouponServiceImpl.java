@@ -3,15 +3,19 @@ package com.nhnacademy.byeol23backend.couponset.coupon.service.impl;
 import com.nhnacademy.byeol23backend.config.CouponBirthdayRabbitProperties;
 import com.nhnacademy.byeol23backend.config.CouponBulkRabbitProperties;
 import com.nhnacademy.byeol23backend.config.CouponIssueRabbitProperties;
+import com.nhnacademy.byeol23backend.couponset.coupon.domain.Coupon;
 import com.nhnacademy.byeol23backend.couponset.coupon.dto.BirthdayCouponIssueRequestDto;
 import com.nhnacademy.byeol23backend.couponset.coupon.dto.CouponIssueRequestDto;
 import com.nhnacademy.byeol23backend.couponset.coupon.repository.CouponRepository;
 import com.nhnacademy.byeol23backend.couponset.coupon.service.CouponService;
+import com.nhnacademy.byeol23backend.utils.JwtParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 
 @Service
@@ -24,6 +28,7 @@ public class CouponServiceImpl implements CouponService {
     private final CouponBulkRabbitProperties couponBulkRabbitProperties;
     private final CouponBirthdayRabbitProperties couponBirthdayRabbitProperties;
     private final CouponRepository couponRepository;
+    private final JwtParser jwtParser;
 
     @Override
     public void sendIssueRequestToMQ(CouponIssueRequestDto request) {
@@ -74,6 +79,17 @@ public class CouponServiceImpl implements CouponService {
         }
 
         log.info("생일 쿠폰 발급 성공, MemberID: " + memberId);
+    }
+
+    @Override
+    public void getCoupons(String token) {
+        Long memberId = accessTokenParser(token);
+        List<Coupon> couponList = couponRepository.findByMember_MemberId(memberId);
+
+    }
+
+    private Long accessTokenParser(String accessToken) {
+        return jwtParser.parseToken(accessToken).get("memberId", Long.class);
     }
 
 }
