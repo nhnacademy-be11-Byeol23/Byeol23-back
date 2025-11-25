@@ -62,3 +62,8 @@ jwt:
     hQIDAQAB
     -----END PUBLIC KEY-----
 
+coupon:
+  birthday:
+    policy-id: 777
+    coupon-name-template: "[생일 쿠폰] {MONTH}월 혜택 쿠폰"
+    validity-days: 30

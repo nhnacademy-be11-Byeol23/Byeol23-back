@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class CouponIssueConsumer {
     private final CouponService couponService;
 
-    @RabbitListener(queues = "${coupon.issue.queue}")
+    @RabbitListener(queues = "${coupon.bulk.queue}")
     public void processCouponIssueRequest(CouponIssueRequestDto request) {
 
         try {

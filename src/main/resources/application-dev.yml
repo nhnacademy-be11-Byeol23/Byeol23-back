@@ -82,8 +82,18 @@ book:
 coupon:
   issue:
     exchange: byeol23.dev.coupon.issue.exchange
-    queue: byeol23.dev.coupon.issue.queue
-    routing-key: byeol23.dev.coupon.issue.key
+
+  bulk:
+    queue: byeol23.dev.coupon.issue.bulk.queue
+    routing-key: byeol23.dev.coupon.issue.bulk.key
+
+  birthday:
+    queue: byeol23.dev.coupon.issue.birthday.queue
+    routing-key: byeol23.dev.coupon.issue.birthday.key
+
+    policy-id: 9
+    coupon-name-template: "[생일 축하] {MONTH}월 혜택 쿠폰"
+    validity-days: 30
 
 management:
   health:
