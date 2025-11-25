@@ -9,6 +9,7 @@ import com.nhnacademy.byeol23backend.couponset.bookcoupon.repository.BookCouponR
 import com.nhnacademy.byeol23backend.couponset.categorycoupon.domain.CategoryCouponPolicy;
 import com.nhnacademy.byeol23backend.couponset.categorycoupon.repository.CategoryCouponPolicyRepository;
 import com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.CouponPolicy;
+import com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.CouponPolicyType;
 import com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.dto.CouponPolicyCreateRequest;
 import com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.dto.CouponPolicyInfoResponse;
 import com.nhnacademy.byeol23backend.couponset.couponpolicy.repository.CouponPolicyRepository;
@@ -19,8 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -40,15 +39,15 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
                 couponPolicyCreateRequest.discountRate(),
                 couponPolicyCreateRequest.discountLimit(),
                 couponPolicyCreateRequest.discountAmount(),
-                couponPolicyCreateRequest.couponPolicyType());
+                CouponPolicyType.valueOf(couponPolicyCreateRequest.couponPolicyType()));
         CouponPolicy savedPolicy = couponPolicyRepository.save(couponPolicy);
 
-
+        CouponPolicyType couponPolicyType = CouponPolicyType.fromValue(couponPolicyCreateRequest.couponPolicyType());
         //도서 or 카테고리 쿠폰정책 생성
-        if(couponPolicyCreateRequest.couponPolicyType().equals("BOOK")){
+        if(couponPolicyType == CouponPolicyType.BOOK){
             Book book = bookRepository.findById(couponPolicyCreateRequest.bookId()).orElseThrow();
             bookCouponRepository.save(BookCouponPolicy.createFromDto(savedPolicy, book));
-        }else{
+        }else if (couponPolicyType == CouponPolicyType.CATEGORY){
             Category category = categoryRepository.findById(couponPolicyCreateRequest.categoryIds()).orElseThrow();
             categoryCouponPolicyRepository.save(CategoryCouponPolicy.createFromDto(savedPolicy, category));
         }
@@ -66,7 +65,7 @@ public class CouponPolicyServiceImpl implements CouponPolicyService {
                 couponPolicy.getDiscountRate(),
                 couponPolicy.getDiscountLimit(),
                 couponPolicy.getDiscountAmount(),
-                couponPolicy.getCouponPolicyType())
+                couponPolicy.getCouponPolicyType().getValue())
         );
     }
 }

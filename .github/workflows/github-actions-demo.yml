@@ -23,8 +23,11 @@ jobs:
           cache: maven
 
       - name: Analyze Backend with SonarQube
-        run: mvn verify sonar:sonar -Dsonar.projectKey=byeol23-back -Dsonar.host.url=${{ env.SONAR_HOST_URL }} -Dsonar.token=${{ env.SONAR_TOKEN }}
-
+        run: |
+          mvn verify sonar:sonar \
+            -Dsonar.projectKey=byeol23-back \
+            -Dsonar.host.url=${{ env.SONAR_HOST_URL }} \
+            -Dsonar.token=${{ env.SONAR_TOKEN }}
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
@@ -57,7 +60,7 @@ jobs:
             export "REDIS_DATABASE=${{ secrets.REDIS_DATABASE }}" 
             export "JWT_PUBLIC_KEY=${{ secrets.JWT_PUBLIC_KEY }}" 
             export "TOSS_SECRET_KEY=${{ secrets.TOSS_SECRET_KEY }}"
-                             
+            
             # 2. startup.sh 스크립트에 실행 권한 부여
             chmod +x ~/startup.sh
             

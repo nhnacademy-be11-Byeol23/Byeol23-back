@@ -17,11 +17,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableRabbit
 @RequiredArgsConstructor
-@EnableConfigurationProperties(value = {BookOutboxRabbitProperties.class, BookReindexRabbitProperties.class, BookEmbeddingRabbitProperties.class})
+@EnableConfigurationProperties(value = {BookOutboxRabbitProperties.class, BookReindexRabbitProperties.class, BookEmbeddingRabbitProperties.class,
+        CouponIssueRabbitProperties.class})
 public class RabbitMqConfig {
     private final BookOutboxRabbitProperties bookOutboxRabbitProperties;
     private final BookReindexRabbitProperties bookReindexRabbitProperties;
     private final BookEmbeddingRabbitProperties bookEmbeddingRabbitProperties;
+    private final CouponIssueRabbitProperties couponIssueRabbitProperties;
 
     @Bean
     public MessageConverter messageConverter() {
@@ -87,5 +89,23 @@ public class RabbitMqConfig {
                 .bind(bookEmbeddingQueue())
                 .to(bookReindexExchange())
                 .with(bookEmbeddingRabbitProperties.routingKey());
+    }
+
+    @Bean
+    public DirectExchange couponIssueExchange() {
+        return new DirectExchange(couponIssueRabbitProperties.exchange());
+    }
+
+    @Bean
+    public Queue couponIssueQueue() {
+        return new Queue(couponIssueRabbitProperties.queue(), true);
+    }
+
+    @Bean
+    public Binding couponIssueBinding() {
+        return BindingBuilder
+                .bind(couponIssueQueue())
+                .to(couponIssueExchange())
+                .with(couponIssueRabbitProperties.routingKey());
     }
 }

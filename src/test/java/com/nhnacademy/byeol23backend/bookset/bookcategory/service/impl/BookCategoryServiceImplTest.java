@@ -22,7 +22,7 @@ import com.nhnacademy.byeol23backend.bookset.bookcategory.repository.BookCategor
 import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
 import com.nhnacademy.byeol23backend.bookset.category.repository.CategoryRepository;
 import com.nhnacademy.byeol23backend.bookset.publisher.domain.Publisher;
-/*
+
 @ExtendWith(MockitoExtension.class)
 class BookCategoryServiceImplTest {
 
@@ -120,25 +120,22 @@ class BookCategoryServiceImplTest {
 	}
 
 	@Test
-	@DisplayName("createBookCategories - 카테고리 ID 리스트가 null인 경우 아무 작업도 하지 않음")
-	void createBookCategories_WhenCategoryIdsIsNull_DoesNothing() {
-		// when
-		bookCategoryService.createBookCategories(testBook, null);
+	@DisplayName("createBookCategories - 카테고리 ID 리스트가 null이면 예외 발생")
+	void createBookCategories_WhenCategoryIdsIsNull_ThrowsException() {
+		assertThatThrownBy(() -> bookCategoryService.createBookCategories(testBook, null))
+			.isInstanceOf(IllegalArgumentException.class)
+			.hasMessageContaining("최소 한 개 이상");
 
-		// then
-		verify(categoryRepository, never()).findAllById(anyList());
-		verify(bookCategoryRepository, never()).saveAll(anyList());
+		verifyNoInteractions(categoryRepository, bookCategoryRepository);
 	}
 
 	@Test
-	@DisplayName("createBookCategories - 카테고리 ID 리스트가 비어있는 경우 아무 작업도 하지 않음")
-	void createBookCategories_WhenCategoryIdsIsEmpty_DoesNothing() {
-		// when
-		bookCategoryService.createBookCategories(testBook, new ArrayList<>());
+	@DisplayName("createBookCategories - 카테고리 ID 리스트가 비어있으면 예외 발생")
+	void createBookCategories_WhenCategoryIdsIsEmpty_ThrowsException() {
+		assertThatThrownBy(() -> bookCategoryService.createBookCategories(testBook, new ArrayList<>()))
+			.isInstanceOf(IllegalArgumentException.class);
 
-		// then
-		verify(categoryRepository, never()).findAllById(anyList());
-		verify(bookCategoryRepository, never()).saveAll(anyList());
+		verifyNoInteractions(categoryRepository, bookCategoryRepository);
 	}
 
 	@Test
@@ -184,106 +181,78 @@ class BookCategoryServiceImplTest {
 	}
 
 	@Test
-	@DisplayName("updateBookCategories - 도서 카테고리 업데이트 성공")
-	void updateBookCategories_Success() {
-		// given
-		List<Long> categoryIds = List.of(1L, 2L);
-		List<Category> categories = List.of(testCategory1, testCategory2);
-		List<BookCategory> bookCategories = List.of(
-			BookCategory.of(testBook, testCategory1),
-			BookCategory.of(testBook, testCategory2)
-		);
+	@DisplayName("updateBookCategories - 신규 카테고리만 추가")
+	void updateBookCategories_AddOnly_Success() {
+		// 구 카테고리: testCategory1
+		given(bookCategoryRepository.findCategoriesByBookId(testBook.getBookId()))
+			.willReturn(List.of(testCategory1));
 
-		doNothing().when(bookCategoryRepository).deleteByBookId(testBook.getBookId());
-		given(categoryRepository.findAllById(categoryIds)).willReturn(categories);
-		given(bookCategoryRepository.saveAll(anyList())).willReturn(bookCategories);
+		List<Long> newCategoryIds = List.of(1L, 2L);
+		List<Category> categoriesToAdd = List.of(testCategory2);
+		List<BookCategory> savedBookCategories = List.of(BookCategory.of(testBook, testCategory2));
 
-		// when
-		bookCategoryService.updateBookCategories(testBook, categoryIds);
+		given(categoryRepository.findAllById(List.of(2L))).willReturn(categoriesToAdd);
+		given(bookCategoryRepository.saveAll(anyList())).willReturn(savedBookCategories);
 
-		// then
-		verify(bookCategoryRepository, times(1)).deleteByBookId(testBook.getBookId());
-		verify(categoryRepository, times(1)).findAllById(categoryIds);
-		verify(bookCategoryRepository, times(1)).saveAll(anyList());
-	}
-
-	@Test
-	@DisplayName("updateBookCategories - 카테고리 ID 리스트가 null인 경우 삭제만 수행하고 빈 리스트로 findAllById 호출")
-	void updateBookCategories_WhenCategoryIdsIsNull_DeletesAndCallsFindAllById() {
-		// given
-		doNothing().when(bookCategoryRepository).deleteByBookId(testBook.getBookId());
-		given(categoryRepository.findAllById(null)).willReturn(new ArrayList<>());
-
-		// when
-		bookCategoryService.updateBookCategories(testBook, null);
-
-		// then
-		verify(bookCategoryRepository, times(1)).deleteByBookId(testBook.getBookId());
-		verify(categoryRepository, times(1)).findAllById(null);
-		verify(bookCategoryRepository, times(1)).saveAll(anyList());
-	}
-
-	@Test
-	@DisplayName("updateBookCategories - 카테고리 ID 리스트가 비어있는 경우 삭제만 수행하고 빈 리스트로 findAllById 호출")
-	void updateBookCategories_WhenCategoryIdsIsEmpty_DeletesAndCallsFindAllById() {
-		// given
-		List<Long> emptyList = new ArrayList<>();
-		doNothing().when(bookCategoryRepository).deleteByBookId(testBook.getBookId());
-		given(categoryRepository.findAllById(emptyList)).willReturn(new ArrayList<>());
-
-		// when
-		bookCategoryService.updateBookCategories(testBook, emptyList);
-
-		// then
-		verify(bookCategoryRepository, times(1)).deleteByBookId(testBook.getBookId());
-		verify(categoryRepository, times(1)).findAllById(emptyList);
-		verify(bookCategoryRepository, times(1)).saveAll(anyList());
-	}
-
-	@Test
-	@DisplayName("updateBookCategories - 존재하지 않는 카테고리 ID는 무시되고 존재하는 것만 저장")
-	void updateBookCategories_WhenSomeCategoriesNotFound_SavesOnlyExisting() {
-		// given
-		List<Long> categoryIds = List.of(1L, 999L);
-		List<Category> foundCategories = List.of(testCategory1); // 999L은 없음
-		List<BookCategory> bookCategories = List.of(
-			BookCategory.of(testBook, testCategory1)
-		);
-
-		doNothing().when(bookCategoryRepository).deleteByBookId(testBook.getBookId());
-		given(categoryRepository.findAllById(categoryIds)).willReturn(foundCategories);
-		given(bookCategoryRepository.saveAll(anyList())).willReturn(bookCategories);
-
-		// when
-		bookCategoryService.updateBookCategories(testBook, categoryIds);
-
-		// then
-		verify(bookCategoryRepository, times(1)).deleteByBookId(testBook.getBookId());
-		verify(categoryRepository, times(1)).findAllById(categoryIds);
-		verify(bookCategoryRepository, times(1)).saveAll(anyList());
-	}
-
-	@Test
-	@DisplayName("updateBookCategories - 모든 카테고리 제거 후 새 카테고리 추가")
-	void updateBookCategories_ReplaceAllCategories_Success() {
-		// given
-		List<Long> newCategoryIds = List.of(2L);
-		List<Category> categories = List.of(testCategory2);
-		List<BookCategory> bookCategories = List.of(
-			BookCategory.of(testBook, testCategory2)
-		);
-
-		doNothing().when(bookCategoryRepository).deleteByBookId(testBook.getBookId());
-		given(categoryRepository.findAllById(newCategoryIds)).willReturn(categories);
-		given(bookCategoryRepository.saveAll(anyList())).willReturn(bookCategories);
-
-		// when
 		bookCategoryService.updateBookCategories(testBook, newCategoryIds);
 
-		// then
-		verify(bookCategoryRepository, times(1)).deleteByBookId(testBook.getBookId());
-		verify(categoryRepository, times(1)).findAllById(newCategoryIds);
-		verify(bookCategoryRepository, times(1)).saveAll(anyList());
+		verify(bookCategoryRepository).findCategoriesByBookId(testBook.getBookId());
+		verify(categoryRepository).findAllById(eq(List.of(2L)));
+		verify(bookCategoryRepository).saveAll(anyList());
+		verify(bookCategoryRepository, never()).deleteByBookIdAndCategoryIds(anyLong(), anyList());
+	}
+
+	@Test
+	@DisplayName("updateBookCategories - 기존 카테고리만 삭제")
+	void updateBookCategories_DeleteOnly_Success() {
+		given(bookCategoryRepository.findCategoriesByBookId(testBook.getBookId()))
+			.willReturn(List.of(testCategory1, testCategory2));
+
+		List<Long> newCategoryIds = List.of(1L); // category 2 삭제
+
+		bookCategoryService.updateBookCategories(testBook, newCategoryIds);
+
+		verify(bookCategoryRepository).findCategoriesByBookId(testBook.getBookId());
+		verify(categoryRepository, never()).findAllById(anyList());
+		verify(bookCategoryRepository, never()).saveAll(anyList());
+		verify(bookCategoryRepository).deleteByBookIdAndCategoryIds(eq(testBook.getBookId()), eq(List.of(2L)));
+	}
+
+	@Test
+	@DisplayName("updateBookCategories - 추가와 삭제가 동시에 발생")
+	void updateBookCategories_AddAndDelete_Success() {
+		// 기존: 1번 카테고리만 존재
+		given(bookCategoryRepository.findCategoriesByBookId(testBook.getBookId()))
+			.willReturn(List.of(testCategory1));
+
+		List<Long> newCategoryIds = List.of(2L); // 1 삭제, 2 추가
+		List<Category> categoriesToAdd = List.of(testCategory2);
+		List<BookCategory> savedBookCategories = List.of(BookCategory.of(testBook, testCategory2));
+
+		given(categoryRepository.findAllById(List.of(2L))).willReturn(categoriesToAdd);
+		given(bookCategoryRepository.saveAll(anyList())).willReturn(savedBookCategories);
+
+		bookCategoryService.updateBookCategories(testBook, newCategoryIds);
+
+		verify(bookCategoryRepository).findCategoriesByBookId(testBook.getBookId());
+		verify(categoryRepository).findAllById(eq(List.of(2L)));
+		verify(bookCategoryRepository).saveAll(anyList());
+		verify(bookCategoryRepository).deleteByBookIdAndCategoryIds(eq(testBook.getBookId()), eq(List.of(1L)));
+	}
+
+	@Test
+	@DisplayName("updateBookCategories - 변경 사항이 없는 경우 아무 작업도 하지 않음")
+	void updateBookCategories_NoChanges() {
+		given(bookCategoryRepository.findCategoriesByBookId(testBook.getBookId()))
+			.willReturn(List.of(testCategory1, testCategory2));
+
+		List<Long> newCategoryIds = List.of(1L, 2L);
+
+		bookCategoryService.updateBookCategories(testBook, newCategoryIds);
+
+		verify(bookCategoryRepository).findCategoriesByBookId(testBook.getBookId());
+		verify(categoryRepository, never()).findAllById(anyList());
+		verify(bookCategoryRepository, never()).saveAll(anyList());
+		verify(bookCategoryRepository, never()).deleteByBookIdAndCategoryIds(anyLong(), anyList());
 	}
 }
-*/
