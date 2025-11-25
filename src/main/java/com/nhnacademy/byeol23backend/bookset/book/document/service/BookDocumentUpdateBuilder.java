@@ -12,6 +12,7 @@ import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.Contributor;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.ContributorRole;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.Tag;
+import com.nhnacademy.byeol23backend.image.dto.ImageUrlProjection;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,8 +39,15 @@ public class BookDocumentUpdateBuilder implements BookDocumentBuilder {
         List<Category> categories = bookCategoryService.getCategoriesByBookId(bookId);
         Map<String, List<Contributor>> contributorMap = bookContributorService.getContributorsByBookId(bookId).stream().collect(Collectors.groupingBy(c -> c.getContributorRole().getLabel()));
         List<Tag> tags = bookTagService.getTagsByBookId(bookId);
-        String imageUrl = bookImageService.getImageUrlsById(bookId).getFirst().getImageUrl();
+//        String imageUrl = bookImageService.getImageUrlsById(bookId).getFirst().getImageUrl();
         BookReview bookReview = bookService.getBookReview(bookId);
+        List<ImageUrlProjection> bookImages = bookImageService.getImageUrlsById(bookId);
+        String imageUrl = null;
+        if (!bookImages.isEmpty()) {
+            // 리스트가 비어있지 않은 경우에만 첫 번째 요소 get
+            imageUrl = bookImages.getFirst().getImageUrl();
+        }
+
 
 
         return BookDocument.builder()

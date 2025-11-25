@@ -1,9 +1,79 @@
 package com.nhnacademy.byeol23backend.couponset.coupon.service.impl;
 
+import com.nhnacademy.byeol23backend.config.CouponBirthdayRabbitProperties;
+import com.nhnacademy.byeol23backend.config.CouponBulkRabbitProperties;
+import com.nhnacademy.byeol23backend.config.CouponIssueRabbitProperties;
+import com.nhnacademy.byeol23backend.couponset.coupon.dto.BirthdayCouponIssueRequestDto;
+import com.nhnacademy.byeol23backend.couponset.coupon.dto.CouponIssueRequestDto;
+import com.nhnacademy.byeol23backend.couponset.coupon.repository.CouponRepository;
 import com.nhnacademy.byeol23backend.couponset.coupon.service.CouponService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
+@Transactional(readOnly = true)
 public class CouponServiceImpl implements CouponService {
-    
+    private final RabbitTemplate rabbitTemplate;
+    private final CouponIssueRabbitProperties couponIssueRabbitProperties;
+    private final CouponBulkRabbitProperties couponBulkRabbitProperties;
+    private final CouponBirthdayRabbitProperties couponBirthdayRabbitProperties;
+    private final CouponRepository couponRepository;
+
+    @Override
+    public void sendIssueRequestToMQ(CouponIssueRequestDto request) {
+        rabbitTemplate.convertAndSend(
+                couponIssueRabbitProperties.exchange(),
+                couponBulkRabbitProperties.routingKey(),
+                request
+        );
+    }
+
+    @Override
+    public void sendBirthdayIssueRequestToMQ(BirthdayCouponIssueRequestDto request) {
+        rabbitTemplate.convertAndSend(
+                couponIssueRabbitProperties.exchange(),
+                couponBirthdayRabbitProperties.routingKey(),
+                request
+        );
+    }
+
+    @Override
+    @Transactional
+    public void issueCoupon(CouponIssueRequestDto request) {
+        int result = couponRepository.issueCouponToAllUsers(request.couponPolicyId(), request.couponName(), request.expiredDate());
+        if(result <= 0){
+            throw new RuntimeException("쿠폰 발급 실패");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void issueBirthdayCoupon(BirthdayCouponIssueRequestDto request) {
+        Long memberId = request.memberId();
+        Long policyId = request.birthDateCouponPolicyId();
+
+        boolean alreadyIssued = couponRepository.existsByMember_memberIdAndCouponPolicy_couponPolicyId(memberId, policyId);
+
+        if (alreadyIssued) {
+            log.info("[생일 쿠폰 발급] 이미 발급된 쿠폰입니다. MemberID: " + memberId);
+            return;
+        }
+
+        int issuedCount = couponRepository.issueBirthdayCoupon(request.birthDateCouponPolicyId(), request.couponName(), request.memberId(), request.expiredDate());
+
+        //발급 실패 시 예외 처리도 해야함 (DB 제약조건 오류 등)
+        if (issuedCount != 1) {
+            // 단일 사용자 발급이 실패하면 RuntimeException을 던져 MQ에 롤백/재처리 신호 필요
+            throw new RuntimeException("생일 쿠폰 발급 실패: MemberID=" + memberId);
+        }
+
+        log.info("생일 쿠폰 발급 성공, MemberID: " + memberId);
+    }
+
 }

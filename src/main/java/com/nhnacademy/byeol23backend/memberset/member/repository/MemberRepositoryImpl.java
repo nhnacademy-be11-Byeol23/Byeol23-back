@@ -20,7 +20,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         queryFactory
                 .update(member)
                 .set(member.status, Status.INACTIVE)
-                .where(member.latestLoginAt.before(threshold))
+                .where(member.status.eq(Status.ACTIVE).and(member.latestLoginAt.before(threshold)))
                 .execute();
     }
 }

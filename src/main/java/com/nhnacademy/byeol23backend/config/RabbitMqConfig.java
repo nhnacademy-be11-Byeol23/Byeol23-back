@@ -17,11 +17,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableRabbit
 @RequiredArgsConstructor
-@EnableConfigurationProperties(value = {BookOutboxRabbitProperties.class, BookReindexRabbitProperties.class, BookEmbeddingRabbitProperties.class})
+@EnableConfigurationProperties(value = {BookOutboxRabbitProperties.class, BookReindexRabbitProperties.class, BookEmbeddingRabbitProperties.class,
+        CouponIssueRabbitProperties.class, CouponBulkRabbitProperties.class, CouponBirthdayRabbitProperties.class})
 public class RabbitMqConfig {
     private final BookOutboxRabbitProperties bookOutboxRabbitProperties;
     private final BookReindexRabbitProperties bookReindexRabbitProperties;
     private final BookEmbeddingRabbitProperties bookEmbeddingRabbitProperties;
+    private final CouponIssueRabbitProperties couponIssueRabbitProperties;
+    private final CouponBulkRabbitProperties couponBulkRabbitProperties;
+    private final CouponBirthdayRabbitProperties couponBirthdayRabbitProperties;
 
     @Bean
     public MessageConverter messageConverter() {
@@ -87,5 +91,36 @@ public class RabbitMqConfig {
                 .bind(bookEmbeddingQueue())
                 .to(bookReindexExchange())
                 .with(bookEmbeddingRabbitProperties.routingKey());
+    }
+
+    @Bean
+    public DirectExchange couponIssueExchange() {
+        return new DirectExchange(couponIssueRabbitProperties.exchange());
+    }
+
+    @Bean
+    public Queue couponBulkQueue() {
+        return new Queue(couponBulkRabbitProperties.queue(), true);
+    }
+
+    @Bean
+    public Binding couponBulkBinding() {
+        return BindingBuilder
+                .bind(couponBulkQueue())
+                .to(couponIssueExchange()) // Exchange 공유
+                .with(couponBulkRabbitProperties.routingKey());
+    }
+
+    @Bean
+    public Queue couponBirthdayQueue() {
+        return new Queue(couponBirthdayRabbitProperties.queue(), true);
+    }
+
+    @Bean
+    public Binding couponBirthdayBinding() {
+        return BindingBuilder
+                .bind(couponBirthdayQueue())
+                .to(couponIssueExchange()) // Exchange 공유
+                .with(couponBirthdayRabbitProperties.routingKey());
     }
 }

@@ -66,7 +66,7 @@ public class QuartzConfig {
                 .forJob(bookDocumentViewCountSyncJobDetail())
                 .withIdentity("bookDocumentViewCountSyncTrigger")
                 .withSchedule(
-                        CronScheduleBuilder.cronSchedule("0 0/10 * * * ?").withMisfireHandlingInstructionFireAndProceed()
+                        CronScheduleBuilder.weeklyOnDayAndHourAndMinute(1, 0, 0).withMisfireHandlingInstructionFireAndProceed()
                 )
                 .build();
     }
@@ -89,5 +89,27 @@ public class QuartzConfig {
 			.withIdentity("deliveryCompletedJobTrigger")
 			.withSchedule(scheduleBuilder)
 			.build();
+	}
+
+	@Bean
+	public JobDetail birthdayCouponJobDetail() {
+		return JobBuilder.newJob(BirthdayCouponJob.class)
+				.withIdentity("birthdayCouponJob")
+				.withDescription("매월 1일 생일자 대상 쿠폰 발급 요청 Job")
+				.storeDurably()
+				.build();
+	}
+
+	@Bean
+	public Trigger birthdayCouponJobTrigger() {
+		// Cron 표현식: 0초 10분 1시 1일 *월 ?요일
+		CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule("0 10 1 1 * ?")
+				.inTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
+
+		return TriggerBuilder.newTrigger()
+				.forJob(birthdayCouponJobDetail())
+				.withIdentity("birthdayCouponJobTrigger")
+				.withSchedule(scheduleBuilder)
+				.build();
 	}
 }

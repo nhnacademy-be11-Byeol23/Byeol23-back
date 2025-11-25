@@ -6,9 +6,10 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
-	List<Member> findAllByGrade_GradeId(Long gradeId);
 
 
     //회원 가입
@@ -22,4 +23,15 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     boolean existsByEmailAndMemberIdNot(String email, Long memberId);
 
 	Optional<Member> getReferenceByMemberId(Long memberId);
+
+    //특정 생일 회원 조회
+    @Query(value = """
+            SELECT m.member_id 
+            FROM members m 
+            WHERE 
+                MONTH(m.birth_date) = :targetMonth 
+                AND m.status = 'ACTIVE'
+            """,
+            nativeQuery = true)
+    List<Long> findMembersByBirthdayMonth(@Param("targetMonth") int targetMonth);
 }

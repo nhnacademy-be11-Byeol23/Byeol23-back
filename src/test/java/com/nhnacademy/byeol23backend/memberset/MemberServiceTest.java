@@ -26,6 +26,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
@@ -57,8 +58,12 @@ public class MemberServiceTest {
 	@Mock
 	JwtParser jwtParser;
 
+	@Mock
+	ApplicationEventPublisher eventPublisher;
+
 	@InjectMocks
 	MemberServiceImpl memberService;
+
 
 	@Test
 	@DisplayName("성공: 회원가입")

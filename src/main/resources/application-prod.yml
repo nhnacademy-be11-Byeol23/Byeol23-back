@@ -95,3 +95,24 @@ book:
     exchange: byeol23.book.embedding.exchange
     queue: byeol23.book.embedding.queue
     routing-key: byeol23.book.embedding.key
+
+coupon:
+  issue:
+    exchange: byeol23.prod.coupon.issue.exchange
+
+  bulk:
+    queue: byeol23.prod.coupon.issue.bulk.queue
+    routing-key: byeol23.prod.coupon.issue.bulk.key
+
+  birthday:
+    queue: byeol23.prod.coupon.issue.birthday.queue
+    routing-key: byeol23.prod.coupon.issue.birthday.key
+
+    policy-id: 2
+    coupon-name-template: "[생일 축하] {MONTH}월 혜택 쿠폰"
+    validity-days: 30
+
+  welcome:
+    policy-id: 4
+    coupon-name-template: "[Welcome] 신규회원 쿠폰"
+    validity-days: 30
