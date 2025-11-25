@@ -29,4 +29,15 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
             @Param("couponName") String couponName,
             @Param("expiredDate") LocalDate expiredDate
     );
+
+    boolean existsByMember_memberIdAndCouponPolicy_couponPolicyId(Long memberId, Long couponPolicyId);
+
+    @Modifying
+    @Query(value = """
+            INSERT INTO coupons (coupon_policy_id, member_id, expired_date, created_date)
+            VALUES (:policyId, :memberId, :expiredDate, CURRENT_DATE())
+            """, nativeQuery = true)
+    int issueBirthdayCoupon(@Param("policyId") Long policyId,
+                            @Param("memberId") Long memberId,
+                            @Param("expiredDate") LocalDate expiredDate);
 }
