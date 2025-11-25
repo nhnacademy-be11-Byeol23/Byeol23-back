@@ -48,13 +48,13 @@ public class TagController {
 	}
 
 
-	@DeleteMapping("/{tag-id}")
+	@PostMapping("/delete/{tag-id}")
 	public ResponseEntity<Void> deleteTagByTagId(@PathVariable(name = "tag-id") Long tagId) {
 		tagService.deleteTagByTagId(tagId);
 		return ResponseEntity.noContent().build();
 	}
 
-	@PutMapping("/{tag-id}")
+	@PostMapping("/put/{tag-id}")
 	public ResponseEntity<TagUpdateResponse> updateTagByTagId(@PathVariable(name = "tag-id") Long tagId, @RequestBody TagUpdateRequest tagRequestDto) {
 		TagUpdateResponse response = tagService.updateTagByTagId(tagId, tagRequestDto);
 		return ResponseEntity.ok(response);

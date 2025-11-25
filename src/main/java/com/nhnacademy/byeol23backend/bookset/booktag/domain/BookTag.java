@@ -41,4 +41,5 @@ public class BookTag {
 	public static BookTag of(Book book, Tag tag) {
 		return new BookTag(book, tag);
 	}
+
 }

@@ -55,13 +55,13 @@ public class ContributorController {
 	    return ResponseEntity.ok(new AllContributorResponse(infoResponse.contributor()));
 	}
 
-	@DeleteMapping("/{contributor-id}")
+	@PostMapping("/delete/{contributor-id}")
 	public ResponseEntity<Void> deleteContributorByContributorId(@PathVariable(name = "contributor-id") Long contributorId){
 		contributorService.deleteContributorByContributorId(contributorId);
 		return ResponseEntity.noContent().build();
 	}
 
-	@PutMapping("/{contributor-id}")
+	@PostMapping("/put/{contributor-id}")
 	public ResponseEntity<ContributorUpdateResponse> updateContributor(@PathVariable(name = "contributor-id") Long contributorId, @RequestBody ContributorUpdateRequest request){
 		ContributorUpdateResponse response = contributorService.updateContributor(contributorId, request);
 		return ResponseEntity.ok(response);

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -34,14 +33,13 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.type.SqlTypes;
 
 @Getter
 @Entity
 @Table(name = "books")
 @NoArgsConstructor
 @SQLDelete(sql = "update books set is_deleted = true where book_id = ?")
-@Where(clause = "is_deleted = 0")
+@Where(clause = "is_deleted = false")
 public class Book {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,7 +66,7 @@ public class Book {
 
 	private LocalDate publishDate;
 
-	@Column(name = "is_pack", nullable = false, columnDefinition = "tinyint")
+	@Column(name = "is_pack", nullable = false, columnDefinition = "TINYINT")
 	private boolean isPack;
 
 	@Column(name = "book_status", nullable = false, length = 10)
@@ -83,7 +81,7 @@ public class Book {
 	@JoinColumn(name = "publisher_id", nullable = false)
 	private Publisher publisher;
 
-	@Column(name = "is_deleted", nullable = false, columnDefinition = "tinyint")
+	@Column(name = "is_deleted", nullable = false, columnDefinition = "TINYINT")
 	private boolean isDeleted;
 
 	@Column(name = "view_count", columnDefinition = "BIGINT DEFAULT 0")

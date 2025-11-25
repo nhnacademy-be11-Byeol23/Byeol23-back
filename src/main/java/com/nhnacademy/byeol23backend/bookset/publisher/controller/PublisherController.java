@@ -48,13 +48,13 @@ public class PublisherController {
 		return ResponseEntity.created(uri).body(response);
 	}
 
-	@DeleteMapping("/{publisher-id}")
+	@PostMapping("/delete/{publisher-id}")
 	public ResponseEntity<Void> deletePublisherByPublisherId(@PathVariable(name = "publisher-id") Long publisherId) {
 		publisherService.deletePublisherByPublisherId(publisherId);
 		return ResponseEntity.noContent().build();
 	}
 
-	@PutMapping("/{publisher-id}")
+	@PostMapping("/put/{publisher-id}")
 	public ResponseEntity<PublisherUpdateResponse> updatePublisherByPublisherId(
 		@PathVariable(name = "publisher-id") Long publisherId,
 		@RequestBody PublisherUpdateRequest publisherRequestDto) {
