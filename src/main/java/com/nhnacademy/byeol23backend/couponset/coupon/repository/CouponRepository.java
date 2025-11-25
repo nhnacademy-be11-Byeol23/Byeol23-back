@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.couponset.coupon.repository;
 
 import com.nhnacademy.byeol23backend.couponset.coupon.domain.Coupon;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -43,5 +44,6 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
                             @Param("memberId") Long memberId,
                             @Param("expiredDate") LocalDate expiredDate);
 
-    List<Coupon> findByMember_MemberId(Long memberMemberId);
+    @EntityGraph(attributePaths = {"couponPolicy"})
+    List<Coupon> findByMember_MemberIdAndUsedAtIsNull(Long memberId);
 }

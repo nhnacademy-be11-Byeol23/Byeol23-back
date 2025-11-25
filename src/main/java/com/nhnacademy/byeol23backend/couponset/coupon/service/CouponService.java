@@ -2,6 +2,9 @@ package com.nhnacademy.byeol23backend.couponset.coupon.service;
 
 import com.nhnacademy.byeol23backend.couponset.coupon.dto.BirthdayCouponIssueRequestDto;
 import com.nhnacademy.byeol23backend.couponset.coupon.dto.CouponIssueRequestDto;
+import com.nhnacademy.byeol23backend.couponset.coupon.dto.IssuedCouponInfoResponseDto;
+
+import java.util.List;
 
 public interface CouponService {
     void sendIssueRequestToMQ(CouponIssueRequestDto request);
@@ -12,5 +15,5 @@ public interface CouponService {
 
     void issueBirthdayCoupon(BirthdayCouponIssueRequestDto request);
 
-    void getCoupons(String token);
+    List<IssuedCouponInfoResponseDto> getIssuedCoupons(String token);
 }

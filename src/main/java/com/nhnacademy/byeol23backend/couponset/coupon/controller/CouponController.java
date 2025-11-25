@@ -24,7 +24,7 @@ public class CouponController {
 
     @GetMapping()
     public ResponseEntity<Void> getCoupons(@CookieValue("Access-Token") String token){
-        couponService.getCoupons(token);
+        couponService.getIssuedCoupons(token);
         return ResponseEntity.ok().build();
     }
 

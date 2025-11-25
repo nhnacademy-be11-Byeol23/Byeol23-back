@@ -6,8 +6,10 @@ import com.nhnacademy.byeol23backend.config.CouponIssueRabbitProperties;
 import com.nhnacademy.byeol23backend.couponset.coupon.domain.Coupon;
 import com.nhnacademy.byeol23backend.couponset.coupon.dto.BirthdayCouponIssueRequestDto;
 import com.nhnacademy.byeol23backend.couponset.coupon.dto.CouponIssueRequestDto;
+import com.nhnacademy.byeol23backend.couponset.coupon.dto.IssuedCouponInfoResponseDto;
 import com.nhnacademy.byeol23backend.couponset.coupon.repository.CouponRepository;
 import com.nhnacademy.byeol23backend.couponset.coupon.service.CouponService;
+import com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.CouponPolicy;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -82,10 +85,38 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public void getCoupons(String token) {
+    public List<IssuedCouponInfoResponseDto> getIssuedCoupons(String token) {
         Long memberId = accessTokenParser(token);
-        List<Coupon> couponList = couponRepository.findByMember_MemberId(memberId);
+        List<Coupon> couponList = couponRepository.findByMember_MemberIdAndUsedAtIsNull(memberId);
 
+        LocalDate today = LocalDate.now();
+
+        // 3. Entity -> DTO 변환
+        return couponList.stream()
+                .map(coupon -> {
+                    CouponPolicy policy = coupon.getCouponPolicy();
+
+                    String discountStr;
+                    if (policy.getDiscountAmount() != null) {
+                        discountStr = policy.getDiscountAmount() + "원";
+                    } else {
+                        discountStr = policy.getDiscountRate() + "%";
+                    }
+
+                    boolean isValid = !today.isAfter(coupon.getExpiredDate());
+
+                    return new IssuedCouponInfoResponseDto(
+                            policy.getCouponPolicyId(),
+                            coupon.getCouponId(),
+                            coupon.getCouponName(),
+                            discountStr,
+                            policy.getCriterionPrice(),
+                            coupon.getCreatedDate(),
+                            coupon.getExpiredDate(),
+                            isValid
+                    );
+                })
+                .toList();
     }
 
     private Long accessTokenParser(String accessToken) {
