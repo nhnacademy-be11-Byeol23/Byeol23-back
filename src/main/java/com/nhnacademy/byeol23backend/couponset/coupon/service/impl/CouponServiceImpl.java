@@ -65,7 +65,7 @@ public class CouponServiceImpl implements CouponService {
             return;
         }
 
-        int issuedCount = couponRepository.issueBirthdayCoupon(request.birthDateCouponPolicyId(), request.memberId(), request.expiredDate());
+        int issuedCount = couponRepository.issueBirthdayCoupon(request.birthDateCouponPolicyId(), request.couponName(), request.memberId(), request.expiredDate());
 
         //발급 실패 시 예외 처리도 해야함 (DB 제약조건 오류 등)
         if (issuedCount != 1) {
