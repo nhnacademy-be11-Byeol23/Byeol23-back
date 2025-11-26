@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.memberset;
 
-import com.nhnacademy.byeol23backend.cartset.cart.service.CartService;
+import com.nhnacademy.byeol23backend.cartset.cart.domain.Cart;
+import com.nhnacademy.byeol23backend.cartset.cart.repository.CartRepository;
 import com.nhnacademy.byeol23backend.memberset.grade.domain.Grade;
 import com.nhnacademy.byeol23backend.memberset.grade.repository.GradeRepository;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
@@ -50,7 +51,7 @@ public class MemberServiceTest {
 	GradeRepository gradeRepository;
 
 	@Mock
-	CartService cartService;
+    CartRepository cartRepository;
 
 	@Mock
 	JwtParser jwtParser;
@@ -105,7 +106,7 @@ public class MemberServiceTest {
 		verify(gradeRepository).findByGradeName("일반");
 		verify(passwordEncoder).encode("password123");
 		verify(memberRepository).save(any(Member.class));
-		verify(cartService).createCart(any(Member.class));
+		verify(cartRepository).save(any(Cart.class));
 	}
 
 	@Test
@@ -133,7 +134,7 @@ public class MemberServiceTest {
 
 		verify(memberRepository).existsByLoginId("testuser");
 		verify(memberRepository, never()).save(any());
-		verify(cartService, never()).createCart(any());
+		verify(cartRepository, never()).save(any());
 	}
 
 	@Test
