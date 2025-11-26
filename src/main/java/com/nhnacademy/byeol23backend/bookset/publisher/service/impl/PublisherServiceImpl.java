@@ -1,5 +1,7 @@
 package com.nhnacademy.byeol23backend.bookset.publisher.service.impl;
 
+import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
+import com.nhnacademy.byeol23backend.bookset.publisher.exception.RelatedBookExistsException;
 import com.nhnacademy.byeol23backend.bookset.publisher.service.PublisherService;
 import com.nhnacademy.byeol23backend.bookset.publisher.domain.Publisher;
 import com.nhnacademy.byeol23backend.bookset.publisher.domain.Publisher;
@@ -26,6 +28,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PublisherServiceImpl implements PublisherService {
 	private final PublisherRepository publisherRepository;
+	private final BookRepository bookRepository;
 
 	@Override
 	public PublisherCreateResponse createPublisher(PublisherCreateRequest request) {
@@ -43,9 +46,14 @@ public class PublisherServiceImpl implements PublisherService {
 	@Override
 	@Transactional
 	public void deletePublisherByPublisherId(Long publisherId) {
-		Publisher publisher = publisherRepository.findByPublisherId(publisherId)
-			.orElseThrow(() -> new PublisherNotFoundException("해당 아이디 태그를 찾을 수 없습니다: " + publisherId));
-		publisherRepository.deletePublisherByPublisherId(publisherId);
+		if (bookRepository.countBooksByPublisherId(publisherId) != 0){
+			throw new RelatedBookExistsException("출판사에서 출판한 책이 아직 존재합니다.");
+		}
+		else {
+			Publisher publisher = publisherRepository.findByPublisherId(publisherId)
+				.orElseThrow(() -> new PublisherNotFoundException("해당 아이디 태그를 찾을 수 없습니다: " + publisherId));
+			publisherRepository.deletePublisherByPublisherId(publisherId);
+		}
 	}
 
 	@Override

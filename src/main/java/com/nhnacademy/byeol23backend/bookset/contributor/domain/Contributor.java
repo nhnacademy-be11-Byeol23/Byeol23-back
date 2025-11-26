@@ -44,7 +44,7 @@ public class Contributor {
 		this.contributorRole = ContributorRole.from(contributorRole);
 	}
 
-	public String getContributorRole() {
-		return this.contributorRole.getLabel();
+	public ContributorRole getContributorRole() {
+		return this.contributorRole;
 	}
 }

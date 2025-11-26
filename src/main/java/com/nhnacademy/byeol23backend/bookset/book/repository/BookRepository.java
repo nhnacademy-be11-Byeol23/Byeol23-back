@@ -3,6 +3,8 @@ package com.nhnacademy.byeol23backend.bookset.book.repository;
 import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookReview;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookViewCount;
+import com.nhnacademy.byeol23backend.bookset.publisher.domain.Publisher;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -43,4 +45,7 @@ select b.book_id as bookId, count(distinct r.review_id) as reviewCount, round(av
 
 	@EntityGraph(attributePaths = {"publisher"})
     Page<Book> findAll(Pageable pageable);
+
+	@Query("select count(b) from Book b where b.publisher.publisherId = :publisherId")
+	Long countBooksByPublisherId(@Param("publisherId") Long publisherId);
 }
