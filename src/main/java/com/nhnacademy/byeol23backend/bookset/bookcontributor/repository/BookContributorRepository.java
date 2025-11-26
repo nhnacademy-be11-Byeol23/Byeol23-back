@@ -29,4 +29,7 @@ public interface BookContributorRepository extends JpaRepository<BookContributor
 		"JOIN FETCH bc.book " +
 		"JOIN FETCH bc.contributor")
 	List<BookContributor> getAllBookContributors();
+
+	@Query("select count(bc) from BookContributor bc  where bc.contributor.contributorId = :contributorId")
+	Long countBookContributorsByContributorId(@Param("contributorId") Long contributorId);
 }

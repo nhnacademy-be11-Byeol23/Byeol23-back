@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.nhnacademy.byeol23backend.bookset.bookcontributor.repository.BookContributorRepository;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.Contributor;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.ContributorRole;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.AllContributorResponse;
@@ -13,9 +14,12 @@ import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorC
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorInfoResponse;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorUpdateResponse;
+import com.nhnacademy.byeol23backend.bookset.contributor.exception.ContributorAlreadyExistsException;
 import com.nhnacademy.byeol23backend.bookset.contributor.exception.ContributorNotFound;
+import com.nhnacademy.byeol23backend.bookset.contributor.exception.RelatedBookExistsException;
 import com.nhnacademy.byeol23backend.bookset.contributor.repository.ContributorRepository;
 import com.nhnacademy.byeol23backend.bookset.contributor.service.ContributorService;
+import com.nhnacademy.byeol23backend.bookset.tag.exception.TagAlreadyExistsException;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class ContributorServiceImpl implements ContributorService {
 
 	private final ContributorRepository contributorRepository;
+	private final BookContributorRepository bookContributorRepository;
 
 	@Override
 	public ContributorInfoResponse getContributorByContributorId(Long contributorId) {
@@ -43,6 +48,9 @@ public class ContributorServiceImpl implements ContributorService {
 		if (request.contributorRole() == null) {
 			throw new IllegalArgumentException("contributorRole is required");
 		}
+		if (contributorRepository.findContributorByNameAndRole(request.contributorName(), request.contributorRole()) != 0) {
+			throw new ContributorAlreadyExistsException("Contributor가 이미 존재합니다.");
+		}
 
 		Contributor contributor = new Contributor(request);
 		contributorRepository.save(contributor);
@@ -51,6 +59,9 @@ public class ContributorServiceImpl implements ContributorService {
 
 	@Override
 	public void deleteContributorByContributorId(Long contributorId) {
+		if (bookContributorRepository.countBookContributorsByContributorId(contributorId) != 0){
+			throw new RelatedBookExistsException("기여자가 기여한 책이 있습니다.");
+		}
 		contributorRepository.deleteById(contributorId);
 	}
 
@@ -64,6 +75,10 @@ public class ContributorServiceImpl implements ContributorService {
 		}
 		if (request.contributorRole() == null) {
 			throw new IllegalArgumentException("contributorRole is required");
+		}
+
+		if (contributorRepository.findContributorByNameAndRole(request.contributorName(), ContributorRole.valueOf(request.contributorRole())) != 0){
+			throw new ContributorAlreadyExistsException("Contributor가 이미 존재합니다.");
 		}
 
 		Contributor contributor = contributorRepository.findById(contributorId)

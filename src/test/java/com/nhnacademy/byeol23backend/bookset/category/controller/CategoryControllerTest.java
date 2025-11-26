@@ -2,7 +2,6 @@ package com.nhnacademy.byeol23backend.bookset.category.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nhnacademy.byeol23backend.bookset.book.interceptor.GuestIdCookieInterceptor;
 import com.nhnacademy.byeol23backend.bookset.book.interceptor.ViewerIdInterceptor;
 import com.nhnacademy.byeol23backend.bookset.category.dto.*;
 import com.nhnacademy.byeol23backend.bookset.category.exception.CategoryDeleteReferencedByBookException;
@@ -10,8 +9,8 @@ import com.nhnacademy.byeol23backend.bookset.category.exception.CategoryNotFound
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryCacheService;
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryCommandService;
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryQueryService;
-import com.nhnacademy.byeol23backend.config.WebConfig;
 import com.nhnacademy.byeol23backend.commons.filter.TokenFilter;
+import com.nhnacademy.byeol23backend.config.WebConfig;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = CategoryController.class,
-excludeFilters = @ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, classes = {TokenFilter.class, GuestIdCookieInterceptor.class, ViewerIdInterceptor.class, WebConfig.class}))
+excludeFilters = @ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, classes = {TokenFilter.class, ViewerIdInterceptor.class, WebConfig.class}))
 class CategoryControllerTest {
     @Autowired
     private MockMvc mockMvc;

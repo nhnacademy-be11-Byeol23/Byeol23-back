@@ -53,14 +53,14 @@ public class ViewerIdInterceptor implements HandlerInterceptor {
                 return true;
             }
         }
-
+        /*
         // 비회원이지만 첫 요청인 경우
         String guestId = (String) request.getAttribute("guestId");
         if(StringUtils.isNotBlank(guestId)) {
             request.setAttribute("viewerId", "guest:%s".formatted(guestId));
             return true;
         }
-
+        */
         return true;
     }
 }
