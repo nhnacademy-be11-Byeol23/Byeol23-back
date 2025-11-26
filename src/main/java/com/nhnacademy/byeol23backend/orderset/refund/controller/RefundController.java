@@ -26,7 +26,7 @@ public class RefundController {
 	 * HTTP 200 OK 상태의 {@link ResponseEntity}
 	 */
 	@PostMapping
-	public ResponseEntity<RefundResponse> refundRequest(@RequestBody RefundRequest request) {
+	public ResponseEntity<RefundResponse> refund(@RequestBody RefundRequest request) {
 		RefundResponse response = refundService.refundRequest(request);
 		return ResponseEntity.ok(response);
 	}

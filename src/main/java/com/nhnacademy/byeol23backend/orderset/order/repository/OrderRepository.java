@@ -32,4 +32,12 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderReposi
 	int updateInDeliveryOrdersToCompleted(@Param("targetDate") LocalDate targetDate);
 
 	Page<Order> findByMemberAndOrderStatusNotOrderByOrderedAtDesc(Member member, String orderStatus, Pageable pageable);
+
+	@Modifying
+	@Transactional
+	@Query("UPDATE Order o SET o.deliverySentDate = :today " +
+		"WHERE o.deliverySentDate is null " +
+		"AND o.orderStatus = '결제 완료'")
+	int updateDeliverySentDate(@Param("today") LocalDate today);
+
 }

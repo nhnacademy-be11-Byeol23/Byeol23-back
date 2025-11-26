@@ -2,7 +2,6 @@ package com.nhnacademy.byeol23backend.orderset.refund.controller;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -66,8 +65,9 @@ class RefundControllerTest {
 		// (RefundRequest, RefundResponse DTO 구조를 JavaDoc 기반으로 추정)
 		refundRequest = new RefundRequest(
 			"order-12345",
-			"MIND_CHANGED", // RefundReason (Enum 또는 String)
-			RefundOption.MIND_CHANGED  // RefundOption (Enum 또는 String)
+			"단순 변심",
+			RefundOption.MIND_CHANGED,
+			new BigDecimal("15000")
 		);
 
 		refundResponse = new RefundResponse(
