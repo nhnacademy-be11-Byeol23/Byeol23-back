@@ -1,11 +1,14 @@
 package com.nhnacademy.byeol23backend.bookset.bookcontributor.repository;
 
-import static org.assertj.core.api.Assertions.*;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
+import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
+import com.nhnacademy.byeol23backend.bookset.book.domain.BookStatus;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookCreateRequest;
+import com.nhnacademy.byeol23backend.bookset.bookcontributor.domain.BookContributor;
+import com.nhnacademy.byeol23backend.bookset.contributor.domain.Contributor;
+import com.nhnacademy.byeol23backend.bookset.contributor.domain.ContributorRole;
+import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorCreateRequest;
+import com.nhnacademy.byeol23backend.bookset.publisher.domain.Publisher;
+import com.nhnacademy.byeol23backend.config.QueryDslConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,15 +19,11 @@ import org.springframework.cloud.netflix.eureka.EurekaClientAutoConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
-import com.nhnacademy.byeol23backend.bookset.book.domain.BookStatus;
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookCreateRequest;
-import com.nhnacademy.byeol23backend.bookset.bookcontributor.domain.BookContributor;
-import com.nhnacademy.byeol23backend.bookset.contributor.domain.Contributor;
-import com.nhnacademy.byeol23backend.bookset.contributor.domain.ContributorRole;
-import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorCreateRequest;
-import com.nhnacademy.byeol23backend.bookset.publisher.domain.Publisher;
-import com.nhnacademy.byeol23backend.config.QueryDslConfig;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @DataJpaTest(excludeAutoConfiguration = {EurekaClientAutoConfiguration.class})
@@ -102,7 +101,7 @@ class BookContributorRepositoryTest {
 		assertThat(result).hasSize(1);
 		assertThat(result.get(0).getContributorId()).isEqualTo(testContributor1.getContributorId());
 		assertThat(result.get(0).getContributorName()).isEqualTo("홍길동");
-		assertThat(result.get(0).getContributorRole()).isEqualTo(ContributorRole.AUTHOR.getLabel());
+		assertThat(result.get(0).getContributorRole().getLabel()).isEqualTo(ContributorRole.AUTHOR.getLabel());
 	}
 
 	@Test
