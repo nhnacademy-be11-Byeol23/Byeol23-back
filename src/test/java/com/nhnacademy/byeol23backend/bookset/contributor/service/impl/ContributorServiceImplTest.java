@@ -1,33 +1,31 @@
 package com.nhnacademy.byeol23backend.bookset.contributor.service.impl;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.*;
-
-import java.util.List;
-import java.util.Optional;
-
 import com.nhnacademy.byeol23backend.bookset.bookcontributor.repository.BookContributorRepository;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.Contributor;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.ContributorRole;
-import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.AllContributorResponse;
-import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorCreateRequest;
-import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorCreateResponse;
-import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorInfoResponse;
-import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorUpdateRequest;
-import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorUpdateResponse;
+import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.*;
 import com.nhnacademy.byeol23backend.bookset.contributor.exception.ContributorAlreadyExistsException;
 import com.nhnacademy.byeol23backend.bookset.contributor.exception.ContributorNotFound;
 import com.nhnacademy.byeol23backend.bookset.contributor.exception.RelatedBookExistsException;
 import com.nhnacademy.byeol23backend.bookset.contributor.repository.ContributorRepository;
-import com.nhnacademy.byeol23backend.bookset.contributor.service.ContributorService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ContributorServiceImplTest {
@@ -368,11 +366,11 @@ class ContributorServiceImplTest {
 
 		assertThat(r1.contributorId()).isEqualTo(1L);
 		assertThat(r1.contributorName()).isEqualTo("저자1");
-		assertThat(r1.contributorRole()).isEqualTo(ContributorRole.TRANSLATOR);
+		assertThat(r1.contributorRole()).isEqualTo(ContributorRole.AUTHOR.getLabel());
 
 		assertThat(r2.contributorId()).isEqualTo(2L);
 		assertThat(r2.contributorName()).isEqualTo("저자2");
-		assertThat(r2.contributorRole()).isEqualTo(ContributorRole.TRANSLATOR);
+		assertThat(r2.contributorRole()).isEqualTo(ContributorRole.TRANSLATOR.getLabel());
 
 		verify(contributorRepository, times(1)).findAll(pageable);
 	}
