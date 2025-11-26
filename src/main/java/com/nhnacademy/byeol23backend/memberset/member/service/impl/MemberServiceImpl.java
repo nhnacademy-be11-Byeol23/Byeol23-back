@@ -18,6 +18,8 @@ import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateRe
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateRequest;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateResponse;
 import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateEmailException;
+import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateIdException;
+import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateNicknameException;
 import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicatePhoneNumberException;
 import com.nhnacademy.byeol23backend.memberset.member.exception.IncorrectPasswordException;
 import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
@@ -140,6 +142,11 @@ public class MemberServiceImpl implements MemberService {
 		return memberRepository.getReferenceById(memberId);
 	}
 
+	@Override
+	public boolean checkIdDuplicated(String loginId) {
+		return memberRepository.existsByLoginId(loginId);
+	}
+
 	/**
 	 * 휴면 상태인 회원을 활성 상태로 변경한다.
 	 * @param memberId Long
@@ -177,11 +184,11 @@ public class MemberServiceImpl implements MemberService {
 
 	private void createValidation(String loginId, String nickname, String phoneNumber, String email) {
 		if (loginId != null && memberRepository.existsByLoginId(loginId)) {
-			throw new DuplicateEmailException("이미 사용 중인 아이디입니다.");
+			throw new DuplicateIdException("이미 사용 중인 아이디입니다.");
 		}
 
 		if (nickname != null && memberRepository.existsByNickname(nickname)) {
-			throw new DuplicateEmailException("이미 사용 중인 닉네임입니다.");
+			throw new DuplicateNicknameException("이미 사용 중인 닉네임입니다.");
 		}
 
 		if (email != null && memberRepository.existsByEmail(email)) {
@@ -197,7 +204,7 @@ public class MemberServiceImpl implements MemberService {
 
 		if (nickname != null &&
 			memberRepository.existsByPhoneNumberAndMemberIdNot(nickname, memberId)) {
-			throw new DuplicatePhoneNumberException("이미 사용 중인 닉네임입니다.");
+			throw new DuplicateNicknameException("이미 사용 중인 닉네임입니다.");
 		}
 
 		if (email != null &&
