@@ -11,9 +11,7 @@ import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateRequest;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateResponse;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberMyPageResponse;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicatePhoneNumberException;
-import com.nhnacademy.byeol23backend.memberset.member.exception.IncorrectPasswordException;
-import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
+import com.nhnacademy.byeol23backend.memberset.member.exception.*;
 import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
 import com.nhnacademy.byeol23backend.memberset.member.service.impl.MemberServiceImpl;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
@@ -130,7 +128,7 @@ public class MemberServiceTest {
 
 		// when & then
 		assertThatThrownBy(() -> memberService.createMember(request))
-			.isInstanceOf(DuplicateEmailException.class)
+			.isInstanceOf(DuplicateIdException.class)
 			.hasMessageContaining("이미 사용 중인 아이디입니다.");
 
 		verify(memberRepository).existsByLoginId("testuser");

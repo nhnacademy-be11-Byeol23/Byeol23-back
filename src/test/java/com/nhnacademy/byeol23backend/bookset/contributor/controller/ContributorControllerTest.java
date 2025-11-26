@@ -1,34 +1,29 @@
 package com.nhnacademy.byeol23backend.bookset.contributor.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
-import java.net.URI;
-import java.util.List;
-
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.Contributor;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.ContributorRole;
-import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.AllContributorResponse;
-import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorCreateRequest;
-import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorCreateResponse;
-import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorFindOrCreateRequest;
-import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorInfoResponse;
-import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorUpdateRequest;
-import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorUpdateResponse;
+import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.*;
 import com.nhnacademy.byeol23backend.bookset.contributor.service.ContributorService;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import java.net.URI;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class ContributorControllerTest {
@@ -135,7 +130,7 @@ class ContributorControllerTest {
 		assertThat(body.contributorId()).isEqualTo(contributorId);
 		assertThat(body.contributorName()).isEqualTo("저자명");
 		// AllContributorResponse.contributorRole() 가 String 이라고 가정
-		assertThat(body.contributorRole()).isEqualTo(ContributorRole.AUTHOR);
+		assertThat(body.contributorRole()).isEqualTo(ContributorRole.AUTHOR.getLabel());
 
 		verify(contributorService, times(1))
 			.findOrCreateContributor("저자명", ContributorRole.AUTHOR);
