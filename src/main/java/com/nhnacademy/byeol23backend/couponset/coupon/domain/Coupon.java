@@ -3,12 +3,14 @@ package com.nhnacademy.byeol23backend.couponset.coupon.domain;
 import com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.CouponPolicy;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "coupons")
+@Getter
 public class Coupon {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

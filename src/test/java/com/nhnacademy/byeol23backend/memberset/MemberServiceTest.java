@@ -11,7 +11,6 @@ import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateRequest;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateResponse;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberMyPageResponse;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateEmailException;
 import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicatePhoneNumberException;
 import com.nhnacademy.byeol23backend.memberset.member.exception.IncorrectPasswordException;
 import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
