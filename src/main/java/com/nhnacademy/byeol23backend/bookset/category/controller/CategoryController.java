@@ -3,10 +3,12 @@ package com.nhnacademy.byeol23backend.bookset.category.controller;
 import com.nhnacademy.byeol23backend.bookset.category.dto.*;
 import com.nhnacademy.byeol23backend.bookset.category.exception.CategoryDeleteReferencedByBookException;
 import com.nhnacademy.byeol23backend.bookset.category.exception.CategoryNotFoundException;
-import com.nhnacademy.byeol23backend.bookset.category.exception.ErrorResponse;
+import com.nhnacademy.byeol23backend.commons.exception.ErrorResponse;
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryCacheService;
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryCommandService;
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryQueryService;
+
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -73,23 +75,23 @@ public class CategoryController {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(400, getErrorMessage(e), LocalDateTime.now()));
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(400, getErrorMessage(e), request.getRequestURI(), LocalDateTime.now()));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(400, getErrorMessage(e), LocalDateTime.now()));
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException e, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(400, getErrorMessage(e), request.getRequestURI(), LocalDateTime.now()));
     }
 
     @ExceptionHandler(CategoryDeleteReferencedByBookException.class)
-    public ResponseEntity<ErrorResponse> handleCategoryDeleteReferencedByBookException(CategoryDeleteReferencedByBookException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(400, e.getMessage(), LocalDateTime.now()));
+    public ResponseEntity<ErrorResponse> handleCategoryDeleteReferencedByBookException(CategoryDeleteReferencedByBookException e, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(400, e.getMessage(), request.getRequestURI(), LocalDateTime.now()));
     }
 
     @ExceptionHandler(CategoryNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleCategoryNotFoundException(CategoryNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(404, e.getMessage(), LocalDateTime.now()));
+    public ResponseEntity<ErrorResponse> handleCategoryNotFoundException(CategoryNotFoundException e, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(404, e.getMessage(), request.getRequestURI(), LocalDateTime.now()));
     }
 
     private String getErrorMessage(MethodArgumentNotValidException e) {

@@ -27,6 +27,8 @@ public interface MemberService {
 
 	void updateMemberPoint(Long memberId, BigDecimal point);
 
+	boolean checkIdDuplicated(String loginId);
+
 	//member proxy
 	Member getMemberProxy(Long memberId);
 
