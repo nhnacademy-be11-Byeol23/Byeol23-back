@@ -275,7 +275,7 @@ class OrderServiceImplTest {
 		given(orderRepository.findOrderByOrderNumber(orderNumber)).willReturn(Optional.of(mockOrder));
 		given(paymentRepository.findPaymentByOrder(mockOrder)).willReturn(Optional.of(mockPayment));
 		given(mockPayment.getPaymentKey()).willReturn("paymentKey123");
-		
+
 		given(paymentService.cancelPayment(any(PaymentCancelRequest.class))).willReturn(null);
 
 		// updateOrderStatusToCanceled 내부에서 findById 호출
@@ -311,7 +311,17 @@ class OrderServiceImplTest {
 	void getOrderByOrderNumber_Success() {
 		// given
 		String orderNumber = "test-order-123";
-		given(orderRepository.findOrderByOrderNumber(orderNumber)).willReturn(Optional.of(mockOrder));
+		DeliveryPolicy mockDeliveryPolicy = Mockito.mock(DeliveryPolicy.class);
+		final Long POLICY_ID = 5L;
+		final BigDecimal DELIVERY_FEE = new BigDecimal("3000");
+
+		given(mockDeliveryPolicy.getDeliveryPolicyId()).willReturn(POLICY_ID);
+		given(mockDeliveryPolicy.getDeliveryFee()).willReturn(DELIVERY_FEE);
+
+		Order mockOrder = Mockito.mock(Order.class);
+		given(mockOrder.getOrderNumber()).willReturn(orderNumber);
+
+		given(mockOrder.getDeliveryPolicy()).willReturn(mockDeliveryPolicy);
 
 		// Mock OrderDetail 및 Book
 		OrderDetail mockDetail1 = Mockito.mock(OrderDetail.class);
@@ -322,9 +332,14 @@ class OrderServiceImplTest {
 		given(mockDetail1.getOrderPrice()).willReturn(new BigDecimal("9000"));
 
 		List<OrderDetail> details = List.of(mockDetail1);
+		given(deliveryPolicyRepository.findById(POLICY_ID)).willReturn(Optional.of(mockDeliveryPolicy));
+		// 5. orderRepository 설정
+		given(orderRepository.findOrderByOrderNumber(orderNumber)).willReturn(Optional.of(mockOrder));
+
+		// 6. orderDetailRepository 설정
 		given(orderDetailRepository.findAllByOrderWithBook(mockOrder)).willReturn(details);
 
-		// when
+		// when (실행)
 		OrderDetailResponse response = orderServiceImpl.getOrderByOrderNumber(orderNumber);
 
 		// then

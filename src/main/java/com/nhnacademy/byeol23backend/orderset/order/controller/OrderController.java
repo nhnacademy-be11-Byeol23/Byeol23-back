@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nhnacademy.byeol23backend.memberset.member.dto.NonmemberOrderRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderBulkUpdateRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelResponse;
@@ -94,6 +95,12 @@ public class OrderController {
 		Pageable pageable) {
 		Page<OrderDetailResponse> responses = orderService.getOrders(token, pageable);
 		return ResponseEntity.ok(responses);
+	}
+
+	@PostMapping("/nonmembers/lookup")
+	public ResponseEntity<OrderDetailResponse> getNonMemberOrder(@Valid @RequestBody NonmemberOrderRequest request) {
+		OrderDetailResponse response = orderService.getNonMemberOrder(request);
+		return ResponseEntity.ok(response);
 	}
 
 }
