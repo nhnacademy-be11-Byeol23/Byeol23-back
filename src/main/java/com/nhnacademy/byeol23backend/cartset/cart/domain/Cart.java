@@ -28,4 +28,12 @@ public class Cart {
 
 	@OneToMany(mappedBy = "cart")
 	private List<CartBook> cartBooks = new ArrayList<>();
+
+    private Cart(Member member) {
+        this.member = member;
+    }
+
+    public static Cart create(Member member) {
+        return new Cart(member);
+    }
 }

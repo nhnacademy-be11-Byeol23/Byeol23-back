@@ -2,6 +2,8 @@ package com.nhnacademy.byeol23backend.config;
 
 import com.nhnacademy.byeol23backend.bookset.book.interceptor.ViewerIdInterceptor;
 import com.nhnacademy.byeol23backend.bookset.book.resolver.ViewerIdResolver;
+import com.nhnacademy.byeol23backend.cartset.cart.interceptor.CustomerIdentificationInterceptor;
+import com.nhnacademy.byeol23backend.cartset.cart.resolver.CustomerIdentifierResolver;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -19,12 +21,15 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new ViewerIdInterceptor(jwtParser))
-                .addPathPatterns("/api/books/*")
-                .order(0);
+                .addPathPatterns("/api/books/*");
+
+        registry.addInterceptor(new CustomerIdentificationInterceptor(jwtParser))
+                .addPathPatterns("/api/carts/**");
     }
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(new ViewerIdResolver());
+        resolvers.add(new CustomerIdentifierResolver());
     }
 }
