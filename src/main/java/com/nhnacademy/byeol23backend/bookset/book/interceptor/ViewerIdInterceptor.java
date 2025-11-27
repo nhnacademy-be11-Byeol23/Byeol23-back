@@ -2,6 +2,7 @@ package com.nhnacademy.byeol23backend.bookset.book.interceptor;
 
 import com.nhnacademy.byeol23backend.utils.JwtParser;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,10 +34,12 @@ public class ViewerIdInterceptor implements HandlerInterceptor {
         }
 
         if(StringUtils.isNotBlank(accessToken)) {
-            Claims claims = jwtParser.parseToken(accessToken);
-            Long memberId = claims.get("memberId", Long.class);
-            request.setAttribute("viewerId", "member:%d".formatted(memberId));
-            return true;
+            try {
+                Claims claims = jwtParser.parseToken(accessToken);
+                Long memberId = claims.get("memberId", Long.class);
+                request.setAttribute("viewerId", "member:%d".formatted(memberId));
+                return true;
+            } catch (ExpiredJwtException ignored) {}
         }
 
         // 비회원인 경우
