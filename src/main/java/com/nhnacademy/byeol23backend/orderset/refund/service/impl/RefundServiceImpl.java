@@ -46,7 +46,7 @@ public class RefundServiceImpl implements RefundService {
 		BigDecimal actualOrderPrice = order.getActualOrderPrice();
 
 		Refund refund = null;
-		RefundPolicy refundPolicy = refundPolicyRepository.getRefundPolicyByRefundOption(request.refundOption())
+		RefundPolicy refundPolicy = refundPolicyRepository.findByRefundOption(request.refundOption())
 			.orElseThrow(
 				() -> new RefundPolicyNotFoundException("해당 이름의 환불 종류를 찾을 수 없습니다.: " + request.refundOption()));
 		LocalDateTime now = LocalDateTime.now();
@@ -56,20 +56,20 @@ public class RefundServiceImpl implements RefundService {
 		// [추가] 쿠폰 사용 내역 있으면 쿠폰 다시 사용 가능 상태로 변경
 
 		BigDecimal refundAmount = null;
-		if (request.refundOption().equals(RefundOption.BREAK)) { // 파손 파지
-			refundAmount = getRefundFee(actualOrderPrice, new BigDecimal(0L)); // 배송비 0원
+		if (request.refundOption().equals(RefundOption.BREAK)) { // 파손 파본
+			refundAmount = order.getActualOrderPrice(); // 배송비 0원
 			refund = Refund.of(order, refundPolicy, now, request.refundReason(), refundAmount, new BigDecimal(0L));
 		} else if (request.refundOption().equals(RefundOption.MIND_CHANGED)) { // 단순 변심
 			DeliveryPolicy currentDeliveryPolicy = deliveryPolicyRepository.findFirstByOrderByChangedAtDesc()
 				.orElseThrow(() -> new DeliveryPolicyNotFoundException("현재 배송비 정책을 찾을 수 없습니다."));
-			refundAmount = getRefundFee(actualOrderPrice,
-				currentDeliveryPolicy.getDeliveryFee()); // 배송비는 현재 배송비 정책에 따름
+			refundAmount = order.getActualOrderPrice()
+				.subtract(currentDeliveryPolicy.getDeliveryFee()); // 배송비는 현재 배송비 정책에 따름
 			refund = Refund.of(order, refundPolicy, now, request.refundReason(), refundAmount,
 				currentDeliveryPolicy.getDeliveryFee());
 		} else {
 			throw new RefundPolicyNotFoundException("해당 환불 정책을 찾을 수 없습니다.: " + request.refundOption());
 		}
-		
+
 		// 나머지 금액은 포인트로 환불, 현재 포인트에 실제로 결제한 금액을 더해줌
 		orderedMember.updatePoint(orderedMember.getCurrentPoint().add(refundAmount));
 
@@ -78,10 +78,6 @@ public class RefundServiceImpl implements RefundService {
 
 		return new RefundResponse(order.getOrderNumber(), refund.getRefundReason(), refundPolicy.getRefundOption(),
 			refund.getRefundPrice(), refund.getRefundedAt());
-	}
-
-	private BigDecimal getRefundFee(BigDecimal actualOrderPrice, BigDecimal deliveryFee) {
-		return actualOrderPrice.subtract(deliveryFee);
 	}
 
 }
