@@ -89,19 +89,4 @@ public class AddressController {
 		return ResponseEntity.ok().build();
 	}
 
-	//
-	// // set default address
-	// @Operation(summary = "기본 주소 설정", description = "해당 주소를 기본 주소로 설정합니다.")
-	// @ApiResponses({
-	// 	@ApiResponse(responseCode = "200", description = "기본 주소 설정 성공"),
-	// 	@ApiResponse(responseCode = "400", description = "설정 실패 또는 잘못된 요청")
-	// })
-	// @PatchMapping("/{addressId}/default")
-	// @RequestMember
-	// public ResponseEntity<Void> setDefaultAddress(@PathVariable Long addressId) {
-	// 	Member member = resolveMemberFromHeader();
-	// 	addressService.setDefaultAddress(member, addressId);
-	// 	return ResponseEntity.ok().build();
-	// }
-
 }
