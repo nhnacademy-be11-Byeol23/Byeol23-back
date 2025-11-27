@@ -3,7 +3,6 @@ package com.nhnacademy.byeol23backend.orderset.refund.service.impl;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -59,6 +58,7 @@ class RefundServiceImplTest {
 	private RefundRequest mindChangedRequest;
 	private RefundRequest breakRequest;
 	private String orderNumber = "order-123";
+	private BigDecimal appliedFee = new BigDecimal("5000");
 
 	@BeforeEach
 	void setUp() {
@@ -69,8 +69,9 @@ class RefundServiceImplTest {
 		mockDeliveryPolicy = Mockito.mock(DeliveryPolicy.class);
 
 		// 테스트용 DTO 생성
-		mindChangedRequest = new RefundRequest(orderNumber, "MIND_CHANGED", RefundOption.MIND_CHANGED);
-		breakRequest = new RefundRequest(orderNumber, "BREAK", RefundOption.BREAK);
+		mindChangedRequest = new RefundRequest(orderNumber, "MIND_CHANGED", RefundOption.MIND_CHANGED, appliedFee);
+		breakRequest = new RefundRequest(orderNumber, "BREAK", RefundOption.BREAK, BigDecimal.ZERO);
+
 	}
 
 	@Test
@@ -87,7 +88,7 @@ class RefundServiceImplTest {
 		given(mockOrder.getActualOrderPrice()).willReturn(actualPrice);
 		given(mockMember.getCurrentPoint()).willReturn(currentPoint);
 
-		given(refundPolicyRepository.getRefundPolicyByRefundOption(RefundOption.MIND_CHANGED))
+		given(refundPolicyRepository.findByRefundOption(RefundOption.MIND_CHANGED))
 			.willReturn(Optional.of(mockRefundPolicy));
 		given(deliveryPolicyRepository.findFirstByOrderByChangedAtDesc())
 			.willReturn(Optional.of(mockDeliveryPolicy));
@@ -130,7 +131,7 @@ class RefundServiceImplTest {
 		given(mockOrder.getActualOrderPrice()).willReturn(actualPrice);
 		given(mockMember.getCurrentPoint()).willReturn(currentPoint);
 
-		given(refundPolicyRepository.getRefundPolicyByRefundOption(RefundOption.BREAK))
+		given(refundPolicyRepository.findByRefundOption(RefundOption.BREAK))
 			.willReturn(Optional.of(mockRefundPolicy));
 
 		ArgumentCaptor<Refund> refundCaptor = ArgumentCaptor.forClass(Refund.class);
@@ -164,7 +165,7 @@ class RefundServiceImplTest {
 		given(mockOrder.getMember()).willReturn(null);
 		given(mockOrder.getActualOrderPrice()).willReturn(new BigDecimal("50000"));
 
-		given(refundPolicyRepository.getRefundPolicyByRefundOption(RefundOption.MIND_CHANGED))
+		given(refundPolicyRepository.findByRefundOption(RefundOption.MIND_CHANGED))
 			.willReturn(Optional.of(mockRefundPolicy));
 		given(deliveryPolicyRepository.findFirstByOrderByChangedAtDesc())
 			.willReturn(Optional.of(mockDeliveryPolicy));
@@ -199,7 +200,7 @@ class RefundServiceImplTest {
 		given(orderRepository.findOrderByOrderNumber(orderNumber)).willReturn(Optional.of(mockOrder));
 		given(mockOrder.getMember()).willReturn(mockMember); // NPE를 피하기 위해 Member 설정
 
-		given(refundPolicyRepository.getRefundPolicyByRefundOption(RefundOption.MIND_CHANGED))
+		given(refundPolicyRepository.findByRefundOption(RefundOption.MIND_CHANGED))
 			.willReturn(Optional.empty());
 
 		// when & then
@@ -215,7 +216,7 @@ class RefundServiceImplTest {
 		given(orderRepository.findOrderByOrderNumber(orderNumber)).willReturn(Optional.of(mockOrder));
 		given(mockOrder.getMember()).willReturn(mockMember);
 
-		given(refundPolicyRepository.getRefundPolicyByRefundOption(RefundOption.MIND_CHANGED))
+		given(refundPolicyRepository.findByRefundOption(RefundOption.MIND_CHANGED))
 			.willReturn(Optional.of(mockRefundPolicy));
 
 		// [핵심] 배송 정책을 찾지 못함
