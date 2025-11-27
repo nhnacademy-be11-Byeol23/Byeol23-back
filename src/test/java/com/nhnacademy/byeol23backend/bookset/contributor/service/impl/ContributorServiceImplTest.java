@@ -5,27 +5,17 @@ import com.nhnacademy.byeol23backend.bookset.contributor.domain.Contributor;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.ContributorRole;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.*;
 import com.nhnacademy.byeol23backend.bookset.contributor.exception.ContributorAlreadyExistsException;
-import com.nhnacademy.byeol23backend.bookset.contributor.exception.ContributorNotFound;
+import com.nhnacademy.byeol23backend.bookset.contributor.exception.ContributorNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.contributor.exception.RelatedBookExistsException;
 import com.nhnacademy.byeol23backend.bookset.contributor.repository.ContributorRepository;
+import com.nhnacademy.byeol23backend.bookset.contributor.service.ContributorService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.*;
+import org.springframework.data.domain.*;
 
 @ExtendWith(MockitoExtension.class)
 class ContributorServiceImplTest {
@@ -71,7 +61,7 @@ class ContributorServiceImplTest {
 
 		// when & then
 		assertThatThrownBy(() -> contributorService.getContributorByContributorId(contributorId))
-			.isInstanceOf(ContributorNotFound.class)
+			.isInstanceOf(ContributorNotFoundException.class)
 			.hasMessageContaining("해당 기여자 없음");
 
 		verify(contributorRepository, times(1)).findById(contributorId);
@@ -326,7 +316,7 @@ class ContributorServiceImplTest {
 
 		// when & then
 		assertThatThrownBy(() -> contributorService.updateContributor(contributorId, request))
-			.isInstanceOf(ContributorNotFound.class)
+			.isInstanceOf(ContributorNotFoundException.class)
 			.hasMessageContaining("해당 기여자 없음");
 
 		verify(contributorRepository, times(1))
