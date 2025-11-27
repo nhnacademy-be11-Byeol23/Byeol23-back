@@ -149,10 +149,12 @@ public class OrderServiceImpl implements OrderService {
 		Payment payment = paymentRepository.findPaymentByOrder(order)
 			.orElseThrow(() -> new PaymentNotFoundException(PAYMENT_NOT_FOUND_MESSAGE + order.getOrderNumber()));
 
-		PaymentCancelRequest paymentCancelRequest = new PaymentCancelRequest(request.cancelReason(),
-			payment.getPaymentKey());
+		if (request.cancelReason().equals("고객 요청에 의한 취소")) {
+			PaymentCancelRequest paymentCancelRequest = new PaymentCancelRequest(request.cancelReason(),
+				payment.getPaymentKey());
 
-		paymentService.cancelPayment(paymentCancelRequest);
+			paymentService.cancelPayment(paymentCancelRequest);
+		}
 
 		updateOrderStatusToCanceled(order.getOrderId());
 
