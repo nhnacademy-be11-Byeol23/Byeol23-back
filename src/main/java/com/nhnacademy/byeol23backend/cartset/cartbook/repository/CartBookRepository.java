@@ -12,4 +12,6 @@ public interface CartBookRepository extends JpaRepository<CartBook, Long> {
 
     @Query("select cb from CartBook cb join fetch cb.book b where cb.cart.cartId = :cartId")
     List<CartBook> findByCartId(@Param("cartId") Long cartId);
+
+    void deleteByBook_BookId(Long bookId);
 }

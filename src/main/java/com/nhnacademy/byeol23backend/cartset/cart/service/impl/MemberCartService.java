@@ -5,6 +5,7 @@ import com.nhnacademy.byeol23backend.bookset.book.exception.BookNotFoundExceptio
 import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
 import com.nhnacademy.byeol23backend.cartset.cart.domain.Cart;
 import com.nhnacademy.byeol23backend.cartset.cart.dto.CustomerIdentifier;
+import com.nhnacademy.byeol23backend.cartset.cart.exception.CartNotFoundException;
 import com.nhnacademy.byeol23backend.cartset.cart.repository.CartRepository;
 import com.nhnacademy.byeol23backend.cartset.cart.service.CartService;
 import com.nhnacademy.byeol23backend.cartset.cartbook.domain.CartBook;
@@ -60,5 +61,11 @@ public class MemberCartService implements CartService {
         CartBook findCartBook = cartBookRepository.findByCart_CartIdAndBook_BookId(cart.getCartId(), bookId);
         findCartBook.updateQuantity(request.quantity());
         log.info("장바구니 {}번 도서 {}개로 변경", bookId, request.quantity());
+    }
+
+    @Override
+    @Transactional
+    public void deleteBook(CustomerIdentifier identifier, Long bookId) {
+        cartBookRepository.deleteByBook_BookId(bookId);
     }
 }

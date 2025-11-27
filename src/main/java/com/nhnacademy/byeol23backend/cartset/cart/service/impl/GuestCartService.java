@@ -74,6 +74,26 @@ public class GuestCartService implements CartService {
         log.info("장바구니 {}번 도서 {}개로 변경", bookId, request.quantity());
     }
 
+    @Override
+    public void deleteBook(CustomerIdentifier identifier, Long bookId) {
+        String cartHashKey = getCartHashKey(identifier.guestId());
+        String cartSortedSetKey = getCartSortedSetKey(identifier.guestId());
+        stringRedisTemplate.execute(new SessionCallback<List<Object>>() {
+            @Override
+            public List<Object> execute(RedisOperations operations) throws DataAccessException {
+                RedisOperations<String, String> ops = operations;
+                ops.multi();
+
+                ops.opsForHash().delete(cartHashKey, String.valueOf(bookId));
+                ops.opsForZSet().remove(cartSortedSetKey, String.valueOf(bookId));
+
+                List<Object> result = ops.exec();
+                log.info("장바구니에 {}번 도서 삭제", bookId);
+                return result;
+            }
+        });
+    }
+
     private String getCartHashKey(String guestId) {
         return "cart:%s:qty".formatted(guestId);
     }
