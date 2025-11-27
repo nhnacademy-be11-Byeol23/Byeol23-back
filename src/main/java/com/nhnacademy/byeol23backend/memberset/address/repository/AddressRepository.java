@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.memberset.address.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -20,5 +21,8 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
 	@Modifying
 	@Query("UPDATE Address SET isDefault = false WHERE member = :member AND isDefault = true")
 	int updateDefaultAddressFalseByMember(@Param("member") Member member);
+
+	@Query("SELECT a from Address a WHERE a.member = :member AND a.isDefault = true")
+	Optional<Address> findAddressByMemberAndIsDefault(Member member);
 
 }
