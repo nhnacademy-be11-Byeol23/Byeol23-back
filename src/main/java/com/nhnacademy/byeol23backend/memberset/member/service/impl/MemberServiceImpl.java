@@ -1,12 +1,41 @@
 package com.nhnacademy.byeol23backend.memberset.member.service.impl;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Objects;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.nhnacademy.byeol23backend.cartset.cart.domain.Cart;
 import com.nhnacademy.byeol23backend.cartset.cart.repository.CartRepository;
 import com.nhnacademy.byeol23backend.couponset.coupon.dto.BirthdayCouponIssueRequestDto;
+import com.nhnacademy.byeol23backend.memberset.address.domain.Address;
+import com.nhnacademy.byeol23backend.memberset.address.dto.AddressResponse;
+import com.nhnacademy.byeol23backend.memberset.address.repository.AddressRepository;
 import com.nhnacademy.byeol23backend.memberset.grade.repository.GradeRepository;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Status;
-import com.nhnacademy.byeol23backend.memberset.member.dto.*;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateRequest;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberMyPageResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateRequest;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateRequest;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateRequest;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberMyPageResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateRequest;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.ValueDuplicationCheckRequest;
+import com.nhnacademy.byeol23backend.memberset.member.dto.ValueDuplicationCheckResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateRequest;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateResponse;
 import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateEmailException;
 import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateIdException;
 import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateNicknameException;
@@ -17,11 +46,6 @@ import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepositor
 import com.nhnacademy.byeol23backend.memberset.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -37,6 +61,7 @@ public class MemberServiceImpl implements MemberService {
 	private final GradeRepository gradeRepository;
 	private final CartRepository cartRepository;
 	private final ApplicationEventPublisher eventPublisher;
+	private final AddressRepository addressRepository;
 
 	@Value("${coupon.welcome.policy-id}")
 	private Long welcomeCouponPolicyId;
@@ -99,6 +124,23 @@ public class MemberServiceImpl implements MemberService {
 
 		Member member = findMemberById(memberId);
 
+		Address defaultAddress = addressRepository.findAddressByMemberAndIsDefault(member)
+			.orElse(null);
+
+		AddressResponse addressResponse = null;
+
+		if (!Objects.isNull(defaultAddress)) {
+			addressResponse = new AddressResponse(
+				defaultAddress.getAddressId(),
+				defaultAddress.getPostCode(),
+				defaultAddress.getAddressInfo(),
+				defaultAddress.getAddressDetail(),
+				defaultAddress.getAddressExtra(),
+				defaultAddress.getAddressAlias(),
+				defaultAddress.getIsDefault()
+			);
+		}
+
 		log.info("회원을 조회하였습니다. {}", member);
 
 		return new MemberMyPageResponse(
@@ -111,6 +153,7 @@ public class MemberServiceImpl implements MemberService {
 			member.getCurrentPoint(),
 			member.getMemberRole(),
 			member.getGrade().getGradeName(),
+			addressResponse,
 			gradeRepository.getAll()
 		);
 	}
@@ -167,6 +210,23 @@ public class MemberServiceImpl implements MemberService {
 		return memberRepository.existsByLoginId(loginId);
 	}
 
+	@Override
+	public ValueDuplicationCheckResponse checkDuplication(ValueDuplicationCheckRequest request) {
+		String loginId = request.loginId();
+		String nickname = request.nickname();
+		String email = request.email();
+		String phoneNumber = request.phoneNumber();
+		boolean isDuplicatedId =  memberRepository.existsByLoginId(loginId);
+
+		boolean isDuplicatedNickname = memberRepository.existsByNickname(nickname);
+
+		boolean isDuplicatedEmail = memberRepository.existsByEmail(email);
+
+		 boolean isDuplicatedPhoneNumber = memberRepository.existsByPhoneNumber(phoneNumber);
+
+		 return new ValueDuplicationCheckResponse(isDuplicatedId, isDuplicatedNickname, isDuplicatedEmail, isDuplicatedPhoneNumber);
+	}
+
 	/**
 	 * 휴면 상태인 회원을 활성 상태로 변경한다.
 	 * @param memberId Long
@@ -197,15 +257,15 @@ public class MemberServiceImpl implements MemberService {
 		log.info("{} 멤버가 탈퇴 처리 되었습니다.", memberId);
 	}
 
-    @Override
-    @Transactional
-    public void deactivateMembersNotLoggedInFor3Months() {
-        LocalDateTime threshold = LocalDateTime.now().minusMonths(3);
-        memberRepository.deactivateMembersNotLoggedInFor3Months(threshold);
-        log.info("마지막 로그인 날짜가 3개월 이전인 회원 휴면 상태로 전환");
-    }
+	@Override
+	@Transactional
+	public void deactivateMembersNotLoggedInFor3Months() {
+		LocalDateTime threshold = LocalDateTime.now().minusMonths(3);
+		memberRepository.deactivateMembersNotLoggedInFor3Months(threshold);
+		log.info("마지막 로그인 날짜가 3개월 이전인 회원 휴면 상태로 전환");
+	}
 
-    private Member findMemberById(Long memberId) {
+	private Member findMemberById(Long memberId) {
 		return memberRepository.findById(memberId)
 			.orElseThrow(() -> new MemberNotFoundException(memberId + "에 해당하는 멤버를 찾을 수 없습니다."));
 	}
