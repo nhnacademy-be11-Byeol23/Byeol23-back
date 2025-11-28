@@ -1,7 +1,10 @@
 
 package com.nhnacademy.byeol23backend.pointset.pointpolicy.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,8 +12,6 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
-import org.hibernate.annotations.Immutable;
 
 @Entity
 @Getter
@@ -32,6 +33,9 @@ public class PointPolicy implements Serializable {
 	@Setter
 	@Column(name = "is_active", nullable = false, columnDefinition = "tinyint(1)")
 	private Boolean isActive;
+
+	@Column(name = "point_policy_type", nullable = false, length = 20)
+	private String pointPolicyType;
 
 	public  PointPolicy(String pointPolicyName, BigDecimal saveAmount, Boolean isActive) {
 		this.pointPolicyName = pointPolicyName;
