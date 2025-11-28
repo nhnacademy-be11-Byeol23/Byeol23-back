@@ -36,4 +36,9 @@ public class CartFacadeService {
         if(identifier.memberId() != null) memberCartService.deleteBook(identifier, bookId);
         else guestCartService.deleteBook(identifier, bookId);
     }
+
+    public void clearCart(CustomerIdentifier identifier, List<Long> bookIds) {
+        if(identifier.memberId() != null) memberCartService.clearCart(identifier, bookIds);
+        else guestCartService.clearCart(identifier, bookIds);
+    }
 }
