@@ -15,11 +15,10 @@ import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorI
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.ContributorUpdateResponse;
 import com.nhnacademy.byeol23backend.bookset.contributor.exception.ContributorAlreadyExistsException;
-import com.nhnacademy.byeol23backend.bookset.contributor.exception.ContributorNotFound;
+import com.nhnacademy.byeol23backend.bookset.contributor.exception.ContributorNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.contributor.exception.RelatedBookExistsException;
 import com.nhnacademy.byeol23backend.bookset.contributor.repository.ContributorRepository;
 import com.nhnacademy.byeol23backend.bookset.contributor.service.ContributorService;
-import com.nhnacademy.byeol23backend.bookset.tag.exception.TagAlreadyExistsException;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,7 @@ public class ContributorServiceImpl implements ContributorService {
 	@Override
 	public ContributorInfoResponse getContributorByContributorId(Long contributorId) {
 		Contributor contributor = contributorRepository.findById(contributorId)
-			.orElseThrow(() -> new ContributorNotFound("해당 기여자 없음: " + contributorId));
+			.orElseThrow(() -> new ContributorNotFoundException("해당 기여자 없음: " + contributorId));
 		return new ContributorInfoResponse(contributor);
 	}
 
@@ -82,7 +81,7 @@ public class ContributorServiceImpl implements ContributorService {
 		}
 
 		Contributor contributor = contributorRepository.findById(contributorId)
-			.orElseThrow(() -> new ContributorNotFound("해당 기여자 없음: " + contributorId));
+			.orElseThrow(() -> new ContributorNotFoundException("해당 기여자 없음: " + contributorId));
 		contributor.setContributorName(request.contributorName());
 		contributor.setContributorRole(request.contributorRole());
 		return new ContributorUpdateResponse(contributor);

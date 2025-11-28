@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.bookset.publisher.service.impl;
 
 import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
+import com.nhnacademy.byeol23backend.bookset.publisher.exception.PublisherAlreadyExistsException;
 import com.nhnacademy.byeol23backend.bookset.publisher.exception.RelatedBookExistsException;
 import com.nhnacademy.byeol23backend.bookset.publisher.service.PublisherService;
 import com.nhnacademy.byeol23backend.bookset.publisher.domain.Publisher;
@@ -14,6 +15,7 @@ import com.nhnacademy.byeol23backend.bookset.publisher.exception.PublisherNotFou
 import com.nhnacademy.byeol23backend.bookset.publisher.repository.PublisherRepository;
 import com.nhnacademy.byeol23backend.bookset.publisher.service.PublisherService;
 import com.nhnacademy.byeol23backend.bookset.publisher.domain.dto.AllPublishersInfoResponse;
+import com.nhnacademy.byeol23backend.bookset.tag.exception.TagAlreadyExistsException;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +34,9 @@ public class PublisherServiceImpl implements PublisherService {
 
 	@Override
 	public PublisherCreateResponse createPublisher(PublisherCreateRequest request) {
+		if (publisherRepository.findByPublisherName(request.publisherName()).isPresent()){
+			throw new PublisherAlreadyExistsException("Publisher가 이미 존재합니다.");
+		}
 		Publisher publisher = new Publisher(request.publisherName());
 		publisherRepository.save(publisher);
 		return new PublisherCreateResponse(publisher);

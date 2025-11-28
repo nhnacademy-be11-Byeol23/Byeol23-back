@@ -1,10 +1,13 @@
 package com.nhnacademy.byeol23backend.memberset.grade.service.impl;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.nhnacademy.byeol23backend.memberset.grade.dto.AllGradeResponse;
 import com.nhnacademy.byeol23backend.memberset.grade.dto.GradeDto;
+import com.nhnacademy.byeol23backend.memberset.grade.repository.GradeRepository;
 import com.nhnacademy.byeol23backend.memberset.grade.service.GradeService;
 
 import lombok.RequiredArgsConstructor;
@@ -14,6 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class GradeServiceImpl implements GradeService {
+
+	private final GradeRepository gradeRepository;
+
 	@Override
 	public void createGrade(String gradeName, BigDecimal criterionPrice, BigDecimal pointRate) {
 		
@@ -33,6 +39,13 @@ public class GradeServiceImpl implements GradeService {
 	public void deleteGrade(String gradeName) {
 
 	}
+
+	@Override
+	public List<AllGradeResponse> getAllGrades(){
+		return gradeRepository.getAll();
+	}
+
+
 	// private final GradeRepository gradeRepository;
 	// private final MemberRepository memberRepository;
 	//

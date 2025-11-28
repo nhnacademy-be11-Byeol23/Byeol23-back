@@ -1,15 +1,28 @@
 package com.nhnacademy.byeol23backend.memberset.grade.repository;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import com.nhnacademy.byeol23backend.memberset.grade.domain.Grade;
+import com.nhnacademy.byeol23backend.memberset.grade.dto.AllGradeResponse;
 
 public interface GradeRepository extends JpaRepository<Grade, Long> {
 	Grade findByGradeName(String gradeName);
 
 	void deleteByGradeName(String gradeName);
+
+	@Query("""
+           select new com.nhnacademy.byeol23backend.memberset.grade.dto.AllGradeResponse(
+               g.gradeName,
+               g.criterionPrice,
+               g.pointRate
+           )
+           from Grade g
+           """)
+	List<AllGradeResponse> getAll();
 
 	/**
 	 * 		SELECT * <br>
