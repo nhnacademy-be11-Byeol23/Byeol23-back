@@ -38,7 +38,6 @@ public class PointPolicyService {
 		return new PointPolicyDTO(
 			pointPolicy.getPointPolicyName(),
 			pointPolicy.getSaveAmount(),
-			pointPolicy.getIsActive(),
 			pointPolicy.getCreatedAt()
 		);
 	}
