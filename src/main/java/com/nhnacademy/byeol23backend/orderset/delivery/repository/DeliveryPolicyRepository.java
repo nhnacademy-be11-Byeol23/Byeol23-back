@@ -1,11 +1,10 @@
 package com.nhnacademy.byeol23backend.orderset.delivery.repository;
 
-import java.util.Optional;
-
+import com.nhnacademy.byeol23backend.orderset.delivery.domain.DeliveryPolicy;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.nhnacademy.byeol23backend.orderset.delivery.domain.DeliveryPolicy;
+import java.util.Optional;
 
 public interface DeliveryPolicyRepository extends JpaRepository<DeliveryPolicy, Long> {
-	Optional<DeliveryPolicy> findFirstByOrderByChangedAtDesc();
+    Optional<DeliveryPolicy> findFirstByOrderByChangedAtDesc();
 }

@@ -12,4 +12,5 @@ public interface CartService {
     List<CartBookResponse> getCartBooks(CustomerIdentifier identifier);
     void updateQuantity(CustomerIdentifier identifier, Long bookId, CartBookUpdateRequest request);
     void deleteBook(CustomerIdentifier identifier, Long bookId);
+    void clearCart(CustomerIdentifier identifier, List<Long> bookIds);
 }
