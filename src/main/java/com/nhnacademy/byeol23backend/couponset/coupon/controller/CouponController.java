@@ -38,9 +38,21 @@ public class CouponController {
         return ResponseEntity.ok(usedCoupons);
     }
 
+    /**
+     * 도서 리스트를 받아와서 해당 도서 ID, 카테고리 ID를 조회
+     * 카테고리 비교 : 도서 카테고리가 쿠폰 카테고리에 속하면 적용 가능
+     * ex)
+     * 쿠폰 : IT>프로그래밍
+     * 도서1 : IT>프로그래밍>자바 =>적용가능
+     * 도서2 : IT => 적용 불가능
+     * @param token
+     * @return
+     */
     @GetMapping("/usable")
-    public ResponseEntity<Void> getUsableCoupons(@CookieValue("Access-Token") String token){
-
+    public ResponseEntity<Void> getUsableCoupons(
+            @CookieValue("Access-Token") String token,
+            Long bookId,
+            ){
         return null;
     }
 
