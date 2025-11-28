@@ -26,7 +26,7 @@ public class CouponController {
         return ResponseEntity.ok("쿠폰 발급 요청 성공");
     }
 
-    @GetMapping("/issued")
+    @GetMapping("/iss ued")
     public ResponseEntity<List<IssuedCouponInfoResponseDto>> getIssuedCoupons(@CookieValue("Access-Token") String token){
         List<IssuedCouponInfoResponseDto> issuedCoupons = couponService.getIssuedCoupons(token);
         return ResponseEntity.ok(issuedCoupons);
@@ -36,6 +36,12 @@ public class CouponController {
     public ResponseEntity<List<UsedCouponInfoResponseDto>> getUsedCoupons(@CookieValue("Access-Token") String token){
         List<UsedCouponInfoResponseDto> usedCoupons = couponService.getUsedCoupons(token);
         return ResponseEntity.ok(usedCoupons);
+    }
+
+    @GetMapping("/usable")
+    public ResponseEntity<Void> getUsableCoupons(@CookieValue("Access-Token") String token){
+
+        return null;
     }
 
 }
