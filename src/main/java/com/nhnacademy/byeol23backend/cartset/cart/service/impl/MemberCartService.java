@@ -66,6 +66,18 @@ public class MemberCartService implements CartService {
     @Override
     @Transactional
     public void deleteBook(CustomerIdentifier identifier, Long bookId) {
+        if(!cartRepository.existsByMember_MemberId(identifier.memberId())) {
+            throw new CartNotFoundException("장바구니를 찾을 수 없습니다.");
+        }
         cartBookRepository.deleteByBook_BookId(bookId);
+    }
+
+    @Override
+    @Transactional
+    public void clearCart(CustomerIdentifier identifier, List<Long> bookIds) {
+        if(!cartRepository.existsByMember_MemberId(identifier.memberId())) {
+            throw new CartNotFoundException("장바구니를 찾을 수 없습니다.");
+        }
+        cartBookRepository.deleteByBook_BookIdIn(bookIds);
     }
 }
