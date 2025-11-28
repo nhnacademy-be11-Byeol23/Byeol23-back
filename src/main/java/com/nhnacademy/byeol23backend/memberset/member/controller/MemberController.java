@@ -1,8 +1,5 @@
 package com.nhnacademy.byeol23backend.memberset.member.controller;
 
-import java.util.Map;
-import java.util.Objects;
-
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,15 +12,16 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nhnacademy.byeol23backend.memberset.member.dto.CheckIdResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.FindLoginIdResponse;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateRequest;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateResponse;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberMyPageResponse;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateRequest;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.ValueDuplicationCheckRequest;
+import com.nhnacademy.byeol23backend.memberset.member.dto.ValueDuplicationCheckResponse;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateRequest;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateResponse;
 import com.nhnacademy.byeol23backend.memberset.member.service.MemberService;
@@ -45,7 +43,7 @@ public class MemberController implements MemberApi {
 	 * @param request MemberCreateRequest
 	 * @return 201(CREATED)
 	 */
-	@PostMapping("/register")
+	@PostMapping
 	public ResponseEntity<MemberCreateResponse> createMember(@Valid @RequestBody MemberCreateRequest request) {
 		MemberCreateResponse createdMember = memberService.createMember(request);
 		return ResponseEntity.status(HttpStatus.CREATED)
@@ -53,9 +51,16 @@ public class MemberController implements MemberApi {
 	}
 
 	@GetMapping("/check-id")
-	public ResponseEntity<CheckIdResponse> checkId(@RequestParam String loginId) {
+	public ResponseEntity<FindLoginIdResponse> checkId(@RequestParam String loginId) {
 		boolean isDuplicated = memberService.checkIdDuplicated(loginId);
-		return ResponseEntity.ok(new CheckIdResponse(isDuplicated));
+		return ResponseEntity.ok(new FindLoginIdResponse(isDuplicated));
+	}
+
+	@PostMapping("/check-duplication")
+	public ResponseEntity<ValueDuplicationCheckResponse> checkDuplication(@RequestBody ValueDuplicationCheckRequest request) {
+		ValueDuplicationCheckResponse response = memberService.checkDuplication(request);
+
+		return ResponseEntity.ok(response);
 	}
 
 	/**

@@ -22,7 +22,7 @@ public class Member {
 	private Long memberId;
 
 	@Setter
-	@Column(name = "login_id", nullable = false, length = 20, unique = true)
+	@Column(name = "login_id", nullable = false, length = 50, unique = true)
 	private String loginId;
 
 	@Setter
