@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import com.nhnacademy.byeol23backend.bookset.book.domain.BookStatus;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookCreateRequest;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookOrderRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookResponse;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookReview;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockResponse;
@@ -46,6 +47,7 @@ import com.nhnacademy.byeol23backend.bookset.publisher.exception.PublisherNotFou
 import com.nhnacademy.byeol23backend.bookset.publisher.repository.PublisherRepository;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.Tag;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.AllTagsInfoResponse;
+import com.nhnacademy.byeol23backend.cartset.cartbook.dto.CartOrderRequest;
 import com.nhnacademy.byeol23backend.image.dto.GetUrlResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -175,6 +177,7 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	public Page<BookResponse> getBooks(Pageable pageable) {
+		// Book만 페이징으로 조회 (Publisher는 ManyToOne이라 문제없음)
 		Page<Book> bookPage = bookRepository.findAll(pageable);
 
 		if (bookPage.isEmpty()) {
@@ -186,6 +189,7 @@ public class BookServiceImpl implements BookService {
 			.map(Book::getBookId)
 			.toList();
 
+		// JOIN FETCH로 Category, Tag, Contributor를 한 번에 조회
 		List<BookCategory> bookCategories = bookCategoryRepository.findByBookIdsWithCategory(bookIds);
 		List<BookTag> bookTags = bookTagRepository.findByBookIdsWithTag(bookIds);
 		List<BookContributor> bookContributors = bookContributorRepository.findByBookIdsWithContributor(bookIds);
@@ -208,6 +212,7 @@ public class BookServiceImpl implements BookService {
 					java.util.stream.Collectors.toList())
 			));
 
+		// @BatchSize가 BookImage를 자동으로 배치 로딩
 		List<BookResponse> bookResponseList = bookList.stream()
 			.map(book -> {
 				List<Category> categories = categoryMap.getOrDefault(book.getBookId(), new ArrayList<>());
@@ -249,6 +254,12 @@ public class BookServiceImpl implements BookService {
 	@Override
 	public BookReview getBookReview(Long bookId) {
 		return bookRepository.queryBookReview(bookId);
+	}
+
+	@Override
+	public BookOrderRequest getBookOrder(CartOrderRequest cartOrderRequest) {
+
+		return null;
 	}
 
 	private BookResponse toResponse(Book book, List<Category> categories, List<Tag> tags,

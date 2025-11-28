@@ -20,11 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nhnacademy.byeol23backend.bookset.book.annotation.ViewerId;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookCreateRequest;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookOrderRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookResponse;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockResponse;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.service.BookService;
+import com.nhnacademy.byeol23backend.cartset.cartbook.dto.CartOrderRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -141,4 +143,11 @@ public class BookController {
 		bookService.updateBookStock(bookId, request);
 		return ResponseEntity.noContent().build();
 	}
+
+	@GetMapping("/orders")
+	public ResponseEntity<BookOrderRequest> getBookOrder(@RequestBody CartOrderRequest cartOrderRequest) {
+		BookOrderRequest request = bookService.getBookOrder(cartOrderRequest);
+		return ResponseEntity.ok(request);
+	}
+
 }
