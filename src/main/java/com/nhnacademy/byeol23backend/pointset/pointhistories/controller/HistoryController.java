@@ -36,7 +36,7 @@ public class HistoryController {
 		List<PointHistory> histories = pointService.getPointHistoriesByMember(member);
 		log.info("getPointHistoriesByMember:{}", histories);
 		return histories.stream()
-			.map(x->new PointHistoryDTO(x.getPointAmount(), x.getChangedAt(), x.getPointPolicy().getPointPolicyName()))
+			.map(x->new PointHistoryDTO(x.getPointAmount(), x.getChangedAt(), x.getPointPolicy().getPointPolicyType().getPointPolicyType().getDescription()))
 			.toList();
 	}
 }

@@ -67,10 +67,10 @@ public class ReviewServiceImpl implements ReviewService {
 		OrderDetail orderDetail = orderDetailService.getOrderDetailByOrderNumberAndBookId(orderNumber, bookId);
 		Long memberId = orderDetail.getOrder().getMember().getMemberId();
 		Member member = memberService.getMemberProxy(memberId);
-		pointService.offsetPointsByReserved(
-			member,
-			ReservedPolicy.REVIEW
-		);
+		// pointService.offsetPointsByReserved(
+		// 	member,
+		// 	ReservedPolicy.REVIEW
+		// );
 		Member memberProxy = memberService.getMemberProxy(memberId);
 		Review review = new Review(
 			reviewRate,
