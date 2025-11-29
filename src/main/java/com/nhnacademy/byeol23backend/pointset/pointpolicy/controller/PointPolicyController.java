@@ -34,6 +34,12 @@ public class PointPolicyController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
+	@GetMapping("/{id}")
+	public ResponseEntity<PointPolicyDTO> getPointPolicyById(@PathVariable("id") Long id) {
+		PointPolicyDTO dto = pointPolicyService.getPointPolicyById(id);
+		return ResponseEntity.ok(dto);
+	}
+
 	@PostMapping("update/{id}")
 	public ResponseEntity<Void> updatePointPolicy(@PathVariable Long id, @RequestBody PointPolicyDTO pointPolicyDTO) {
 		// 경로 id를 DTO의 id로 보장하여 서비스 호출

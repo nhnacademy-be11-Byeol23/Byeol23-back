@@ -12,4 +12,5 @@ public interface PointPolicyService {
 	public void savePointPolicy(PointPolicyDTO pointPolicyDTO);
 	public void deletePointPolicy(Long id);
 	public void updatePointPolicy(PointPolicyDTO pointPolicyDTO);
+	public PointPolicyDTO getPointPolicyById(Long id);
 }

@@ -88,4 +88,19 @@ public class PointPolicyServiceImpl implements PointPolicyService {
 		}
 		pointPolicyRepository.save(existingPolicy);
 	}
+
+	@Override
+	public PointPolicyDTO getPointPolicyById(Long id) {
+		PointPolicy policy = pointPolicyRepository.findById(id)
+			.orElseThrow(() -> new RuntimeException("PointPolicy not found with id: " + id));
+
+		return new PointPolicyDTO(
+			policy.getPointPolicyType().getPointPolicyType(),
+			policy.getPointPolicyId(),
+			policy.getPointPolicyName(),
+			policy.getSaveAmount(),
+			null, // 활성화 여부는 여기서 판단하지 않음
+			policy.getCreatedAt()
+		);
+	}
 }
