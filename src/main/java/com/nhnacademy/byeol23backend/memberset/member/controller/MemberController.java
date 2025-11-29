@@ -1,18 +1,11 @@
 package com.nhnacademy.byeol23backend.memberset.member.controller;
 
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.nhnacademy.byeol23backend.memberset.member.dto.FindLoginIdResponse;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateRequest;
@@ -71,7 +64,7 @@ public class MemberController implements MemberApi {
 	 */
 	@GetMapping
 	public ResponseEntity<MemberMyPageResponse> getMember(
-		@CookieValue(name = "Access-Token", required = false) String accessToken) {
+			@RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String accessToken) {
 		Long memberId = jwtParser.parseToken(accessToken).get("memberId", Long.class);
 		return ResponseEntity.ok(memberService.getMember(memberId));
 	}
