@@ -118,6 +118,7 @@ public class Book {
 	}
 
 	@BatchSize(size = 100)
+    @OrderBy("bookImageId asc")
 	@OneToMany(mappedBy = "book", fetch = FetchType.LAZY, orphanRemoval = true)
 	private List<BookImage> bookImageUrls = new ArrayList<>();
 }

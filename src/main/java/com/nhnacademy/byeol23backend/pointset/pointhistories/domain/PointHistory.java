@@ -30,7 +30,7 @@ public class PointHistory {
     private Member memberId;
 
 	@ManyToOne
-	@JoinColumn(name = "point_policy_name")
+	@JoinColumn(name = "point_policy_id")
 	private PointPolicy pointPolicy;
 
 	public PointHistory(
