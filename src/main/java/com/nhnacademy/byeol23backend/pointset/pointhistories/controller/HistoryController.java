@@ -34,7 +34,7 @@ public class HistoryController {
 		Long memberId = jwtParser.parseToken(accessToken).get("memberId",Long.class);
 		Member member = memberRepository.findById(memberId).orElse(null);
 		List<PointHistory> histories = pointService.getPointHistoriesByMember(member);
-		log.info("getPointHistoriesByMember:{}", histories);
+		// log.info("getPointHistoriesByMember:{}", histories);
 		return histories.stream()
 			.map(x->new PointHistoryDTO(x.getPointAmount(), x.getChangedAt(), x.getPointPolicy().getPointPolicyType().getPointPolicyType().getDescription()))
 			.toList();

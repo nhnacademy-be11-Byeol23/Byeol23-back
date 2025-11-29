@@ -29,6 +29,7 @@ public class PointInternalService {
 			throw new PointNotEnoughException("Insufficient points for member ID: " + member.getMemberId());
 		}
 		pointHistoryRepository.save(pointHistory);
+		log.info("PointHistory created: {}", pointHistory);
 		return pointHistory;
 	}
 
