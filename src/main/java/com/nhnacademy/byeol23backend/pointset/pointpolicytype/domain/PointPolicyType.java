@@ -22,6 +22,4 @@ public class PointPolicyType {
 	@OneToMany(mappedBy = "pointPolicyType", fetch = FetchType.LAZY)
 	private List<PointPolicy> pointPolicies;
 
-	@OneToOne(mappedBy = "pointPolicyType", fetch = FetchType.EAGER)
-	private ActivatedPointPolicy activatedPointPolicy;
 }

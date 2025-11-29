@@ -14,7 +14,9 @@ import com.nhnacademy.byeol23backend.pointset.pointpolicy.dto.ReservedPolicy;
 import com.nhnacademy.byeol23backend.pointset.pointpolicy.service.PointPolicyService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/point-policies")
 @RequiredArgsConstructor

@@ -5,6 +5,7 @@ import com.nhnacademy.byeol23backend.pointset.pointpolicytype.domain.PointPolicy
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "activated_point_policy")

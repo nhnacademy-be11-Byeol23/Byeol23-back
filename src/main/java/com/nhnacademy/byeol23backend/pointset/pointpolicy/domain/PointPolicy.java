@@ -1,4 +1,3 @@
-
 package com.nhnacademy.byeol23backend.pointset.pointpolicy.domain;
 
 import com.nhnacademy.byeol23backend.pointset.pointpolicy.dto.ReservedPolicy;

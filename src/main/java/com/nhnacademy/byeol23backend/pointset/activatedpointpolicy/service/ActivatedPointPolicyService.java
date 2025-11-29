@@ -13,7 +13,9 @@ import com.nhnacademy.byeol23backend.pointset.pointpolicytype.domain.PointPolicy
 import com.nhnacademy.byeol23backend.pointset.pointpolicytype.repository.PointPolicyTypeRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ActivatedPointPolicyService {
@@ -21,25 +23,23 @@ public class ActivatedPointPolicyService {
 	private final PointPolicyTypeRepository pointPolicyTypeRepository;
 	private final PointPolicyRepository pointPolicyRepository;
 
-	protected void activatePolicy(PointPolicy pointPolicy) {
+	@Transactional
+	public void activatePolicy(Long policyId) {
+		PointPolicy pointPolicy = pointPolicyRepository.getReferenceById(policyId);
 		ActivatedPointPolicy activatedPointPolicy = activatedPointPolicyRepository.findByPointPolicyType(pointPolicy.getPointPolicyType());
-		if (activatedPointPolicy != null) {
-			activatedPointPolicyRepository.delete(activatedPointPolicy);
-		}
+		if (activatedPointPolicy != null) activatedPointPolicyRepository.delete(activatedPointPolicy);
 		ActivatedPointPolicy newActivatedPolicy = new ActivatedPointPolicy(pointPolicy);
 		activatedPointPolicyRepository.save(newActivatedPolicy);
 	}
 
-	@Transactional //PointPolicy를 활성화
-	public void activatePolicy(Long policyId) {
-		PointPolicy pointPolicy = pointPolicyRepository.getReferenceById(policyId);
-		activatePolicy(pointPolicy);
-	}
-
+	@Transactional(readOnly = true)
 	public PointPolicy getActivatedPolicy(ReservedPolicy policyType) {
-		PointPolicyType pointPolicyType = pointPolicyTypeRepository.findById(policyType)
-			.orElseThrow(() -> new NoActivatedPolicyException("Invalid Point Policy Type: " + policyType));
-		return pointPolicyType.getActivatedPointPolicy().getPointPolicy();
+		PointPolicyType pointPolicyType = pointPolicyTypeRepository.getReferenceById(policyType);
+		ActivatedPointPolicy activatedPointPolicy = activatedPointPolicyRepository.findByPointPolicyType(pointPolicyType);
+		if (activatedPointPolicy == null) {
+			throw new NoActivatedPolicyException("No activated policy for type: " + policyType);
+		}
+		return activatedPointPolicy.getPointPolicy();
 	}
 
 }

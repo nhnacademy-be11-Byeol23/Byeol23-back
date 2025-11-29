@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.byeol23backend.pointset.activatedpointpolicy.domain.ActivatedPointPolicy;
+import com.nhnacademy.byeol23backend.pointset.activatedpointpolicy.service.ActivatedPointPolicyService;
 import com.nhnacademy.byeol23backend.pointset.pointpolicy.domain.PointPolicy;
 import com.nhnacademy.byeol23backend.pointset.pointpolicy.dto.PointPolicyDTO;
 import com.nhnacademy.byeol23backend.pointset.pointpolicy.dto.ReservedPolicy;
@@ -26,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PointPolicyServiceImpl implements PointPolicyService {
 	private final PointPolicyRepository pointPolicyRepository;
 	private final PointPolicyTypeRepository pointPolicyTypeRepository;
+	private final ActivatedPointPolicyService activatedPointPolicyService;
 
 	@Override
 	public Map<ReservedPolicy, List<PointPolicyDTO>> getAllPointPolicies() { //관리자페이지에서만 사용할것이므로 pageable 생략
@@ -34,10 +36,11 @@ public class PointPolicyServiceImpl implements PointPolicyService {
 
 		for (PointPolicyType type : pointPolicyTypes) {
 			List<PointPolicyDTO> dtoList = new ArrayList<>();//각 타입별 dto리스트 생성
-			ActivatedPointPolicy activatedPointPolicy = type.getActivatedPointPolicy();
 			Long activatedPolicyId = null; //활성화된 정책이 없을 수도 있음
-			if(activatedPointPolicy != null){
-				activatedPolicyId = activatedPointPolicy.getPointPolicy().getPointPolicyId();
+			try{
+				activatedPolicyId = activatedPointPolicyService.getActivatedPolicy(type.getPointPolicyType()).getPointPolicyId();
+			} catch (Exception e){
+				log.info("No activated policy for type: " + type.getPointPolicyType());
 			}
 			for (PointPolicy policy : type.getPointPolicies()) {//parsing
 				PointPolicyDTO dto = new PointPolicyDTO(
@@ -57,6 +60,9 @@ public class PointPolicyServiceImpl implements PointPolicyService {
 
 	@Override
 	public void savePointPolicy(PointPolicyDTO pointPolicyDTO) {
+		if(pointPolicyDTO.type() == ReservedPolicy.UNKNOWN){
+			throw new IllegalArgumentException("Invalid PointPolicyType: " + pointPolicyDTO.type());
+		}
 		PointPolicyType policyType = pointPolicyTypeRepository.findById(pointPolicyDTO.type())
 			.orElseThrow(() -> new RuntimeException("PointPolicyType not found: " + pointPolicyDTO.type()));
 
