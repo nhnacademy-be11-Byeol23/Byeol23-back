@@ -63,13 +63,13 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	@Transactional
-	public Long registerReview(String reviewContent, Byte reviewRate, String orderNumber, Long bookId) {
+	public Long registerReview(String reviewContent, Byte reviewRate, String orderNumber, Long bookId, boolean withImage) {
 		OrderDetail orderDetail = orderDetailService.getOrderDetailByOrderNumberAndBookId(orderNumber, bookId);
 		Long memberId = orderDetail.getOrder().getMember().getMemberId();
 		Member member = memberService.getMemberProxy(memberId);
-		pointService.offsetPointsByReserved(
+		pointService.offsetPoints(
 			member,
-			ReservedPolicy.REVIEW
+			withImage? ReservedPolicy.REVIEW_WITH_IMAGE : ReservedPolicy.REVIEW_WITHOUT_IMAGE
 		);
 		Member memberProxy = memberService.getMemberProxy(memberId);
 		Review review = new Review(

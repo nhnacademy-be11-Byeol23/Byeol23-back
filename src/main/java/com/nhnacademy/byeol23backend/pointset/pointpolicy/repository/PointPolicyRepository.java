@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.nhnacademy.byeol23backend.pointset.pointpolicy.domain.PointPolicy;
 
-public interface PointPolicyRepository extends JpaRepository<PointPolicy, Integer> {
+public interface PointPolicyRepository extends JpaRepository<PointPolicy, Long> {
 	// @Cacheable("value = 'pointPolicies', key = '#pointPolicyName'")
 	Optional<PointPolicy> findByPointPolicyName(String pointPolicyName);
 
