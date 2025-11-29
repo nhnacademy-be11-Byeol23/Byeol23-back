@@ -16,13 +16,19 @@ public class ActivatedPointPolicy {
     private ActivatedPointPolicyId id = new ActivatedPointPolicyId();
 
     @MapsId("pointPolicyId")
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "point_policy_id")
     private PointPolicy pointPolicy;
 
     @MapsId("pointPolicyType")
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "point_policy_type")
     private PointPolicyType pointPolicyType;
 
+	public ActivatedPointPolicy(PointPolicy pointPolicy) {
+		this.pointPolicy = pointPolicy;
+		this.pointPolicyType = pointPolicy.getPointPolicyType();
+		this.id = new ActivatedPointPolicyId(pointPolicy.getPointPolicyId(), pointPolicy.getPointPolicyType()
+			.getPointPolicyType());
+	}
 }

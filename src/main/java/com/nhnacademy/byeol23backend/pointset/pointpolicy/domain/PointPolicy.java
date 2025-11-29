@@ -1,6 +1,7 @@
 
 package com.nhnacademy.byeol23backend.pointset.pointpolicy.domain;
 
+import com.nhnacademy.byeol23backend.pointset.pointpolicy.dto.ReservedPolicy;
 import com.nhnacademy.byeol23backend.pointset.pointpolicytype.domain.PointPolicyType;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -17,14 +18,17 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class PointPolicy implements Serializable {
 	private static final long serialVersionUID = 1L;
+	//auto-generated id
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "point_policy_id", nullable = false)
 	private Long pointPolicyId;
 
 	@JoinColumn(name = "point_policy_type", nullable = false)
-	@OneToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	private PointPolicyType pointPolicyType;
 
+	@Setter
 	@Column(name = "point_policy_name", nullable = false, length = 50)
 	private String pointPolicyName;
 
@@ -37,11 +41,11 @@ public class PointPolicy implements Serializable {
 	private LocalDateTime createdAt;
 
 
-//	public  PointPolicy(String pointPolicyName, BigDecimal saveAmount, Boolean isActive) {
-//		this.pointPolicyName = pointPolicyName;
-//		this.saveAmount = saveAmount;
-//		this.createdAt = LocalDateTime.now();
-//		this.isActive = isActive;
-//	}
+	public  PointPolicy(String pointPolicyName, BigDecimal saveAmount, PointPolicyType pointPolicyType) {
+		this.pointPolicyType = pointPolicyType;
+		this.pointPolicyName = pointPolicyName;
+		this.saveAmount = saveAmount;
+		this.createdAt = LocalDateTime.now();
+	}
 
 }
