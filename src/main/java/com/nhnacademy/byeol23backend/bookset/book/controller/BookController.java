@@ -144,7 +144,7 @@ public class BookController {
 		return ResponseEntity.noContent().build();
 	}
 
-	@GetMapping("/orders")
+	@PostMapping("/orders")
 	public ResponseEntity<BookOrderRequest> getBookOrder(@RequestBody CartOrderRequest cartOrderRequest) {
 		BookOrderRequest request = bookService.getBookOrder(cartOrderRequest);
 		return ResponseEntity.ok(request);

@@ -1,7 +1,6 @@
 package com.nhnacademy.byeol23backend.orderset.payment.service.impl;
 
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +23,6 @@ import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentResultRe
 import com.nhnacademy.byeol23backend.orderset.payment.exception.PaymentNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.payment.repository.PaymentRepository;
 import com.nhnacademy.byeol23backend.orderset.payment.service.PaymentService;
-import com.nhnacademy.byeol23backend.pointset.pointhistories.domain.PointHistory;
 import com.nhnacademy.byeol23backend.pointset.pointhistories.service.PointService;
 
 import lombok.RequiredArgsConstructor;
@@ -65,10 +63,11 @@ public class PaymentServiceImpl implements PaymentService {
 
 		Member member = order.getMember();
 
-		if (!Objects.isNull(member)) {
-			PointHistory pointHistory = pointService.offsetPointsByOrder(member, order.getActualOrderPrice());
-			order.setPointHistory(pointHistory);
-		}
+		//포인트 관련 로직 추가필요
+		// if (!Objects.isNull(member)) {
+		// 	PointHistory pointHistory = pointService.offsetPointsByOrder(member, order.getActualOrderPrice());
+		// 	order.setPointHistory(pointHistory);
+		// }
 
 		return new PaymentResultResponse(confirmResponse.paymentKey(), confirmResponse.orderId(),
 			confirmResponse.orderName(),

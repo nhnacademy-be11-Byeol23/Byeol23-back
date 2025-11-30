@@ -3,6 +3,7 @@ package com.nhnacademy.byeol23backend.orderset.order.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.nhnacademy.byeol23backend.cartset.cartbook.dto.CartOrderRequest;
 import com.nhnacademy.byeol23backend.memberset.member.dto.NonmemberOrderRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderBulkUpdateRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelRequest;
@@ -33,4 +34,6 @@ public interface OrderService {
 	Page<OrderDetailResponse> getOrders(Long memberId, Pageable pageable);
 
 	OrderDetailResponse getNonMemberOrder(NonmemberOrderRequest request);
+
+	void saveGuestOrder(String guestId, CartOrderRequest orderRequest);
 }
