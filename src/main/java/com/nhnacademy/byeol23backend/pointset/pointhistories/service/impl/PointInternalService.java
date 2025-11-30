@@ -2,6 +2,7 @@ package com.nhnacademy.byeol23backend.pointset.pointhistories.service.impl;
 
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.pointset.pointhistories.domain.PointHistory;
+import com.nhnacademy.byeol23backend.pointset.pointhistories.exception.PointNotEnoughException;
 import com.nhnacademy.byeol23backend.pointset.pointhistories.repository.PointHistoryRepository;
 import com.nhnacademy.byeol23backend.pointset.pointpolicy.domain.PointPolicy;
 import lombok.RequiredArgsConstructor;
@@ -21,19 +22,15 @@ public class PointInternalService {
 
 	@Transactional(propagation = Propagation.MANDATORY)
 	protected PointHistory addPoints(Member member, PointPolicy policy , BigDecimal additionalAmount) {
-//		PointHistory pointHistory = new PointHistory(member, policy, additionalAmount);
-//		member.setCurrentPoint(member.getCurrentPoint().add(policy.getSaveAmount().add(additionalAmount)));
-//		if(!policy.getIsActive()){
-//			log.error("Point policy {} is inactive.", policy.getPointPolicyName());
-//			throw new IllegalStateException("Point policy is inactive: " + policy.getPointPolicyName());
-//		}
-//		if (member.getCurrentPoint().compareTo(BigDecimal.ZERO) < 0) {
-//			log.error("Member ID {} has insufficient points: {}", member.getMemberId(), member.getCurrentPoint());
-//			throw new PointNotEnoughException("Insufficient points for member ID: " + member.getMemberId());
-//		}
-//		pointHistoryRepository.save(pointHistory);
-//		return pointHistory;
-		return null;
+		PointHistory pointHistory = new PointHistory(member, policy, additionalAmount);
+		member.setCurrentPoint(member.getCurrentPoint().add(policy.getSaveAmount().add(additionalAmount)));
+		if (member.getCurrentPoint().compareTo(BigDecimal.ZERO) < 0) {
+			log.error("Member ID {} has insufficient points: {}", member.getMemberId(), member.getCurrentPoint());
+			throw new PointNotEnoughException("Insufficient points for member ID: " + member.getMemberId());
+		}
+		pointHistoryRepository.save(pointHistory);
+		log.info("PointHistory created: {}", pointHistory);
+		return pointHistory;
 	}
 
 	protected List<PointHistory> getPointHistoriesByMember(Member member) {
