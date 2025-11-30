@@ -4,11 +4,15 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +22,7 @@ import com.nhnacademy.byeol23backend.bookset.book.dto.BookInfoRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookOrderInfoResponse;
 import com.nhnacademy.byeol23backend.bookset.book.exception.BookNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
+import com.nhnacademy.byeol23backend.cartset.cartbook.dto.CartOrderRequest;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.memberset.member.dto.NonmemberOrderRequest;
 import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
@@ -57,7 +62,9 @@ import com.nhnacademy.byeol23backend.pointset.pointhistories.repository.PointHis
 import com.nhnacademy.byeol23backend.utils.JwtParser;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -79,6 +86,7 @@ public class OrderServiceImpl implements OrderService {
 	private static final String PAYMENT_NOT_FOUND_MESSAGE = "해당 결제를 찾을 수 없습니다.: ";
 	private static final String DELIVERY_POLICY_NOT_FOUND_MESSAGE = "현재 배송 정책을 찾을 수 없습니다.";
 	private final PointHistoryRepository pointHistoryRepository;
+	private final RedisTemplate<String, Object> redisTemplate;
 
 	@Override
 	@Transactional
@@ -276,6 +284,23 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		return mapOrderDetailsToOrderDetailResponse(order);
+	}
+
+	@Override
+	public void saveGuestOrder(String guestId, CartOrderRequest orderRequest) {
+		String key = "GUEST_ORDER:" + guestId;
+
+		HashOperations<String, String, Integer> hashOperations = redisTemplate.opsForHash();
+
+		for (Map.Entry<Long, Integer> entry : orderRequest.cartOrderList().entrySet()) {
+			Long bookId = entry.getKey();
+			Integer quantity = entry.getValue();
+
+			hashOperations.put(key, String.valueOf(bookId), quantity);
+		}
+
+		redisTemplate.expire(key, 30, TimeUnit.MINUTES);
+		log.info("비회원 주문 데이터가 Redis에 저장되었습니다.");
 	}
 
 	@Transactional

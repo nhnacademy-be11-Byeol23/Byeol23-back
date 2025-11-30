@@ -2,6 +2,7 @@ package com.nhnacademy.byeol23backend.bookset.book.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import com.nhnacademy.byeol23backend.bookset.book.domain.BookStatus;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookCreateRequest;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookInfoRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookOrderRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookResponse;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookReview;
@@ -30,6 +32,7 @@ import com.nhnacademy.byeol23backend.bookset.bookcategory.service.BookCategorySe
 import com.nhnacademy.byeol23backend.bookset.bookcontributor.domain.BookContributor;
 import com.nhnacademy.byeol23backend.bookset.bookcontributor.repository.BookContributorRepository;
 import com.nhnacademy.byeol23backend.bookset.bookcontributor.service.BookContributorService;
+import com.nhnacademy.byeol23backend.bookset.bookimage.domain.BookImage;
 import com.nhnacademy.byeol23backend.bookset.bookimage.service.BookImageServiceImpl;
 import com.nhnacademy.byeol23backend.bookset.booktag.domain.BookTag;
 import com.nhnacademy.byeol23backend.bookset.booktag.repository.BookTagRepository;
@@ -38,6 +41,7 @@ import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
 import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.Contributor;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.AllContributorResponse;
+import com.nhnacademy.byeol23backend.bookset.contributor.repository.ContributorRepository;
 import com.nhnacademy.byeol23backend.bookset.outbox.BookOutbox;
 import com.nhnacademy.byeol23backend.bookset.outbox.event.BookOutboxEvent;
 import com.nhnacademy.byeol23backend.bookset.outbox.repository.BookOutboxRepository;
@@ -70,6 +74,7 @@ public class BookServiceImpl implements BookService {
 	private final BookContributorService bookContributorService;
 	private final BookImageServiceImpl bookImageService;
 	private final BookOutboxRepository bookOutboxRepository;
+	private final ContributorRepository contributorRepository;
 
 	@Override
 	@Transactional
@@ -259,7 +264,40 @@ public class BookServiceImpl implements BookService {
 	@Override
 	public BookOrderRequest getBookOrder(CartOrderRequest cartOrderRequest) {
 
-		return null;
+		Set<Long> bookIds = cartOrderRequest.cartOrderList().keySet();
+
+		List<Book> books = bookRepository.findAllByWithContributors(bookIds);
+
+		List<BookInfoRequest> bookList = new ArrayList<>();
+
+		for (Book book : books) {
+			String firstImg = "https://image.yes24.com/momo/Noimg_L.jpg"; // 기본 이미지로 초기화
+
+			if (book.getBookImageUrls() != null && !book.getBookImageUrls().isEmpty()) {
+
+				BookImage firstImage = book.getBookImageUrls().getFirst();
+
+				if (firstImage != null && firstImage.getBookImageUrl() != null) {
+					firstImg = firstImage.getBookImageUrl();
+				}
+			}
+			bookList.add(new BookInfoRequest(
+				book.getBookId(),
+				book.getBookName(),
+				firstImg,
+				book.isPack(),
+				book.getRegularPrice(),
+				book.getSalePrice(),
+				new AllPublishersInfoResponse(book.getPublisher()),
+				cartOrderRequest.cartOrderList().get(book.getBookId()), // 수량을 가져옴
+				book.getBookContributors().stream().map(
+					bc -> new AllContributorResponse(bc.getContributor())
+				).toList(),
+				null
+			));
+		}
+
+		return new BookOrderRequest(bookList);
 	}
 
 	private BookResponse toResponse(Book book, List<Category> categories, List<Tag> tags,
