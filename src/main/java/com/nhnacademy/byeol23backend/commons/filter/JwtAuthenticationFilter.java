@@ -9,6 +9,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -58,13 +59,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String getToken(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if(cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("Access-Token".equals(cookie.getName())) {
-                    return cookie.getValue().startsWith("Bearer") ? cookie.getValue().substring(7) : cookie.getValue();
-                }
-            }
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+        if(token != null) {
+            return token.startsWith("Bearer ") ? token.substring(7) : token;
         }
         return null;
     }
