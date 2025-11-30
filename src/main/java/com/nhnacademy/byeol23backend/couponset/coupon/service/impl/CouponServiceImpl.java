@@ -10,6 +10,7 @@ import com.nhnacademy.byeol23backend.couponset.coupon.dto.IssuedCouponInfoRespon
 import com.nhnacademy.byeol23backend.couponset.coupon.dto.UsedCouponInfoResponseDto;
 import com.nhnacademy.byeol23backend.couponset.coupon.repository.CouponRepository;
 import com.nhnacademy.byeol23backend.couponset.coupon.service.CouponService;
+import com.nhnacademy.byeol23backend.couponset.coupon.service.CouponValidationStrategy;
 import com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.CouponPolicy;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -33,6 +35,8 @@ public class CouponServiceImpl implements CouponService {
     private final CouponBirthdayRabbitProperties couponBirthdayRabbitProperties;
     private final CouponRepository couponRepository;
     private final JwtParser jwtParser;
+    private final Map<String, CouponValidationStrategy> validationStrategyMap;
+
 
     @Override
     public void sendIssueRequestToMQ(CouponIssueRequestDto request) {
@@ -152,6 +156,23 @@ public class CouponServiceImpl implements CouponService {
                     );
                 })
                 .toList();
+    }
+
+    @Override
+    public void getUsableCoupons(String token, List<Long> bookIds, List<Long> categoryIds) {
+        Long memberId = accessTokenParser(token);
+        //유효한 쿠폰 전부 조회
+        List<Coupon> allUsableCoupons = couponRepository.findByMember_MemberIdAndUsedAtIsNullAndExpiredDateGreaterThanEqual(memberId, LocalDate.now());
+        for(Coupon coupon : allUsableCoupons){
+            log.info("coupon 정보 : {}", coupon);
+        }
+    }
+
+    @Override
+    public void getUsableCouponsTest(Long memberId) {
+        List<Coupon> allUsableCoupons = couponRepository.findByMember_MemberIdAndUsedAtIsNullAndExpiredDateGreaterThanEqual(memberId, LocalDate.now());
+
+
     }
 
 

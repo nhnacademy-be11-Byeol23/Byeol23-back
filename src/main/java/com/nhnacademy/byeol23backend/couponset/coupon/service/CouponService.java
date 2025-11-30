@@ -19,4 +19,8 @@ public interface CouponService {
     List<IssuedCouponInfoResponseDto> getIssuedCoupons(String token);
 
     List<UsedCouponInfoResponseDto> getUsedCoupons(String token);
+
+    void getUsableCoupons(String token, List<Long> bookIds, List<Long> categoryIds);
+
+    void getUsableCouponsTest(Long memberId);
 }
