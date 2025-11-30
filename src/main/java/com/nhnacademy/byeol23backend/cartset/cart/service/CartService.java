@@ -1,17 +1,16 @@
 package com.nhnacademy.byeol23backend.cartset.cart.service;
 
-import com.nhnacademy.byeol23backend.cartset.cart.domain.dto.CartResponse;
-import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
+import com.nhnacademy.byeol23backend.cartset.cart.dto.CustomerIdentifier;
+import com.nhnacademy.byeol23backend.cartset.cartbook.dto.CartBookAddRequest;
+import com.nhnacademy.byeol23backend.cartset.cartbook.dto.CartBookResponse;
+import com.nhnacademy.byeol23backend.cartset.cartbook.dto.CartBookUpdateRequest;
+
+import java.util.List;
 
 public interface CartService {
-
-    // 회원 장바구니 생성(회원 가입)
-    void createCart(Member member);
-
-    // 회원 아이디로 장바구니 삭제(회원 탈퇴)
-    void deleteCart(Long memberId);
-
-    // 장바구니 조회
-    CartResponse getCartWithBooksByMemberId(Long memberId);
-
+    void addBook(CustomerIdentifier identifier, CartBookAddRequest request);
+    List<CartBookResponse> getCartBooks(CustomerIdentifier identifier);
+    void updateQuantity(CustomerIdentifier identifier, Long bookId, CartBookUpdateRequest request);
+    void deleteBook(CustomerIdentifier identifier, Long bookId);
+    void clearCart(CustomerIdentifier identifier, List<Long> bookIds);
 }

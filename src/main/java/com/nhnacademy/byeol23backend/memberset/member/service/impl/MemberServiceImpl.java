@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.memberset.member.service.impl;
 
-import com.nhnacademy.byeol23backend.cartset.cart.service.CartService;
+import com.nhnacademy.byeol23backend.cartset.cart.domain.Cart;
+import com.nhnacademy.byeol23backend.cartset.cart.repository.CartRepository;
 import com.nhnacademy.byeol23backend.couponset.coupon.dto.BirthdayCouponIssueRequestDto;
 import com.nhnacademy.byeol23backend.memberset.grade.repository.GradeRepository;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
@@ -34,7 +35,7 @@ public class MemberServiceImpl implements MemberService {
 	private final MemberRepository memberRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final GradeRepository gradeRepository;
-	private final CartService cartService;
+	private final CartRepository cartRepository;
 	private final ApplicationEventPublisher eventPublisher;
 
 	@Value("${coupon.welcome.policy-id}")
@@ -70,7 +71,7 @@ public class MemberServiceImpl implements MemberService {
 			gradeRepository.findByGradeName("일반")
 		);
 		memberRepository.save(newMember);
-		cartService.createCart(newMember);
+        cartRepository.save(Cart.create(newMember));
 		log.info("멤버 생성을 완료했습니다. {}", newMember.getMemberId());
 		
 		//회원가입 성공 시 (save 커밋 성공) 이벤트 발행

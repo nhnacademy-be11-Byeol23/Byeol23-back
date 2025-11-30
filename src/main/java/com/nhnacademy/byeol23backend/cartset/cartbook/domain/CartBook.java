@@ -39,4 +39,18 @@ public class CartBook {
 	@JoinColumn(name = "cart_id", nullable = false)
 	@Setter
 	private Cart cart;
+
+    public CartBook(int quantity, Book book, Cart cart) {
+        this.quantity = quantity;
+        this.book = book;
+        this.cart = cart;
+    }
+
+    public void increaseQuantity(int quantity) {
+        this.quantity += quantity;
+    }
+
+    public void updateQuantity(int quantity) {
+        this.quantity = quantity;
+    }
 }

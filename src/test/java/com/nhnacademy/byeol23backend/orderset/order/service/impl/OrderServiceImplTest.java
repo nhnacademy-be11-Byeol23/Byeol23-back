@@ -270,7 +270,8 @@ class OrderServiceImplTest {
 	void cancelOrder_Success() {
 		// given
 		String orderNumber = "test-order-123";
-		OrderCancelRequest cancelRequest = new OrderCancelRequest("MIND_CHANGED");
+		String expectedReason = "고객 요청에 의한 취소";
+		OrderCancelRequest cancelRequest = new OrderCancelRequest(expectedReason);
 
 		given(orderRepository.findOrderByOrderNumber(orderNumber)).willReturn(Optional.of(mockOrder));
 		given(paymentRepository.findPaymentByOrder(mockOrder)).willReturn(Optional.of(mockPayment));
