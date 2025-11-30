@@ -40,7 +40,8 @@ public class ReviewController {
 			request.reviewContent(),
 			request.reviewRate(),
 			request.orderNumber(),
-			request.bookId()
+			request.bookId(),
+			request.withImage()
 		);
 		return ResponseEntity.ok(id);
 	}

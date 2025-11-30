@@ -1,5 +1,7 @@
 package com.nhnacademy.byeol23backend.cartset.cart.service.impl;
 
+import com.nhnacademy.byeol23backend.bookset.book.exception.BookNotFoundException;
+import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
 import com.nhnacademy.byeol23backend.cartset.cart.dto.CustomerIdentifier;
 import com.nhnacademy.byeol23backend.cartset.cart.service.CartService;
 import com.nhnacademy.byeol23backend.cartset.cartbook.dto.CartBookAddRequest;
@@ -25,9 +27,13 @@ import java.util.Set;
 public class GuestCartService implements CartService {
     private final StringRedisTemplate stringRedisTemplate;
     private final CartBookService cartBookService;
-
+    private final BookRepository bookRepository;
     @Override
     public void addBook(CustomerIdentifier identifier, CartBookAddRequest request) {
+        if(!bookRepository.existsById(request.bookId())) {
+            throw new BookNotFoundException("찾을 수 없는 도서 입니다.");
+        }
+
         String cartHashKey = getCartHashKey(identifier.guestId());
         String cartSortedSetKey = getCartSortedSetKey(identifier.guestId());
         stringRedisTemplate.execute(new SessionCallback<>() {
@@ -89,6 +95,26 @@ public class GuestCartService implements CartService {
 
                 List<Object> result = ops.exec();
                 log.info("장바구니에 {}번 도서 삭제", bookId);
+                return result;
+            }
+        });
+    }
+
+    @Override
+    public void clearCart(CustomerIdentifier identifier, List<Long> bookIds) {
+        String cartHashKey = getCartHashKey(identifier.guestId());
+        String cartSortedSetKey = getCartSortedSetKey(identifier.guestId());
+        stringRedisTemplate.execute(new SessionCallback<List<Object>>() {
+            @Override
+            public List<Object> execute(RedisOperations operations) throws DataAccessException {
+                RedisOperations<String, String> ops = operations;
+                ops.multi();
+
+                ops.opsForHash().delete(cartHashKey, bookIds.stream().map(String::valueOf).toList());
+                ops.opsForZSet().remove(cartSortedSetKey, bookIds.stream().map(String::valueOf).toList());
+
+                List<Object> result = ops.exec();
+                log.info("주문 완료된 장바구니 상품 제거");
                 return result;
             }
         });
