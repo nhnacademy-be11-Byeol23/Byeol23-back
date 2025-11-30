@@ -76,7 +76,7 @@ public class MemberController implements MemberApi {
 	 * @param request MemberUpdateRequest
 	 * @return 200(OK) / MemberUpdateResponse
 	 */
-	@PutMapping
+	@PostMapping("/put")
 	public ResponseEntity<MemberUpdateResponse> updateMember(
 		@Valid @RequestBody MemberUpdateRequest request,
 		@CookieValue(name = "Access-Token", required = false) String accessToken
@@ -85,7 +85,7 @@ public class MemberController implements MemberApi {
 		return ResponseEntity.ok(memberService.updateMember(memberId, request));
 	}
 
-	@PutMapping("/password")
+	@PostMapping("/put/password")
 	public ResponseEntity<MemberPasswordUpdateResponse> updateMemberPassword(
 		@Valid @RequestBody MemberPasswordUpdateRequest request,
 		@CookieValue(name = "Access-Token", required = false) String accessToken
@@ -108,7 +108,7 @@ public class MemberController implements MemberApi {
 	 * 회원 삭제에 관한 요청을 처리한다.
 	 * @return 204(NO CONTENT)
 	 */
-	@DeleteMapping
+	@PostMapping("/delete")
 	public ResponseEntity<Void> deleteMember(
 		@CookieValue(name = "Access-Token", required = false) String accessToken
 	) {
