@@ -10,6 +10,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Role;
 import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
+import com.nhnacademy.byeol23backend.utils.MemberUtil;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,25 +28,7 @@ public class RoleAspect {
 	@Around("@annotation(requireRole)")
 	public Object roleCheck(ProceedingJoinPoint pjp, RequireRole requireRole) throws Throwable {
 
-		ServletRequestAttributes attrs =
-			(ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
-
-		if(attrs == null) {
-			throw new MemberNotFoundException("요청 정보가 없습니다.");
-		}
-
-		HttpServletRequest request = attrs.getRequest();
-
-		Cookie[] cookies = request.getCookies();
-
-		String token = null;
-		for(Cookie cookie : cookies) {
-			if("Access-Token".equals(cookie.getName())) {
-				token = cookie.getValue();
-			}
-		}
-
-		String role = jwtParser.parseToken(token).get("role", String.class);
+		String role = MemberUtil.getRole();
 
 		Role userRole = Role.valueOf(role);
 		Role requiredRole = requireRole.value();
