@@ -16,7 +16,7 @@ public interface CouponService {
 
     void issueBirthdayCoupon(BirthdayCouponIssueRequestDto request);
 
-    List<IssuedCouponInfoResponseDto> getIssuedCoupons(String token);
+    List<IssuedCouponInfoResponseDto> getIssuedCoupons(Long memberId);
 
-    List<UsedCouponInfoResponseDto> getUsedCoupons(String token);
+    List<UsedCouponInfoResponseDto> getUsedCoupons(Long memberId);
 }

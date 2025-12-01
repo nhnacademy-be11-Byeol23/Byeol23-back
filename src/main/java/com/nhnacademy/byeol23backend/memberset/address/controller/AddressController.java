@@ -18,6 +18,7 @@ import com.nhnacademy.byeol23backend.memberset.address.dto.AddressInfoResponse;
 import com.nhnacademy.byeol23backend.memberset.address.dto.AddressRequest;
 import com.nhnacademy.byeol23backend.memberset.address.dto.AddressResponse;
 import com.nhnacademy.byeol23backend.memberset.address.service.AddressService;
+import com.nhnacademy.byeol23backend.utils.MemberUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -36,9 +37,10 @@ public class AddressController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터")
 	})
 	@PostMapping
-	public ResponseEntity<AddressResponse> createAddress(@CookieValue(name = "Access-Token") String token,
+	public ResponseEntity<AddressResponse> createAddress(
 		@RequestBody AddressRequest request) {
-		AddressResponse response = addressService.createOrder(token, request);
+		Long memberId = MemberUtil.getMemberId();
+		AddressResponse response = addressService.createOrder(memberId, request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
@@ -59,8 +61,9 @@ public class AddressController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터")
 	})
 	@GetMapping
-	public ResponseEntity<List<AddressInfoResponse>> getAddresses(@CookieValue(name = "Access-Token") String token) {
-		List<AddressInfoResponse> responses = addressService.getAddresses(token);
+	public ResponseEntity<List<AddressInfoResponse>> getAddresses() {
+		Long memberId = MemberUtil.getMemberId();
+		List<AddressInfoResponse> responses = addressService.getAddresses(memberId);
 		return ResponseEntity.status(HttpStatus.OK).body(responses);
 	}
 
