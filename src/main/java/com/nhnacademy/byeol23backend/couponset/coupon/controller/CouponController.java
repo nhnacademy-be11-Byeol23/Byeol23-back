@@ -49,15 +49,13 @@ public class CouponController {
      * 쿠폰 : IT>프로그래밍
      * 도서1 : IT>프로그래밍>자바 =>적용가능
      * 도서2 : IT => 적용 불가능
-     * @param token
-     * @return
      */
     @GetMapping("/usable")
     public ResponseEntity<Void> getUsableCoupons(
-            @CookieValue("Access-Token") String token,
             List<Long> bookIds,
             List<Long> categoryIds){
-        couponService.getUsableCoupons(token, bookIds, categoryIds);
+        Long memberId = MemberUtil.getMemberId();
+        couponService.getUsableCoupons(memberId, bookIds, categoryIds);
 
 
         return ResponseEntity.ok().build();
