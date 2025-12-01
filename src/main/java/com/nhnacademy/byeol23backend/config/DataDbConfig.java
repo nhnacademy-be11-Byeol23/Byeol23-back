@@ -19,7 +19,7 @@ import java.util.HashMap;
 @Profile("prod")
 @Configuration
 @EnableJpaRepositories(
-        basePackages = {"com.nhnacademy.byeol23backend.bookset", "com.nhnacademy.byeol23backend.cartset", "com.nhnacademy.byeol23backend.couponset", "com.nhnacademy.byeol23backend.memberset", "com.nhnacademy.byeol23backend.orderset", "com.nhnacademy.byeol23backend.pointset", "com.nhnacademy.byeol23backend.reviewset"},
+        basePackages = {"com.nhnacademy.byeol23backend.bookset", "com.nhnacademy.byeol23backend.cartset", "com.nhnacademy.byeol23backend.couponset", "com.nhnacademy.byeol23backend.memberset", "com.nhnacademy.byeol23backend.orderset", "com.nhnacademy.byeol23backend.pointset", "com.nhnacademy.byeol23backend.reviewset", "com.nhnacademy.byeol23backend.like"},
         entityManagerFactoryRef = "dataDbEntityManagerFactory",
         transactionManagerRef = "dataDbTransactionManager"
 )
