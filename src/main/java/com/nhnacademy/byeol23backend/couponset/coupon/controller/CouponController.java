@@ -26,7 +26,7 @@ public class CouponController {
         return ResponseEntity.ok("쿠폰 발급 요청 성공");
     }
 
-    @GetMapping("/iss ued")
+    @GetMapping("/issued")
     public ResponseEntity<List<IssuedCouponInfoResponseDto>> getIssuedCoupons(@CookieValue("Access-Token") String token){
         List<IssuedCouponInfoResponseDto> issuedCoupons = couponService.getIssuedCoupons(token);
         return ResponseEntity.ok(issuedCoupons);

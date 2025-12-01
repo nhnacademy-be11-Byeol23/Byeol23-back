@@ -171,7 +171,7 @@ public class CouponServiceImpl implements CouponService {
     @Override
     public void getUsableCouponsTest(Long memberId) {
         List<Coupon> allUsableCoupons = couponRepository.findByMember_MemberIdAndUsedAtIsNullAndExpiredDateGreaterThanEqual(memberId, LocalDate.now());
-
+        
 
     }
 

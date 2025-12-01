@@ -19,7 +19,7 @@ public class BookCouponValidationStrategy implements CouponValidationStrategy {
         Long couponPolicyId = coupon.getCouponPolicy().getCouponPolicyId();
 
         // 1. 해당 정책이 적용되는 모든 도서 ID를 DB에서 조회
-        List<Long> restrictedBookIds = bookCouponRepository.findBookIdsByCouponPolicyId(couponPolicyId);
+        List<Long> restrictedBookIds = bookCouponRepository.findBookIdsByCouponPolicy_CouponPolicyId(couponPolicyId);
 
         // 2. 현재 주문 목록(context.getBookIds())과 교집합이 있는지 확인
         return restrictedBookIds.stream()

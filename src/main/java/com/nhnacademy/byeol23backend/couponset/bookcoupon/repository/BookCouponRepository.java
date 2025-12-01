@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface BookCouponRepository extends JpaRepository<BookCouponPolicy, Long> {
-    List<Long> findBookIdsByCouponPolicyId(Long couponPolicyId);
+    List<Long> findBookIdsByCouponPolicy_CouponPolicyId(Long couponPolicyId);
 }
