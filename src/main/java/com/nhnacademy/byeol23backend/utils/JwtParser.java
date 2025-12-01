@@ -24,6 +24,9 @@ public class JwtParser {
     }
 
     public Claims parseToken(String token) {
+        if(token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
         return Jwts.parser()
                 .verifyWith(publicKey)
                 .clockSkewSeconds(60)

@@ -33,9 +33,10 @@ public class PointServiceImpl implements PointService {
 	public PointHistory offsetPointsByOrder(Member member, BigDecimal orderAmount) {
 		final PointPolicy orderPolicy = activatedPointPolicyService.getActivatedPolicy(ReservedPolicy.ORDER);
 		BigDecimal points = member.getGrade()
-			.getPointRate()
+			.getPointRate().add(orderPolicy.getSaveAmount()) //personal rate + base rate
 			.multiply(orderAmount)
 			.divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
 		return pointInternalService.addPoints(member, orderPolicy, points);
 	}
 

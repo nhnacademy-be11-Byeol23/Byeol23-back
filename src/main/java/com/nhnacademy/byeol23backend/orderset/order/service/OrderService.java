@@ -16,7 +16,7 @@ import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderSearchCondit
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.PointOrderResponse;
 
 public interface OrderService {
-	OrderPrepareResponse prepareOrder(OrderPrepareRequest request, String accessToken);
+	OrderPrepareResponse prepareOrder(Long memberId, OrderPrepareRequest request);
 
 	OrderCreateResponse updateOrderStatus(String orderNumber, String orderStatus);
 
@@ -30,7 +30,7 @@ public interface OrderService {
 
 	void updateBulkOrderStatus(OrderBulkUpdateRequest request);
 
-	Page<OrderDetailResponse> getOrders(String token, Pageable pageable);
+	Page<OrderDetailResponse> getOrders(Long memberId, Pageable pageable);
 
 	OrderDetailResponse getNonMemberOrder(NonmemberOrderRequest request);
 }

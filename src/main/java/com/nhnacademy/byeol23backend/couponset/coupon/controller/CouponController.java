@@ -4,6 +4,8 @@ import com.nhnacademy.byeol23backend.couponset.coupon.dto.CouponIssueRequestDto;
 import com.nhnacademy.byeol23backend.couponset.coupon.dto.IssuedCouponInfoResponseDto;
 import com.nhnacademy.byeol23backend.couponset.coupon.dto.UsedCouponInfoResponseDto;
 import com.nhnacademy.byeol23backend.couponset.coupon.service.CouponService;
+import com.nhnacademy.byeol23backend.utils.MemberUtil;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,14 +29,16 @@ public class CouponController {
     }
 
     @GetMapping("/issued")
-    public ResponseEntity<List<IssuedCouponInfoResponseDto>> getIssuedCoupons(@CookieValue("Access-Token") String token){
-        List<IssuedCouponInfoResponseDto> issuedCoupons = couponService.getIssuedCoupons(token);
+    public ResponseEntity<List<IssuedCouponInfoResponseDto>> getIssuedCoupons(){
+        Long memberId = MemberUtil.getMemberId();
+        List<IssuedCouponInfoResponseDto> issuedCoupons = couponService.getIssuedCoupons(memberId);
         return ResponseEntity.ok(issuedCoupons);
     }
 
     @GetMapping("/used")
-    public ResponseEntity<List<UsedCouponInfoResponseDto>> getUsedCoupons(@CookieValue("Access-Token") String token){
-        List<UsedCouponInfoResponseDto> usedCoupons = couponService.getUsedCoupons(token);
+    public ResponseEntity<List<UsedCouponInfoResponseDto>> getUsedCoupons(){
+        Long memberId = MemberUtil.getMemberId();
+        List<UsedCouponInfoResponseDto> usedCoupons = couponService.getUsedCoupons(memberId);
         return ResponseEntity.ok(usedCoupons);
     }
 

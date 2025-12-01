@@ -3,7 +3,6 @@ package com.nhnacademy.byeol23backend.couponset.bookcoupon.domain;
 import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.CouponPolicy;
 
-import com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.dto.CouponPolicyCreateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
