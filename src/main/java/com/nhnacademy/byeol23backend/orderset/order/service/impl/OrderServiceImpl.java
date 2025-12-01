@@ -22,6 +22,7 @@ import com.nhnacademy.byeol23backend.bookset.book.dto.BookInfoRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookOrderInfoResponse;
 import com.nhnacademy.byeol23backend.bookset.book.exception.BookNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
+import com.nhnacademy.byeol23backend.bookset.bookimage.domain.BookImage;
 import com.nhnacademy.byeol23backend.cartset.cartbook.dto.CartOrderRequest;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.memberset.member.dto.NonmemberOrderRequest;
@@ -205,7 +206,7 @@ public class OrderServiceImpl implements OrderService {
 			pageable);
 
 		return orderList.map(order -> {
-			List<OrderDetail> orderDetailsForThisOrder = orderDetailRepository.findByOrder(order);
+			List<OrderDetail> orderDetailsForThisOrder = orderDetailRepository.findByOrderWithBook(order);
 
 			DeliveryPolicy deliveryPolicy = deliveryPolicyRepository.findById(
 					order.getDeliveryPolicy().getDeliveryPolicyId())
@@ -228,6 +229,17 @@ public class OrderServiceImpl implements OrderService {
 
 			List<BookOrderInfoResponse> bookOrderInfos = orderDetailsForThisOrder.stream()
 				.map(detail -> {
+					List<BookImage> images = detail.getBook().getBookImageUrls();
+
+					String firstImage = "https://image.yes24.com/momo/Noimg_L.jpg";
+
+					if (images != null && !images.isEmpty()) {
+						BookImage firstImageEntity = images.getFirst();
+
+						if (firstImageEntity != null && firstImageEntity.getBookImageUrl() != null) {
+							firstImage = firstImageEntity.getBookImageUrl();
+						}
+					}
 					Packaging packaging = detail.getPackaging();
 					PackagingInfoResponse packagingResponse = null;
 
@@ -242,6 +254,7 @@ public class OrderServiceImpl implements OrderService {
 
 					return new BookOrderInfoResponse(
 						detail.getBook().getBookId(),
+						firstImage,
 						detail.getBook().getBookName(),
 						detail.getQuantity(),
 						detail.getOrderPrice(),
@@ -308,6 +321,17 @@ public class OrderServiceImpl implements OrderService {
 	protected List<BookOrderInfoResponse> mapOrderDetailsToInfoResponses(List<OrderDetail> orderDetails) {
 		return orderDetails.stream()
 			.map(orderDetail -> {
+					List<BookImage> images = orderDetail.getBook().getBookImageUrls();
+
+					String firstImage = "https://image.yes24.com/momo/Noimg_L.jpg";
+
+					if (images != null && !images.isEmpty()) {
+						BookImage firstImageEntity = images.getFirst();
+
+						if (firstImageEntity != null && firstImageEntity.getBookImageUrl() != null) {
+							firstImage = firstImageEntity.getBookImageUrl();
+						}
+					}
 					Packaging packaging = orderDetail.getPackaging();
 					PackagingInfoResponse packagingInfoResponse = null;
 
@@ -322,6 +346,7 @@ public class OrderServiceImpl implements OrderService {
 
 					return new BookOrderInfoResponse(
 						orderDetail.getBook().getBookId(),
+						firstImage,
 						orderDetail.getBook().getBookName(),
 						orderDetail.getQuantity(),
 						orderDetail.getOrderPrice(),

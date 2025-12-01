@@ -230,7 +230,8 @@ class OrderControllerTest {
 
 		// BookOrderInfoResponse 리스트 (테스트용)
 		List<BookOrderInfoResponse> mockItems = List.of(
-			new BookOrderInfoResponse(100L, "테스트 도서 A", 2, new BigDecimal("4500.00"), mockPackaging)
+			new BookOrderInfoResponse(100L, "https://image.yes24.com/momo/Noimg_L.jpg", "테스트 도서 A", 2,
+				new BigDecimal("4500.00"), mockPackaging)
 		);
 
 		// given
