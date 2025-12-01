@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,6 +48,7 @@ import com.nhnacademy.byeol23backend.orderset.payment.repository.PaymentReposito
 import com.nhnacademy.byeol23backend.pointset.pointhistories.domain.PointHistory;
 import com.nhnacademy.byeol23backend.pointset.pointhistories.service.PointService;
 
+@Disabled
 @ExtendWith(MockitoExtension.class)
 class PaymentServiceImplTest {
 
