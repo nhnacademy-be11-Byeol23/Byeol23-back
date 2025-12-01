@@ -132,26 +132,7 @@ class OrderControllerTest {
 	@DisplayName("POST /api/orders (주문 준비) - 회원")
 	void prepareOrder_Member_Success() throws Exception {
 		// given
-		String accessToken = "member-access-token";
-		given(orderService.prepareOrder(any(OrderPrepareRequest.class), eq(accessToken))).willReturn(prepareResponse);
-
-		// when & then
-		mockMvc.perform(post("/api/orders")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(prepareRequest))
-				.cookie(new Cookie("Access-Token", accessToken))) // Access-Token 쿠키 추가
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.orderNumber").value(testOrderNumber));
-
-		verify(orderService, times(1)).prepareOrder(any(OrderPrepareRequest.class), eq(accessToken));
-	}
-
-	@Test
-	@DisplayName("POST /api/orders (주문 준비) - 비회원")
-	void prepareOrder_NonMember_Success() throws Exception {
-		// given
-		// 비회원은 accessToken이 null로 전달됨
-		given(orderService.prepareOrder(any(OrderPrepareRequest.class), eq(null))).willReturn(prepareResponse);
+		given(orderService.prepareOrder(any(), any(OrderPrepareRequest.class))).willReturn(prepareResponse);
 
 		// when & then
 		mockMvc.perform(post("/api/orders")
@@ -160,7 +141,24 @@ class OrderControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.orderNumber").value(testOrderNumber));
 
-		verify(orderService, times(1)).prepareOrder(any(OrderPrepareRequest.class), eq(null));
+		verify(orderService, times(1)).prepareOrder(any(), any(OrderPrepareRequest.class));
+	}
+
+	@Test
+	@DisplayName("POST /api/orders (주문 준비) - 비회원")
+	void prepareOrder_NonMember_Success() throws Exception {
+		// given
+		// 비회원은 accessToken이 null로 전달됨
+		given(orderService.prepareOrder(eq(null), any(OrderPrepareRequest.class))).willReturn(prepareResponse);
+
+		// when & then
+		mockMvc.perform(post("/api/orders")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(prepareRequest)))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.orderNumber").value(testOrderNumber));
+
+		verify(orderService, times(1)).prepareOrder( eq(null), any(OrderPrepareRequest.class));
 	}
 
 	@Test

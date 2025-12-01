@@ -62,7 +62,6 @@ public class MemberServiceTest {
 	@InjectMocks
 	MemberServiceImpl memberService;
 
-
 	@Test
 	@DisplayName("성공: 회원가입")
 	void createMember_success() {

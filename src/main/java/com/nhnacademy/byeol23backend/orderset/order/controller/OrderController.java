@@ -28,6 +28,7 @@ import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareRespo
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderSearchCondition;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.PointOrderResponse;
 import com.nhnacademy.byeol23backend.orderset.order.service.OrderService;
+import com.nhnacademy.byeol23backend.utils.MemberUtil;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,9 +40,10 @@ public class OrderController {
 	private final OrderService orderService;
 
 	@PostMapping
-	public ResponseEntity<OrderPrepareResponse> prepareOrder(@Valid @RequestBody OrderPrepareRequest request,
-		@CookieValue(name = "Access-Token", required = false) String accessToken) {
-		OrderPrepareResponse response = orderService.prepareOrder(request, accessToken);
+	public ResponseEntity<OrderPrepareResponse> prepareOrder(@Valid @RequestBody OrderPrepareRequest request
+		) {
+		Long memberId = MemberUtil.getMemberId();
+		OrderPrepareResponse response = orderService.prepareOrder(memberId, request);
 		return ResponseEntity.ok(response);
 	}
 
@@ -91,9 +93,11 @@ public class OrderController {
 	}
 
 	@GetMapping("/members")
-	public ResponseEntity<Page<OrderDetailResponse>> getOrders(@CookieValue(name = "Access-Token") String token,
+	public ResponseEntity<Page<OrderDetailResponse>> getOrders(
 		Pageable pageable) {
-		Page<OrderDetailResponse> responses = orderService.getOrders(token, pageable);
+
+		Long memberId = MemberUtil.getMemberId();
+		Page<OrderDetailResponse> responses = orderService.getOrders(memberId, pageable);
 		return ResponseEntity.ok(responses);
 	}
 

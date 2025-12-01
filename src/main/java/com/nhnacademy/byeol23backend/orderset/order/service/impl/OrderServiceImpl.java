@@ -55,6 +55,7 @@ import com.nhnacademy.byeol23backend.orderset.payment.service.PaymentService;
 import com.nhnacademy.byeol23backend.pointset.pointhistories.domain.PointHistory;
 import com.nhnacademy.byeol23backend.pointset.pointhistories.repository.PointHistoryRepository;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
+import com.nhnacademy.byeol23backend.utils.MemberUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -82,19 +83,13 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	@Transactional
-	public OrderPrepareResponse prepareOrder(OrderPrepareRequest request, String accessToken) {
+	public OrderPrepareResponse prepareOrder(Long memberId, OrderPrepareRequest request) {
 		String timeStamp = new SimpleDateFormat("yyMMddHHmmss").format(new Date());
 		String randomPart = String.format("%06d", new Random().nextInt(1_000_000));
 		String orderId = timeStamp + randomPart;
-		Long memberId;
-		Member member = null;
-
-		// 회원
-		if (accessToken != null && !accessToken.isBlank()) {
-			memberId = accessTokenParser(accessToken);
-			member = memberRepository.findById(memberId)
+		Member member = memberRepository.findById(memberId)
 				.orElseThrow(() -> new MemberNotFoundException("해당 아이디의 멤버를 찾을 수 없습니다.: " + memberId));
-		}
+
 
 		String orderPassword = request.orderPassword() == null ? null : passwordEncoder.encode(request.orderPassword());
 
@@ -194,9 +189,7 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public Page<OrderDetailResponse> getOrders(String token, Pageable pageable) {
-		Long memberId = accessTokenParser(token);
-
+	public Page<OrderDetailResponse> getOrders(Long memberId, Pageable pageable) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new MemberNotFoundException("해당 아이디의 회원을 찾을 수 없습니다.: " + memberId));
 

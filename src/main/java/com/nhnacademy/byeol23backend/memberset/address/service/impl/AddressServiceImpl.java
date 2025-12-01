@@ -32,8 +32,8 @@ public class AddressServiceImpl implements AddressService {
 
 	@Override
 	@Transactional
-	public AddressResponse createOrder(String token, AddressRequest request) {
-		Member member = getMember(token);
+	public AddressResponse createOrder(Long memberId, AddressRequest request) {
+		Member member = getMember(memberId);
 
 		// 주소는 10개 이하로
 		if (addressRepository.countAddressesByMember(member) > 10) {
@@ -64,8 +64,8 @@ public class AddressServiceImpl implements AddressService {
 	}
 
 	@Override
-	public List<AddressInfoResponse> getAddresses(String token) {
-		Member member = getMember(token);
+	public List<AddressInfoResponse> getAddresses(Long memberId) {
+		Member member = getMember(memberId);
 
 		List<Address> addresses = addressRepository.findByMemberOrderByIsDefaultDesc(member);
 
@@ -104,9 +104,7 @@ public class AddressServiceImpl implements AddressService {
 		newDefaultAddress.setIsDefault(true);
 	}
 
-	private Member getMember(String token) {
-		Long memberId = jwtParser.parseToken(token).get("memberId", Long.class);
-		log.debug("멤버 아이디(주소 생성, 토큰 파싱 후): {}", memberId);
+	private Member getMember(Long memberId) {
 		return memberRepository.findById(memberId)
 			.orElseThrow(() -> new MemberNotFoundException("해당 아이디의 회원을 찾을 수 없습니다.: " + memberId));
 
