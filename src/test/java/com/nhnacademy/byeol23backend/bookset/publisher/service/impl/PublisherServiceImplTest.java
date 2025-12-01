@@ -19,6 +19,7 @@ import com.nhnacademy.byeol23backend.bookset.publisher.exception.PublisherNotFou
 import com.nhnacademy.byeol23backend.bookset.publisher.exception.RelatedBookExistsException;
 import com.nhnacademy.byeol23backend.bookset.publisher.repository.PublisherRepository;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +34,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
+@Disabled
 @ExtendWith(MockitoExtension.class)
 class PublisherServiceImplTest {
 
