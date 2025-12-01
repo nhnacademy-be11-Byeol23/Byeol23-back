@@ -5,7 +5,7 @@ import com.nhnacademy.byeol23backend.bookset.contributor.domain.Contributor;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.ContributorRole;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.dto.*;
 import com.nhnacademy.byeol23backend.bookset.contributor.exception.ContributorAlreadyExistsException;
-import com.nhnacademy.byeol23backend.bookset.contributor.exception.ContributorNotFound;
+import com.nhnacademy.byeol23backend.bookset.contributor.exception.ContributorNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.contributor.exception.RelatedBookExistsException;
 import com.nhnacademy.byeol23backend.bookset.contributor.repository.ContributorRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -22,10 +22,9 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.given;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ContributorServiceImplTest {
@@ -71,7 +70,7 @@ class ContributorServiceImplTest {
 
 		// when & then
 		assertThatThrownBy(() -> contributorService.getContributorByContributorId(contributorId))
-			.isInstanceOf(ContributorNotFound.class)
+			.isInstanceOf(ContributorNotFoundException.class)
 			.hasMessageContaining("해당 기여자 없음");
 
 		verify(contributorRepository, times(1)).findById(contributorId);
@@ -326,7 +325,7 @@ class ContributorServiceImplTest {
 
 		// when & then
 		assertThatThrownBy(() -> contributorService.updateContributor(contributorId, request))
-			.isInstanceOf(ContributorNotFound.class)
+			.isInstanceOf(ContributorNotFoundException.class)
 			.hasMessageContaining("해당 기여자 없음");
 
 		verify(contributorRepository, times(1))

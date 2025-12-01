@@ -6,7 +6,15 @@ import com.nhnacademy.byeol23backend.couponset.coupon.dto.BirthdayCouponIssueReq
 import com.nhnacademy.byeol23backend.memberset.grade.repository.GradeRepository;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Status;
-import com.nhnacademy.byeol23backend.memberset.member.dto.*;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateRequest;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberMyPageResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateRequest;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.ValueDuplicationCheckRequest;
+import com.nhnacademy.byeol23backend.memberset.member.dto.ValueDuplicationCheckResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateRequest;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateResponse;
 import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateEmailException;
 import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateIdException;
 import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateNicknameException;
@@ -46,7 +54,7 @@ public class MemberServiceImpl implements MemberService {
 
 	@Value("${coupon.welcome.validity-days}")
 	private int validityDays;
-	
+
 	/**
 	 * 회원을 저장하는 함수
 	 * @param request MemberCreateRequest
@@ -73,7 +81,7 @@ public class MemberServiceImpl implements MemberService {
 		memberRepository.save(newMember);
         cartRepository.save(Cart.create(newMember));
 		log.info("멤버 생성을 완료했습니다. {}", newMember.getMemberId());
-		
+
 		//회원가입 성공 시 (save 커밋 성공) 이벤트 발행
 		//이벤트 객체는 생일쿠폰 발급 시 사용한 dto 그대로 사용
 		eventPublisher.publishEvent(
@@ -110,7 +118,8 @@ public class MemberServiceImpl implements MemberService {
 			member.getBirthDate(),
 			member.getCurrentPoint(),
 			member.getMemberRole(),
-			member.getGrade().getGradeName()
+			member.getGrade().getGradeName(),
+			gradeRepository.getAll()
 		);
 	}
 
@@ -164,6 +173,23 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public boolean checkIdDuplicated(String loginId) {
 		return memberRepository.existsByLoginId(loginId);
+	}
+
+	@Override
+	public ValueDuplicationCheckResponse checkDuplication(ValueDuplicationCheckRequest request) {
+		String loginId = request.loginId();
+		String nickname = request.nickname();
+		String email = request.email();
+		String phoneNumber = request.phoneNumber();
+		boolean isDuplicatedId =  memberRepository.existsByLoginId(loginId);
+
+		boolean isDuplicatedNickname = memberRepository.existsByNickname(nickname);
+
+		boolean isDuplicatedEmail = memberRepository.existsByEmail(email);
+
+		 boolean isDuplicatedPhoneNumber = memberRepository.existsByPhoneNumber(phoneNumber);
+
+		 return new ValueDuplicationCheckResponse(isDuplicatedId, isDuplicatedNickname, isDuplicatedEmail, isDuplicatedPhoneNumber);
 	}
 
 	/**
