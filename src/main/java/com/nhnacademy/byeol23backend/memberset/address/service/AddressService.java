@@ -7,11 +7,11 @@ import com.nhnacademy.byeol23backend.memberset.address.dto.AddressRequest;
 import com.nhnacademy.byeol23backend.memberset.address.dto.AddressResponse;
 
 public interface AddressService {
-	AddressResponse createOrder(Long memberId, AddressRequest request);
+	AddressResponse createOrder(String token, AddressRequest request);
 
 	void updateAddress(AddressRequest request);
 
-	List<AddressInfoResponse> getAddresses(Long memberId);
+	List<AddressInfoResponse> getAddresses(String token);
 
 	void deleteAddress(Long addressId);
 

@@ -11,11 +11,14 @@ import org.springframework.data.repository.query.Param;
 
 public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
 
+
+    //회원 가입
     boolean existsByLoginId(String loginId);
     boolean existsByNickname(String nickname);
     boolean existsByEmail(String email);
     boolean existsByPhoneNumber(String phoneNumber);
 
+    //회원 수정
     boolean existsByPhoneNumberAndMemberIdNot(String phoneNumber, Long memberId);
     boolean existsByEmailAndMemberIdNot(String email, Long memberId);
 

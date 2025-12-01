@@ -16,13 +16,14 @@ import java.util.List;
 @Configuration
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
+    private final JwtParser jwtParser;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new ViewerIdInterceptor())
+        registry.addInterceptor(new ViewerIdInterceptor(jwtParser))
                 .addPathPatterns("/api/books/*");
 
-        registry.addInterceptor(new CustomerIdentificationInterceptor())
+        registry.addInterceptor(new CustomerIdentificationInterceptor(jwtParser))
                 .addPathPatterns("/api/carts/**");
     }
 
