@@ -20,7 +20,7 @@ public interface CouponService {
 
     List<UsedCouponInfoResponseDto> getUsedCoupons(String token);
 
-    void getUsableCoupons(Long memberId, List<Long> bookIds, List<Long> categoryIds);
+    void getUsableCoupons(String token, List<Long> bookIds, List<Long> categoryIds);
 
-    void getUsableCouponsTest(Long memberId);
+    void getUsableCouponsTest(String token);
 }

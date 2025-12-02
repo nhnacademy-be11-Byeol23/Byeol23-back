@@ -158,13 +158,9 @@ public class CouponServiceImpl implements CouponService {
                 .toList();
     }
 
-
-    private Long accessTokenParser(String accessToken) {
-        return jwtParser.parseToken(accessToken).get("memberId", Long.class);
-    }
-
     @Override
-    public void getUsableCoupons(Long memberId, List<Long> bookIds, List<Long> categoryIds) {
+    public void getUsableCoupons(String token, List<Long> bookIds, List<Long> categoryIds) {
+        Long memberId = accessTokenParser(token);
         //유효한 쿠폰 전부 조회
         List<Coupon> allUsableCoupons = couponRepository.findByMember_MemberIdAndUsedAtIsNullAndExpiredDateGreaterThanEqual(memberId, LocalDate.now());
         for(Coupon coupon : allUsableCoupons){
@@ -173,9 +169,14 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public void getUsableCouponsTest(Long memberId) {
+    public void getUsableCouponsTest(String token) {
+        Long memberId = accessTokenParser(token);
         List<Coupon> allUsableCoupons = couponRepository.findByMember_MemberIdAndUsedAtIsNullAndExpiredDateGreaterThanEqual(memberId, LocalDate.now());
 
 
+    }
+
+    private Long accessTokenParser(String accessToken) {
+        return jwtParser.parseToken(accessToken).get("memberId", Long.class);
     }
 }

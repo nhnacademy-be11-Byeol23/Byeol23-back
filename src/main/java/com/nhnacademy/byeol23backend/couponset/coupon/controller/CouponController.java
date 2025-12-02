@@ -49,9 +49,9 @@ public class CouponController {
     @GetMapping("/usable")
     public ResponseEntity<Void> getUsableCoupons(
             List<Long> bookIds,
-            List<Long> categoryIds){
-        Long memberId = MemberUtil.getMemberId();
-        couponService.getUsableCoupons(memberId, bookIds, categoryIds);
+            List<Long> categoryIds,
+            @CookieValue("Access-Token") String token){
+        couponService.getUsableCoupons(token, bookIds, categoryIds);
 
 
         return ResponseEntity.ok().build();
@@ -59,8 +59,8 @@ public class CouponController {
 
     @GetMapping("/usable-test")
     public ResponseEntity<Void> getUsableCouponsTest(
-            Long memberId){
-        couponService.getUsableCouponsTest(memberId);
+            @CookieValue("Access-Token") String token){
+        couponService.getUsableCouponsTest(token);
 
 
         return ResponseEntity.ok().build();
