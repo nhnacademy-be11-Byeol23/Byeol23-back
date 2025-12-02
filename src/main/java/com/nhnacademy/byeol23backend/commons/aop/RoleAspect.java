@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.nhnacademy.byeol23backend.commons.exception.PermissionDeniedException;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Role;
 import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
@@ -35,7 +36,7 @@ public class RoleAspect {
 
 		if(!userRole.equals(requiredRole)) {
 			log.warn("권한 부족: required={}, user={}", requiredRole, userRole);
-			throw new MemberNotFoundException("권한이 부족합니다.");
+			throw new PermissionDeniedException("권한이 부족합니다.");
 		}
 		return pjp.proceed();
 	}

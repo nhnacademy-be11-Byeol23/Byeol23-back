@@ -41,6 +41,7 @@ public class BookController {
 
 	private final BookService bookService;
 
+	@RequireRole(Role.ADMIN)
 	@PostMapping
 	public ResponseEntity<BookResponse> createBook(@Valid @RequestBody BookCreateRequest createRequest) {
 		BookResponse response = bookService.createBook(createRequest);

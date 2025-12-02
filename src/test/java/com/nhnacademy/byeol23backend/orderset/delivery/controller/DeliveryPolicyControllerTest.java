@@ -3,7 +3,6 @@ package com.nhnacademy.byeol23backend.orderset.delivery.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.byeol23backend.bookset.book.interceptor.ViewerIdInterceptor;
 import com.nhnacademy.byeol23backend.cartset.cart.interceptor.CustomerIdentificationInterceptor;
-import com.nhnacademy.byeol23backend.commons.filter.TokenFilter;
 import com.nhnacademy.byeol23backend.config.WebConfig;
 import com.nhnacademy.byeol23backend.orderset.delivery.domain.dto.DeliveryPolicyCreateRequest;
 import com.nhnacademy.byeol23backend.orderset.delivery.domain.dto.DeliveryPolicyCreateResponse;
@@ -36,7 +35,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(value = DeliveryPolicyController.class,
-excludeFilters = @ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, classes = {TokenFilter.class, CustomerIdentificationInterceptor.class, ViewerIdInterceptor.class, WebConfig.class}))
+excludeFilters = @ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, classes = {CustomerIdentificationInterceptor.class, ViewerIdInterceptor.class, WebConfig.class}))
 class DeliveryPolicyControllerTest {
 
 	@Autowired

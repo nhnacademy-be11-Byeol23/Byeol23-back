@@ -25,7 +25,7 @@ public class ViewerIdInterceptor implements HandlerInterceptor {
 
         // 회원인 경우
         Long memberId = MemberUtil.getMemberId();
-        if(memberId != null) {
+        if(memberId != -1L) {
             request.setAttribute("viewerId", "member:%d".formatted(memberId));
             return true;
         }

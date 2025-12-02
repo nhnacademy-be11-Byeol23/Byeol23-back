@@ -10,7 +10,6 @@ import com.nhnacademy.byeol23backend.bookset.category.service.CategoryCacheServi
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryCommandService;
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryQueryService;
 import com.nhnacademy.byeol23backend.cartset.cart.interceptor.CustomerIdentificationInterceptor;
-import com.nhnacademy.byeol23backend.commons.filter.TokenFilter;
 import com.nhnacademy.byeol23backend.config.WebConfig;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -34,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = CategoryController.class,
-excludeFilters = @ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, classes = {TokenFilter.class, CustomerIdentificationInterceptor.class, ViewerIdInterceptor.class, WebConfig.class}))
+excludeFilters = @ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, classes = {CustomerIdentificationInterceptor.class, ViewerIdInterceptor.class, WebConfig.class}))
 class CategoryControllerTest {
     @Autowired
     private MockMvc mockMvc;
