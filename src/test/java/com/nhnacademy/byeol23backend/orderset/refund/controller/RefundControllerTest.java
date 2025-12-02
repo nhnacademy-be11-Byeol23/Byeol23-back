@@ -13,8 +13,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -23,13 +26,16 @@ import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
 import com.nhnacademy.byeol23backend.orderset.refund.domain.dto.RefundRequest;
 import com.nhnacademy.byeol23backend.orderset.refund.domain.dto.RefundResponse;
+import com.nhnacademy.byeol23backend.config.SecurityConfig;
 import com.nhnacademy.byeol23backend.orderset.refund.service.RefundService;
 import com.nhnacademy.byeol23backend.orderset.refundpolicy.domain.RefundOption;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
 
 import io.jsonwebtoken.Claims;
 
-@WebMvcTest(RefundController.class)
+@WebMvcTest(value = RefundController.class,
+excludeFilters = @ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, classes = {SecurityConfig.class}))
+@AutoConfigureMockMvc(addFilters = false)
 class RefundControllerTest {
 
 	@Autowired

@@ -13,8 +13,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -29,13 +32,16 @@ import com.nhnacademy.byeol23backend.orderset.packaging.domain.dto.PackagingCrea
 import com.nhnacademy.byeol23backend.orderset.packaging.domain.dto.PackagingCreateResponse;
 import com.nhnacademy.byeol23backend.orderset.packaging.domain.dto.PackagingInfoResponse;
 import com.nhnacademy.byeol23backend.orderset.packaging.domain.dto.PackagingUpdateRequest;
+import com.nhnacademy.byeol23backend.config.SecurityConfig;
 import com.nhnacademy.byeol23backend.orderset.packaging.domain.dto.PackagingUpdateResponse;
 import com.nhnacademy.byeol23backend.orderset.packaging.service.PackagingService;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
 
 import io.jsonwebtoken.Claims;
 
-@WebMvcTest(PackagingController.class)
+@WebMvcTest(value = PackagingController.class,
+excludeFilters = @ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, classes = {SecurityConfig.class}))
+@AutoConfigureMockMvc(addFilters = false)
 class PackagingControllerTest {
 
 	@Autowired

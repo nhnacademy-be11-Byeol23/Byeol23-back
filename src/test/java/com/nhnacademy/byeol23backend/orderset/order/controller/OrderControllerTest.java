@@ -15,8 +15,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -40,14 +43,16 @@ import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareReque
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderSearchCondition;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.PointOrderResponse;
+import com.nhnacademy.byeol23backend.config.SecurityConfig;
 import com.nhnacademy.byeol23backend.orderset.order.service.OrderService;
 import com.nhnacademy.byeol23backend.orderset.packaging.domain.dto.PackagingInfoResponse;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
 
 import io.jsonwebtoken.Claims;
-import jakarta.servlet.http.Cookie;
 
-@WebMvcTest(OrderController.class)
+@WebMvcTest(value = OrderController.class,
+excludeFilters = @ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, classes = {SecurityConfig.class}))
+@AutoConfigureMockMvc(addFilters = false)
 class OrderControllerTest {
 
 	@Autowired
