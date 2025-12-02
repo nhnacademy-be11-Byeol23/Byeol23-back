@@ -1,13 +1,13 @@
 package com.nhnacademy.byeol23backend.couponset.coupon.service.impl;
 
+import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
+import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
+import com.nhnacademy.byeol23backend.bookset.category.repository.CategoryRepository;
 import com.nhnacademy.byeol23backend.config.CouponBirthdayRabbitProperties;
 import com.nhnacademy.byeol23backend.config.CouponBulkRabbitProperties;
 import com.nhnacademy.byeol23backend.config.CouponIssueRabbitProperties;
 import com.nhnacademy.byeol23backend.couponset.coupon.domain.Coupon;
-import com.nhnacademy.byeol23backend.couponset.coupon.dto.BirthdayCouponIssueRequestDto;
-import com.nhnacademy.byeol23backend.couponset.coupon.dto.CouponIssueRequestDto;
-import com.nhnacademy.byeol23backend.couponset.coupon.dto.IssuedCouponInfoResponseDto;
-import com.nhnacademy.byeol23backend.couponset.coupon.dto.UsedCouponInfoResponseDto;
+import com.nhnacademy.byeol23backend.couponset.coupon.dto.*;
 import com.nhnacademy.byeol23backend.couponset.coupon.repository.CouponRepository;
 import com.nhnacademy.byeol23backend.couponset.coupon.service.CouponService;
 import com.nhnacademy.byeol23backend.couponset.coupon.service.CouponValidationStrategy;
@@ -19,6 +19,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -33,10 +34,11 @@ public class CouponServiceImpl implements CouponService {
     private final CouponIssueRabbitProperties couponIssueRabbitProperties;
     private final CouponBulkRabbitProperties couponBulkRabbitProperties;
     private final CouponBirthdayRabbitProperties couponBirthdayRabbitProperties;
+    private final CategoryRepository categoryRepository;
     private final CouponRepository couponRepository;
+    private final BookRepository bookRepository;
     private final JwtParser jwtParser;
     private final Map<String, CouponValidationStrategy> validationStrategyMap;
-
 
     @Override
     public void sendIssueRequestToMQ(CouponIssueRequestDto request) {
@@ -159,13 +161,39 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public void getUsableCoupons(String token, List<Long> bookIds, List<Long> categoryIds) {
+    public List<UsableCouponInfoResponse> getUsableCoupons(String token, List<OrderItemRequest> request) {
         Long memberId = accessTokenParser(token);
+        List<Long> bookIds = request.stream()
+                .map(OrderItemRequest::bookId)
+                .toList();
+
         //유효한 쿠폰 전부 조회
         List<Coupon> allUsableCoupons = couponRepository.findByMember_MemberIdAndUsedAtIsNullAndExpiredDateGreaterThanEqual(memberId, LocalDate.now());
-        for(Coupon coupon : allUsableCoupons){
-            log.info("coupon 정보 : {}", coupon);
+
+        //도서들의 카테고리 아이디(부모 카테고리 포함)
+        List<Long> allCategoryIds = categoryRepository.findAllAncestorsByBookIds(bookIds);
+        Long totalAmount = calculateTotalAmount(request);
+
+        for(Long categoryId : allCategoryIds){
+            log.info("조회된 카테고리: {}", categoryId);
         }
+        //OrderContext 초기화
+        OrderContext orderContext = new OrderContext(bookIds, allCategoryIds, totalAmount);
+        //상품에 적용 가능한 쿠폰들 검증
+        return allUsableCoupons.stream()
+                .filter(coupon -> {
+                    String policyType = coupon.getCouponPolicy().getCouponPolicyType().getValue();
+                    CouponValidationStrategy strategy = validationStrategyMap.get(policyType);
+
+                    if (strategy != null) {
+                        return strategy.isApplicable(coupon, orderContext);
+                    }
+                    return false;
+                })
+                .map(UsableCouponInfoResponse::fromEntity)
+                .toList();
+        //
+
     }
 
     @Override
@@ -178,5 +206,28 @@ public class CouponServiceImpl implements CouponService {
 
     private Long accessTokenParser(String accessToken) {
         return jwtParser.parseToken(accessToken).get("memberId", Long.class);
+    }
+
+    private Long calculateTotalAmount(List<OrderItemRequest> orderItems) {
+        // BigDecimal을 사용하여 금액 계산의 정확성을 확보
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        // 주문 항목들을 순회하며 금액 계산
+        for (OrderItemRequest item : orderItems) {
+            // 1. DB에서 해당 도서의 최신 판매 가격(salePrice)을 조회
+            Book book = bookRepository.findByBookId(item.bookId()) // 1. Optional<Book>을 반환받음
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 도서 ID: " + item.bookId()));
+
+            // 2. 판매 가격(salePrice)과 수량(quantity)을 곱함
+            BigDecimal itemPrice = book.getSalePrice()
+                    .multiply(new BigDecimal(item.quantity()));
+
+            // 3. 총 금액에 합산
+            totalAmount = totalAmount.add(itemPrice);
+        }
+
+        // 4. 합산된 BigDecimal 금액을 정수형(Long)으로 반환 (원 단위로 가정)
+        // 예: 1000.00 -> 1000L
+        return totalAmount.longValue();
     }
 }

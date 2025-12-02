@@ -1,9 +1,6 @@
 package com.nhnacademy.byeol23backend.couponset.coupon.service;
 
-import com.nhnacademy.byeol23backend.couponset.coupon.dto.BirthdayCouponIssueRequestDto;
-import com.nhnacademy.byeol23backend.couponset.coupon.dto.CouponIssueRequestDto;
-import com.nhnacademy.byeol23backend.couponset.coupon.dto.IssuedCouponInfoResponseDto;
-import com.nhnacademy.byeol23backend.couponset.coupon.dto.UsedCouponInfoResponseDto;
+import com.nhnacademy.byeol23backend.couponset.coupon.dto.*;
 
 import java.util.List;
 
@@ -20,7 +17,7 @@ public interface CouponService {
 
     List<UsedCouponInfoResponseDto> getUsedCoupons(String token);
 
-    void getUsableCoupons(String token, List<Long> bookIds, List<Long> categoryIds);
+    List<UsableCouponInfoResponse> getUsableCoupons(String token, List<OrderItemRequest> request);
 
     void getUsableCouponsTest(String token);
 }

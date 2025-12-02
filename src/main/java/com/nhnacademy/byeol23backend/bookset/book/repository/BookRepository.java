@@ -48,4 +48,6 @@ select b.book_id as bookId, count(distinct r.review_id) as reviewCount, round(av
 
 	@Query("select count(b) from Book b where b.publisher.publisherId = :publisherId")
 	Long countBooksByPublisherId(@Param("publisherId") Long publisherId);
+
+    Optional<Book> findByBookId(Long bookId);
 }

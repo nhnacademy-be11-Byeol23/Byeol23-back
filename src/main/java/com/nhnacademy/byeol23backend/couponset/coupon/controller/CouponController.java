@@ -1,10 +1,9 @@
 package com.nhnacademy.byeol23backend.couponset.coupon.controller;
 
-import com.nhnacademy.byeol23backend.couponset.coupon.dto.CouponIssueRequestDto;
-import com.nhnacademy.byeol23backend.couponset.coupon.dto.IssuedCouponInfoResponseDto;
-import com.nhnacademy.byeol23backend.couponset.coupon.dto.UsedCouponInfoResponseDto;
+import com.nhnacademy.byeol23backend.couponset.coupon.dto.*;
 import com.nhnacademy.byeol23backend.couponset.coupon.service.CouponService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/coupon")
 @RequiredArgsConstructor
+@Slf4j
 public class CouponController {
     private final CouponService couponService;
 
@@ -45,16 +45,22 @@ public class CouponController {
      * 쿠폰 : IT>프로그래밍
      * 도서1 : IT>프로그래밍>자바 =>적용가능
      * 도서2 : IT => 적용 불가능
+     *
+     * book 객체들
+     * 객체에 있어야되는거
+     * 1. 도서 id
+     * 2. 카테고리 ids(루트부터 이어지는 list)
      */
-    @GetMapping("/usable")
-    public ResponseEntity<Void> getUsableCoupons(
-            List<Long> bookIds,
-            List<Long> categoryIds,
+    @PostMapping("/usable")
+    public ResponseEntity<List<UsableCouponInfoResponse>> getUsableCoupons(
+            @RequestBody List<OrderItemRequest> request,
             @CookieValue("Access-Token") String token){
-        couponService.getUsableCoupons(token, bookIds, categoryIds);
+        List<UsableCouponInfoResponse> usableCoupons = couponService.getUsableCoupons(token, request);
 
-
-        return ResponseEntity.ok().build();
+        for(UsableCouponInfoResponse couponInfoResponse : usableCoupons){
+            log.info("사용가능 쿠폰 : {}", couponInfoResponse.toString());
+        }
+        return ResponseEntity.ok(usableCoupons);
     }
 
     @GetMapping("/usable-test")
