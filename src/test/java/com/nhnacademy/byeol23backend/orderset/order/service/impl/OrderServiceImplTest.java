@@ -58,12 +58,10 @@ import com.nhnacademy.byeol23backend.utils.JwtParser;
 import io.jsonwebtoken.Claims;
 
 /**
- * 25.12.01
- * Disable 해도 에러나서 메서드 몇개 주석처리 해놓음
- * 나중에 해결 필요
+ * method symbol이랑 다른 부분은 주석처리 해놨음
  */
-@Disabled
 @ExtendWith(MockitoExtension.class)
+@Disabled
 class OrderServiceImplTest {
 
 	@Mock

@@ -13,8 +13,6 @@ import com.nhnacademy.byeol23backend.couponset.coupon.service.CouponService;
 import com.nhnacademy.byeol23backend.couponset.coupon.service.CouponValidationStrategy;
 import com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.CouponPolicy;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
-import com.nhnacademy.byeol23backend.utils.MemberUtil;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -92,7 +90,8 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public List<IssuedCouponInfoResponseDto> getIssuedCoupons(Long memberId) {
+    public List<IssuedCouponInfoResponseDto> getIssuedCoupons(String token) {
+        Long memberId = accessTokenParser(token);
         List<Coupon> couponList = couponRepository.findByMember_MemberIdAndUsedAtIsNull(memberId);
 
         LocalDate today = LocalDate.now();
@@ -128,7 +127,9 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public List<UsedCouponInfoResponseDto> getUsedCoupons(Long memberId) {
+    public List<UsedCouponInfoResponseDto> getUsedCoupons(String token) {
+        Long memberId = accessTokenParser(token);
+
         List<Coupon> couponList = couponRepository.findByMember_MemberIdAndUsedAtIsNotNull(memberId);
 
         return couponList.stream()
@@ -155,6 +156,11 @@ public class CouponServiceImpl implements CouponService {
                     );
                 })
                 .toList();
+    }
+
+
+    private Long accessTokenParser(String accessToken) {
+        return jwtParser.parseToken(accessToken).get("memberId", Long.class);
     }
 
     @Override

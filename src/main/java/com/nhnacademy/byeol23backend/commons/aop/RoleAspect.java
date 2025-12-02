@@ -10,6 +10,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Role;
 import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
+//import com.nhnacademy.byeol23backend.utils.MemberUtil;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,7 +29,7 @@ public class RoleAspect {
 	public Object roleCheck(ProceedingJoinPoint pjp, RequireRole requireRole) throws Throwable {
 
 		ServletRequestAttributes attrs =
-			(ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
+				(ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
 
 		if(attrs == null) {
 			throw new MemberNotFoundException("요청 정보가 없습니다.");
