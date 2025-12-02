@@ -1,4 +1,4 @@
-package com.nhnacademy.byeol23backend.orderset.payment.service.impl;
+package com.nhnacademy.byeol23backend.orderset.payment.service;
 
 import java.util.List;
 import java.util.Map;
@@ -13,7 +13,6 @@ import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentCancelRe
 import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentCancelResponse;
 import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentConfirmResponse;
 import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentParamRequest;
-import com.nhnacademy.byeol23backend.orderset.payment.service.PaymentGatewayClient;
 
 @Component
 public class PaymentFacade {
@@ -21,7 +20,7 @@ public class PaymentFacade {
 	// (PG사 Enum을 key로, 실제 client 구현체를 value로 갖는 Map)
 	private final Map<PaymentProvider, PaymentGatewayClient> clientMap;
 
-	/*
+	/**
 	 * Spring이 PaymentGatewayClient를 구현한 모든 Bean(Toss, ....)을
 	 * List로 주입
 	 * */
@@ -34,7 +33,7 @@ public class PaymentFacade {
 			));
 	}
 
-	/*
+	/**
 	 * 결제 승인을 요청하는 유일한 창구(facade) 메서드
 	 * */
 	public PaymentConfirmResponse confirmPayment(PaymentProvider provider, PaymentParamRequest request) {

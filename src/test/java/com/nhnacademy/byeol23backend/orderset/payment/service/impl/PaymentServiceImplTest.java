@@ -45,6 +45,7 @@ import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentParamReq
 import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentResultResponse;
 import com.nhnacademy.byeol23backend.orderset.payment.exception.PaymentNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.payment.repository.PaymentRepository;
+import com.nhnacademy.byeol23backend.orderset.payment.service.PaymentFacade;
 import com.nhnacademy.byeol23backend.pointset.pointhistories.domain.PointHistory;
 import com.nhnacademy.byeol23backend.pointset.pointhistories.service.PointService;
 

@@ -57,8 +57,13 @@ import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentCancelRe
 import com.nhnacademy.byeol23backend.orderset.payment.exception.PaymentNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.payment.repository.PaymentRepository;
 import com.nhnacademy.byeol23backend.orderset.payment.service.PaymentService;
+import com.nhnacademy.byeol23backend.pointset.orderpoint.domain.OrderPoint;
+import com.nhnacademy.byeol23backend.pointset.orderpoint.repository.OrderPointRepository;
 import com.nhnacademy.byeol23backend.pointset.pointhistories.domain.PointHistory;
+import com.nhnacademy.byeol23backend.pointset.pointhistories.exception.PointNotEnoughException;
 import com.nhnacademy.byeol23backend.pointset.pointhistories.repository.PointHistoryRepository;
+import com.nhnacademy.byeol23backend.pointset.pointhistories.service.PointService;
+import com.nhnacademy.byeol23backend.pointset.pointpolicy.dto.ReservedPolicy;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
 
 import lombok.RequiredArgsConstructor;
@@ -77,6 +82,8 @@ public class OrderServiceImpl implements OrderService {
 	private final PaymentService paymentService;
 	private final DeliveryPolicyRepository deliveryPolicyRepository;
 	private final PackagingRepository packagingRepository;
+	private final OrderPointRepository orderPointRepository;
+	private final PointService pointService;
 	private final JwtParser jwtParser;
 	private final PasswordEncoder passwordEncoder;
 	private static final String ORDER_STATUS_PAYMENT_COMPLETED = "결제 완료";
@@ -130,6 +137,24 @@ public class OrderServiceImpl implements OrderService {
 				book, packaging, order);
 
 			orderDetailRepository.save(orderDetail);
+		}
+
+		// 회원 주문이고(member가 null이 아니고) 사용한 포인트량이 null이 아니면
+		if (!Objects.isNull(member) && !Objects.isNull(request.usedPoints())) {
+			BigDecimal usedPoints = request.usedPoints();
+			BigDecimal currentPoint = member.getCurrentPoint();
+
+			if (usedPoints.compareTo(currentPoint) > 0) {
+				throw new PointNotEnoughException("보유 포인트를 초과하여 사용할 수 없습니다.");
+			}
+
+			if (usedPoints.compareTo(BigDecimal.ZERO) > 0) {
+				PointHistory pointHistory = pointService.offsetPointsWithExtra(member, ReservedPolicy.ORDER,
+					usedPoints.negate());
+				order.setPointHistory(pointHistory);
+				OrderPoint orderPoint = new OrderPoint(order, pointHistory);
+				orderPointRepository.save(orderPoint);
+			}
 		}
 
 		return new OrderPrepareResponse(order.getOrderNumber(), order.getActualOrderPrice(), order.getReceiver());
@@ -352,16 +377,11 @@ public class OrderServiceImpl implements OrderService {
 		DeliveryPolicyInfoResponse delivery = new DeliveryPolicyInfoResponse(deliveryPolicy.getFreeDeliveryCondition(),
 			deliveryPolicy.getDeliveryFee(), deliveryPolicy.getChangedAt());
 
-		PointHistory pointHistory = null;
+		// 포인트 amount가 0보다 작은 값을 가져옴
+		BigDecimal pointAmount = orderPointRepository.findUsedPointsAmountByOrder(order);
 
-		if (order.getPointHistory() != null) {
-			pointHistory = pointHistoryRepository.findById(order.getPointHistory().getPointHistoryId())
-				.orElse(null);
-		}
-
-		BigDecimal usedPoints = (pointHistory != null && pointHistory.getPointAmount() != null)
-			? pointHistory.getPointAmount()
-			: BigDecimal.ZERO;
+		// 포인트 내역에서 포인트 사용량이 있고, 포인트 사용량이 0보다 낮으면 orderDetail에 저장
+		BigDecimal usedPoints = pointAmount != null ? pointAmount.abs() : BigDecimal.ZERO;
 
 		return new OrderDetailResponse(order.getOrderNumber(), order.getOrderedAt(), order.getOrderStatus(),
 			order.getActualOrderPrice(), order.getReceiver(), order.getReceiverPhone(), order.getReceiverAddress(),
