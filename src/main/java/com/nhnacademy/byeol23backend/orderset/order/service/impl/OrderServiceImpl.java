@@ -215,6 +215,13 @@ public class OrderServiceImpl implements OrderService {
 		Order order = orderRepository.findOrderByOrderNumber(orderNumber)
 			.orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND_MESSAGE + orderNumber));
 
+		PointHistory pointHistory = pointService.offsetPointsByOrder(order.getMember(), order.getActualOrderPrice());
+		pointHistoryRepository.save(pointHistory);
+		order.setPointHistory(pointHistory);
+
+		OrderPoint orderPoint = new OrderPoint(order, pointHistory);
+		orderPointRepository.save(orderPoint);
+
 		order.updateOrderStatus(ORDER_STATUS_PAYMENT_COMPLETED);
 
 		return new PointOrderResponse(order.getOrderNumber(), order.getTotalBookPrice(), PAYMENT_METHOD_POINT);
