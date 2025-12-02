@@ -1,7 +1,9 @@
 package com.nhnacademy.byeol23backend.couponset.coupon.service;
 
 import com.nhnacademy.byeol23backend.couponset.coupon.dto.*;
+import com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.CouponPolicy;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface CouponService {
@@ -19,5 +21,9 @@ public interface CouponService {
 
     List<UsableCouponInfoResponse> getUsableCoupons(String token, List<OrderItemRequest> request);
 
-    void getUsableCouponsTest(String token);
+    Long calculateFinalDiscount(CouponApplyRequest request);
+
+    Long calculateTotalAmount(List<OrderItemRequest> orderItems);
+
+    Long calculateDiscountValue(CouponPolicy policy, BigDecimal targetSubtotal);
 }

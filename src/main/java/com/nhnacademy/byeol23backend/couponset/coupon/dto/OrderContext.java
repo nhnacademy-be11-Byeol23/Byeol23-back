@@ -6,6 +6,6 @@ import java.util.List;
 public record OrderContext(
         List<Long> bookIds,
         List<Long> categoryIds,
-        Long totalPrice
+        BigDecimal totalPrice
 ) {
 }

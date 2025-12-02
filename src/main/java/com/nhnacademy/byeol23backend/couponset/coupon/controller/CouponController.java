@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/coupon")
@@ -63,13 +64,10 @@ public class CouponController {
         return ResponseEntity.ok(usableCoupons);
     }
 
-    @GetMapping("/usable-test")
-    public ResponseEntity<Void> getUsableCouponsTest(
-            @CookieValue("Access-Token") String token){
-        couponService.getUsableCouponsTest(token);
+    @PostMapping("/calculate-discount")
+    public ResponseEntity<Map<String, Long>> calculateDiscount(@RequestBody CouponApplyRequest request) {
 
-
-        return ResponseEntity.ok().build();
+        Long finalDiscountAmount = couponService.calculateFinalDiscount(request);
+        return ResponseEntity.ok(Map.of("discountAmount", finalDiscountAmount));
     }
-
 }

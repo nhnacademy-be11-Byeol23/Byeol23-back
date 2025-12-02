@@ -91,4 +91,9 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
             nativeQuery = true
     )
     List<Long> findAllAncestorsByBookIds(@Param("bookIds") List<Long> bookIds);
+
+    @Query("SELECT COUNT(ccp) > 0 FROM CategoryCouponPolicy ccp " +
+            "WHERE ccp.couponPolicy.couponPolicyId = :policyId " +
+            "AND ccp.category.categoryId IN :itemCategoryIds")
+    boolean isAnyCategoryIncludedInPolicy(@Param("itemCategoryIds") List<Long> itemCategoryIds, @Param("policyId") Long policyId);
 }
