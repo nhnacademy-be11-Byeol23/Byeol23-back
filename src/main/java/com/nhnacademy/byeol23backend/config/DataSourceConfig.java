@@ -2,7 +2,6 @@ package com.nhnacademy.byeol23backend.config;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -75,19 +74,5 @@ public class DataSourceConfig {
         transactionManager.setEntityManagerFactory(dataDbEntityManagerFactory(dataSource).getObject());
 
         return transactionManager;
-    }
-    @Bean
-    public CommandLineRunner checkDataSource(@Qualifier("mainDataSource") DataSource dataSource) {
-        return args -> {
-            if (dataSource instanceof BasicDataSource) {
-                BasicDataSource basicDataSource = (BasicDataSource) dataSource;
-                System.out.println(">>> DBCP2 Config Check <<<");
-                System.out.println("Initial Size: " + basicDataSource.getInitialSize());
-                System.out.println("Max Total: " + basicDataSource.getMaxTotal());
-                System.out.println("Url: " + basicDataSource.getUrl());
-            } else {
-                System.out.println(">>> DataSource is not BasicDataSource: " + dataSource.getClass().getName());
-            }
-        };
     }
 }
