@@ -68,6 +68,11 @@ public class CategoryController {
         return categoryQueryService.getLeafCategories();
     }
 
+	@GetMapping("/categories/leaf/mainpage")
+	public List<CategoryMainPageResponse> getLeavesForMainPage(){
+		return categoryQueryService.getLeafCategoriesForMainPage();
+	}
+
     @GetMapping("/categories/tree")
     @ResponseStatus(HttpStatus.OK)
     public List<CategoryTreeResponse> getRootsWithChildren2Depth() {

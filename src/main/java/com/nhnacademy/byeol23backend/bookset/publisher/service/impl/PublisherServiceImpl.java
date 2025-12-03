@@ -20,19 +20,21 @@ import com.nhnacademy.byeol23backend.bookset.tag.exception.TagAlreadyExistsExcep
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PublisherServiceImpl implements PublisherService {
 	private final PublisherRepository publisherRepository;
 	private final BookRepository bookRepository;
 
 	@Override
+	@Transactional
 	public PublisherCreateResponse createPublisher(PublisherCreateRequest request) {
 		if (publisherRepository.findByPublisherName(request.publisherName()).isPresent()){
 			throw new PublisherAlreadyExistsException("Publisher가 이미 존재합니다.");
@@ -62,6 +64,7 @@ public class PublisherServiceImpl implements PublisherService {
 	}
 
 	@Override
+	@Transactional
 	public PublisherUpdateResponse updatePublisherByPublisherId(Long publisherId, PublisherUpdateRequest request) {
 		Publisher publisher = publisherRepository.findByPublisherId(publisherId)
 			.orElseThrow(() -> new PublisherNotFoundException("해당 아이디 태그를 찾을 수 없습니다: " + publisherId));
@@ -82,6 +85,7 @@ public class PublisherServiceImpl implements PublisherService {
 	}
 
 	@Override
+	@Transactional
 	public AllPublishersInfoResponse findOrCreatePublisher(String publisherName) {
 		return publisherRepository.findByPublisherName(publisherName)
 			.map(AllPublishersInfoResponse::new)
