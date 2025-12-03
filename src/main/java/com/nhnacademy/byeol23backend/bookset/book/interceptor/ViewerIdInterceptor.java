@@ -1,6 +1,8 @@
 package com.nhnacademy.byeol23backend.bookset.book.interceptor;
 
 import com.nhnacademy.byeol23backend.utils.JwtParser;
+import com.nhnacademy.byeol23backend.utils.MemberUtil;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
@@ -17,30 +19,19 @@ import java.util.Arrays;
 @SuppressWarnings("squid:S3516")
 @RequiredArgsConstructor
 public class ViewerIdInterceptor implements HandlerInterceptor {
-    private final JwtParser jwtParser;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         if(!"GET".equalsIgnoreCase(request.getMethod())) return true;
 
         // 회원인 경우
-        String accessToken = null;
-        if(request.getCookies() != null) {
-            accessToken = Arrays.stream(request.getCookies())
-                    .filter(cookie -> cookie.getName().equals("Access-Token"))
-                    .map(Cookie::getValue)
-                    .findFirst()
-                    .orElse(null);
+        Long memberId = MemberUtil.getMemberId();
+        if(memberId != -1L) {
+            request.setAttribute("viewerId", "member:%d".formatted(memberId));
+            return true;
         }
 
-        if(StringUtils.isNotBlank(accessToken)) {
-            try {
-                Claims claims = jwtParser.parseToken(accessToken);
-                Long memberId = claims.get("memberId", Long.class);
-                request.setAttribute("viewerId", "member:%d".formatted(memberId));
-                return true;
-            } catch (ExpiredJwtException ignored) {}
-        }
+
 
         // 비회원인 경우
         if(request.getCookies() != null) {

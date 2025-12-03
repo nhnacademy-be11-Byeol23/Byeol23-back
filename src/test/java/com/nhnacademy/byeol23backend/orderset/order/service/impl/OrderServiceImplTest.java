@@ -30,7 +30,6 @@ import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookInfoRequest;
 import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
-import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
 import com.nhnacademy.byeol23backend.orderset.delivery.domain.DeliveryPolicy;
 import com.nhnacademy.byeol23backend.orderset.delivery.repository.DeliveryPolicyRepository;
@@ -40,7 +39,6 @@ import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelReques
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderDetailResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderInfoResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareRequest;
-import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderSearchCondition;
 import com.nhnacademy.byeol23backend.orderset.order.exception.OrderNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.order.repository.OrderRepository;
@@ -53,9 +51,6 @@ import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentCancelRe
 import com.nhnacademy.byeol23backend.orderset.payment.exception.PaymentNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.payment.repository.PaymentRepository;
 import com.nhnacademy.byeol23backend.orderset.payment.service.PaymentService;
-import com.nhnacademy.byeol23backend.utils.JwtParser;
-
-import io.jsonwebtoken.Claims;
 
 /**
  * method symbol이랑 다른 부분은 주석처리 해놨음
@@ -80,8 +75,7 @@ class OrderServiceImplTest {
 	private DeliveryPolicyRepository deliveryPolicyRepository;
 	@Mock
 	private PackagingRepository packagingRepository;
-	@Mock
-	private JwtParser jwtParser;
+
 	@Mock
 	private PasswordEncoder passwordEncoder;
 
@@ -96,9 +90,9 @@ class OrderServiceImplTest {
 	private Order mockOrder;
 	private Payment mockPayment;
 	private OrderPrepareRequest memberRequest;
-	private OrderPrepareRequest nonMemberRequest;
 	private BookInfoRequest bookInfoRequestWithPackaging;
 	private BookInfoRequest bookInfoRequestWithoutPackaging;
+	private BigDecimal usedPoints = BigDecimal.ZERO;
 	private static final String ORDER_STATUS_PAYMENT_COMPLETED = "결제 완료";
 	private static final String ORDER_STATUS_ORDER_CANCELED = "주문 취소";
 	private static final String ORDER_NOT_FOUND_MESSAGE = "해당 주문 번호를 찾을 수 없습니다.: ";
@@ -133,7 +127,8 @@ class OrderServiceImplTest {
 			"홍길동", "12345", "주소", "상세주소", null, "01012345678",
 			LocalDate.now().plusDays(1),
 			List.of(bookInfoRequestWithPackaging, bookInfoRequestWithoutPackaging),
-			null // 회원 주문은 비밀번호가 null
+			null, // 회원 주문은 비밀번호가 null
+			usedPoints
 		);
 
 		// 비회원 주문 DTO
@@ -142,22 +137,17 @@ class OrderServiceImplTest {
 			"비회원", "54321", "주소", "상세주소", null, "01087654321",
 			LocalDate.now().plusDays(1),
 			List.of(bookInfoRequestWithPackaging, bookInfoRequestWithoutPackaging),
-			"nonMemberPassword123" // 비회원 주문은 비밀번호가 있음
+			"nonMemberPassword123", // 비회원 주문은 비밀번호가 있음
+			BigDecimal.ZERO
 		);
-
 	}
 
 	@Test
 	@DisplayName("회원 주문 준비 (prepareOrder) 성공")
 	void prepareOrder_Member_Success() {
 		// given
-		String accessToken = "valid-member-token";
 		Long memberId = 1L;
-		String hashedPassword = "hashedPassword";
 
-		Claims mockClaims = Mockito.mock(Claims.class);
-		given(jwtParser.parseToken(accessToken)).willReturn(mockClaims);
-		given(mockClaims.get("memberId", Long.class)).willReturn(memberId);
 		given(memberRepository.findById(memberId)).willReturn(Optional.of(mockMember));
 		given(deliveryPolicyRepository.findFirstByOrderByChangedAtDesc()).willReturn(Optional.of(mockPolicy));
 
@@ -173,10 +163,10 @@ class OrderServiceImplTest {
 		given(orderRepository.save(orderCaptor.capture())).willReturn(mockOrder);
 
 		// when
-//		OrderPrepareResponse response = orderServiceImpl.prepareOrder(memberRequest, accessToken);
+
+		OrderPrepareResponse response = orderServiceImpl.prepareOrder(memberId, memberRequest);
 
 		// then
-		verify(jwtParser, times(1)).parseToken(accessToken);
 		verify(memberRepository, times(1)).findById(memberId);
 		verify(passwordEncoder, never()).encode(anyString()); // 회원 주문 시 비밀번호 암호화 X
 		verify(orderRepository, times(1)).save(any(Order.class));
@@ -187,58 +177,21 @@ class OrderServiceImplTest {
 		assertThat(savedOrder.getMember()).isEqualTo(mockMember);
 		assertThat(savedOrder.getOrderPassword()).isNull();
 
-//		assertThat(response).isNotNull();
-//		assertThat(response.receiver()).isEqualTo("홍길동");
-	}
-
-	@Test
-	@DisplayName("비회원 주문 준비 (prepareOrder) 성공")
-	void prepareOrder_NonMember_Success() {
-		// given
-		String accessToken = null; // 비회원은 토큰 없음
-		String hashedPassword = "hashedPassword";
-
-		given(passwordEncoder.encode("nonMemberPassword123")).willReturn(hashedPassword);
-		given(deliveryPolicyRepository.findFirstByOrderByChangedAtDesc()).willReturn(Optional.of(mockPolicy));
-		given(bookRepository.findById(anyLong())).willReturn(Optional.of(mockBook));
-		given(packagingRepository.findById(anyLong())).willReturn(Optional.of(mockPackaging));
-
-		ArgumentCaptor<Order> orderCaptor = ArgumentCaptor.forClass(Order.class);
-		given(orderRepository.save(orderCaptor.capture())).willReturn(mockOrder);
-
-		// when
-//		OrderPrepareResponse response = orderServiceImpl.prepareOrder(nonMemberRequest, accessToken);
-
-		// then
-		verify(jwtParser, never()).parseToken(anyString()); // 비회원 주문 시 토큰 파싱 X
-		verify(memberRepository, never()).findById(anyLong()); // 회원 조회 X
-		verify(passwordEncoder, times(1)).encode("nonMemberPassword123"); // 비밀번호 암호화 O
-		verify(orderRepository, times(1)).save(any(Order.class));
-		verify(orderDetailRepository, times(2)).save(any(OrderDetail.class));
-
-		Order savedOrder = orderCaptor.getValue();
-		assertThat(savedOrder.getMember()).isNull();
-		assertThat(savedOrder.getOrderPassword()).isEqualTo(hashedPassword);
-
-//		assertThat(response).isNotNull();
-//		assertThat(response.receiver()).isEqualTo("비회원");
+		assertThat(response).isNotNull();
+		assertThat(response.receiver()).isEqualTo("홍길동");
 	}
 
 	@Test
 	@DisplayName("주문 준비 시 회원 조회 실패")
 	void prepareOrder_MemberNotFound_ThrowsException() {
 		// given
-		String accessToken = "invalid-token";
 		Long memberId = 99L;
-		Claims mockClaims = Mockito.mock(Claims.class);
-		given(jwtParser.parseToken(accessToken)).willReturn(mockClaims);
-		given(mockClaims.get("memberId", Long.class)).willReturn(memberId);
 		given(memberRepository.findById(memberId)).willReturn(Optional.empty()); // 회원 없음
 
 		// when & then
-//		assertThatThrownBy(() -> orderServiceImpl.prepareOrder(memberRequest, accessToken))
-//			.isInstanceOf(MemberNotFoundException.class)
-//			.hasMessageContaining("해당 아이디의 멤버를 찾을 수 없습니다.: 99");
+		assertThatThrownBy(() -> orderServiceImpl.prepareOrder(memberId, memberRequest))
+			.isInstanceOf(MemberNotFoundException.class)
+			.hasMessageContaining("해당 아이디의 멤버를 찾을 수 없습니다.: 99");
 	}
 
 	@Test

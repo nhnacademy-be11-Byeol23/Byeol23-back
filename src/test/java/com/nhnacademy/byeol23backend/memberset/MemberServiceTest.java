@@ -1,21 +1,15 @@
 package com.nhnacademy.byeol23backend.memberset;
 
-import com.nhnacademy.byeol23backend.cartset.cart.domain.Cart;
-import com.nhnacademy.byeol23backend.cartset.cart.repository.CartRepository;
-import com.nhnacademy.byeol23backend.memberset.grade.domain.Grade;
-import com.nhnacademy.byeol23backend.memberset.grade.repository.GradeRepository;
-import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
-import com.nhnacademy.byeol23backend.memberset.member.domain.RegistrationSource;
-import com.nhnacademy.byeol23backend.memberset.member.domain.Role;
-import com.nhnacademy.byeol23backend.memberset.member.domain.Status;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberMyPageResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.exception.*;
-import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
-import com.nhnacademy.byeol23backend.memberset.member.service.impl.MemberServiceImpl;
-import com.nhnacademy.byeol23backend.utils.JwtParser;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
+
+import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,17 +21,28 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.math.BigDecimal;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import com.nhnacademy.byeol23backend.cartset.cart.domain.Cart;
+import com.nhnacademy.byeol23backend.cartset.cart.repository.CartRepository;
+import com.nhnacademy.byeol23backend.memberset.address.domain.Address;
+import com.nhnacademy.byeol23backend.memberset.address.repository.AddressRepository;
+import com.nhnacademy.byeol23backend.memberset.grade.domain.Grade;
+import com.nhnacademy.byeol23backend.memberset.grade.repository.GradeRepository;
+import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
+import com.nhnacademy.byeol23backend.memberset.member.domain.RegistrationSource;
+import com.nhnacademy.byeol23backend.memberset.member.domain.Role;
+import com.nhnacademy.byeol23backend.memberset.member.domain.Status;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateRequest;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberMyPageResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateRequest;
+import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateEmailException;
+import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateIdException;
+import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicatePhoneNumberException;
+import com.nhnacademy.byeol23backend.memberset.member.exception.IncorrectPasswordException;
+import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
+import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
+import com.nhnacademy.byeol23backend.memberset.member.service.impl.MemberServiceImpl;
+import com.nhnacademy.byeol23backend.utils.JwtParser;
 
 @ExtendWith(MockitoExtension.class)
 public class MemberServiceTest {
@@ -51,7 +56,10 @@ public class MemberServiceTest {
 	GradeRepository gradeRepository;
 
 	@Mock
-    CartRepository cartRepository;
+	private AddressRepository addressRepository; // AddressRepository 모킹 유지
+
+	@Mock
+	CartRepository cartRepository;
 
 	@Mock
 	JwtParser jwtParser;
@@ -62,6 +70,8 @@ public class MemberServiceTest {
 	@InjectMocks
 	MemberServiceImpl memberService;
 
+	@Mock
+	private Address mockAddress;
 
 	@Test
 	@DisplayName("성공: 회원가입")
@@ -217,6 +227,18 @@ public class MemberServiceTest {
 			grade
 		);
 
+		given(addressRepository.findAddressByMemberAndIsDefault(any(Member.class)))
+			.willReturn(Optional.of(mockAddress)); // null이 아닌 유효한 주소가 있다고 가정
+
+		// 2. AddressResponse DTO 생성을 위해 mockAddress의 Getter 동작 정의
+		given(mockAddress.getAddressId()).willReturn(8L);
+		given(mockAddress.getPostCode()).willReturn("04410");
+		given(mockAddress.getAddressInfo()).willReturn("서울 용산구 한남대로 25");
+		given(mockAddress.getAddressDetail()).willReturn("213");
+		given(mockAddress.getAddressExtra()).willReturn("한남동");
+		given(mockAddress.getAddressAlias()).willReturn("집");
+		given(mockAddress.getIsDefault()).willReturn(true);
+
 		when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
 
 		// when
@@ -233,7 +255,57 @@ public class MemberServiceTest {
 		assertThat(response.memberRole()).isEqualTo(Role.USER);
 		assertThat(response.gradeName()).isEqualTo("일반");
 
+		assertThat(response.address()).isNotNull();
+		assertThat(response.address().postCode()).isEqualTo("04410");
+		assertThat(response.address().addressInfo()).isEqualTo("서울 용산구 한남대로 25");
+		assertThat(response.address().addressAlias()).isEqualTo("집");
+		assertThat(response.address().isDefault()).isTrue(); // boolean 검증
+
 		verify(memberRepository).findById(memberId);
+		verify(addressRepository).findAddressByMemberAndIsDefault(any(Member.class));
+	}
+
+	@Test
+	@DisplayName("성공: 회원 조회 (주소 없음)")
+	void getMember_success_NoAddress() {
+		// given
+		Long memberId = 100L;
+		Grade grade = new Grade();
+		grade.setGradeName("일반");
+
+		Member member = Member.create(
+			"testuser",
+			"encodedPassword",
+			"홍길동",
+			"길동이",
+			"01012345678",
+			"test@example.com",
+			LocalDate.of(1990, 1, 1),
+			Role.USER,
+			RegistrationSource.WEB,
+			grade
+		);
+
+		when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+
+		given(addressRepository.findAddressByMemberAndIsDefault(any(Member.class)))
+			.willReturn(Optional.empty()); // Optional.empty() 반환
+
+		// when
+		MemberMyPageResponse response = memberService.getMember(memberId);
+
+		// then
+		assertThat(response).isNotNull();
+		assertThat(response.address()).isNull(); // AddressResponse가 null인지 검증
+		assertThat(response.loginId()).isEqualTo("testuser");
+		assertThat(response.memberName()).isEqualTo("홍길동");
+		assertThat(response.nickname()).isEqualTo("길동이");
+		assertThat(response.phoneNumber()).isEqualTo("01012345678");
+		assertThat(response.email()).isEqualTo("test@example.com");
+		assertThat(response.birthDate()).isEqualTo(LocalDate.of(1990, 1, 1));
+		assertThat(response.memberRole()).isEqualTo(Role.USER);
+		assertThat(response.gradeName()).isEqualTo("일반");
+
 	}
 
 	@Test
@@ -435,17 +507,17 @@ public class MemberServiceTest {
 		assertThat(member.getCurrentPoint()).isEqualByComparingTo(newPoint);
 	}
 
-    @Test
-    @DisplayName("마지막 로그인 날짜가 3개월 전인 회원 휴면 전환")
-    void deactivateMembersNotLoggedInFor3Months_success() {
-        memberService.deactivateMembersNotLoggedInFor3Months();
+	@Test
+	@DisplayName("마지막 로그인 날짜가 3개월 전인 회원 휴면 전환")
+	void deactivateMembersNotLoggedInFor3Months_success() {
+		memberService.deactivateMembersNotLoggedInFor3Months();
 
-        ArgumentCaptor<LocalDateTime> captor = ArgumentCaptor.forClass(LocalDateTime.class);
-        verify(memberRepository, times(1)).deactivateMembersNotLoggedInFor3Months(captor.capture());
+		ArgumentCaptor<LocalDateTime> captor = ArgumentCaptor.forClass(LocalDateTime.class);
+		verify(memberRepository, times(1)).deactivateMembersNotLoggedInFor3Months(captor.capture());
 
-        LocalDateTime threshold = captor.getValue();
-        LocalDateTime expected = LocalDateTime.now().minusMonths(3);
-        long diff = Duration.between(expected, threshold).abs().getSeconds();
-        Assertions.assertTrue(diff <= 3);
-    }
+		LocalDateTime threshold = captor.getValue();
+		LocalDateTime expected = LocalDateTime.now().minusMonths(3);
+		long diff = Duration.between(expected, threshold).abs().getSeconds();
+		Assertions.assertTrue(diff <= 3);
+	}
 }
