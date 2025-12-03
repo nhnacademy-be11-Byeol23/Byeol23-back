@@ -3,7 +3,7 @@ package com.nhnacademy.byeol23backend.orderset.delivery.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.byeol23backend.bookset.book.interceptor.ViewerIdInterceptor;
 import com.nhnacademy.byeol23backend.cartset.cart.interceptor.CustomerIdentificationInterceptor;
-import com.nhnacademy.byeol23backend.config.SecurityConfig;
+import com.nhnacademy.byeol23backend.commons.filter.TokenFilter;
 import com.nhnacademy.byeol23backend.config.WebConfig;
 import com.nhnacademy.byeol23backend.orderset.delivery.domain.dto.DeliveryPolicyCreateRequest;
 import com.nhnacademy.byeol23backend.orderset.delivery.domain.dto.DeliveryPolicyCreateResponse;
@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
@@ -39,8 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Disabled
 @WebMvcTest(value = DeliveryPolicyController.class,
-excludeFilters = @ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, classes = {CustomerIdentificationInterceptor.class, ViewerIdInterceptor.class, WebConfig.class, SecurityConfig.class}))
-@AutoConfigureMockMvc(addFilters = false)
+excludeFilters = @ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, classes = {TokenFilter.class, CustomerIdentificationInterceptor.class, ViewerIdInterceptor.class, WebConfig.class}))
 class DeliveryPolicyControllerTest {
 
 	@Autowired

@@ -2,8 +2,6 @@ package com.nhnacademy.byeol23backend.cartset.cart.interceptor;
 
 import com.nhnacademy.byeol23backend.cartset.cart.dto.CustomerIdentifier;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
-import com.nhnacademy.byeol23backend.utils.MemberUtil;
-
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,20 +16,29 @@ import java.util.Arrays;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class CustomerIdentificationInterceptor implements HandlerInterceptor {
+    private final JwtParser jwtParser;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        Long memberId = MemberUtil.getMemberId();
-        if(memberId != -1) {
-            request.setAttribute("customerIdentifier", CustomerIdentifier.member(memberId));
-            return true;
-        }
+        if(request.getCookies() != null) {
+            String accessToken = getCookieValue(request, "Access-Token");
+            if(StringUtils.isNotBlank(accessToken)) {
+                try {
+                    Long memberId = jwtParser.parseToken(accessToken).get("memberId", Long.class);
+                    request.setAttribute("customerIdentifier", CustomerIdentifier.member(memberId));
+                    return true;
+                } catch (ExpiredJwtException ignored) {
+                    log.info("jwt 토큰 만료");
+                }
+            }
 
-        String guestId = getCookieValue(request, "guestId");
-        if(StringUtils.isNotBlank(guestId)) {
-            request.setAttribute("customerIdentifier", CustomerIdentifier.guest(guestId));
-            return true;
+            String guestId = getCookieValue(request, "guestId");
+            if(StringUtils.isNotBlank(guestId)) {
+                request.setAttribute("customerIdentifier", CustomerIdentifier.guest(guestId));
+                return true;
+            }
         }
         return true;
     }

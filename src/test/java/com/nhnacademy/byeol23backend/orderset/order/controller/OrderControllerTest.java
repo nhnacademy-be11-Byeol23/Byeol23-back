@@ -16,10 +16,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -30,7 +28,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.byeol23backend.bookset.book.domain.dto.BookOrderInfoResponse;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookInfoRequest;
-import com.nhnacademy.byeol23backend.config.SecurityConfig;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
 import com.nhnacademy.byeol23backend.orderset.delivery.domain.dto.DeliveryPolicyInfoResponse;
@@ -52,20 +49,22 @@ import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 
 @Disabled
-@WebMvcTest(value = OrderController.class,
-	excludeFilters = @ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, classes = {SecurityConfig.class}))
-@AutoConfigureMockMvc(addFilters = false)
+@WebMvcTest(OrderController.class)
 class OrderControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
 
+	@MockBean
+	private JwtParser jwtParser;
+
 	@Autowired
 	private ObjectMapper objectMapper; // JSON 직렬화/역직렬화를 위해
 
+	@MockBean
 	private OrderService orderService; // 컨트롤러가 의존하는 서비스 Mock
 
-
+	@MockBean
 	private MemberRepository memberRepository;
 
 	private String testOrderNumber;
@@ -120,6 +119,9 @@ class OrderControllerTest {
 		// 2. [수정] 모든 인자에 eq() 매처를 사용하여 'get' 메서드를 정확하게 모킹
 		given(mockClaims.get(eq("memberId"), eq(Long.class))).willReturn(1L);
 
+		// 3. parseToken()이 "member-access-token"으로 호출되면 'mockClaims' 반환
+		given(jwtParser.parseToken(eq("member-access-token"))).willReturn(mockClaims);
+
 		// 4. MemberRepository가 1L로 호출되면 가짜 Member 객체 반환
 		Member mockMember = Mockito.mock(Member.class);
 		given(memberRepository.getReferenceById(anyLong())).willReturn(mockMember);
@@ -132,16 +134,18 @@ class OrderControllerTest {
 	@DisplayName("POST /api/orders (주문 준비) - 회원")
 	void prepareOrder_Member_Success() throws Exception {
 		// given
-		given(orderService.prepareOrder(any(), any())).willReturn(prepareResponse);
+		String accessToken = "member-access-token";
+		given(orderService.prepareOrder(any(OrderPrepareRequest.class), eq(accessToken))).willReturn(prepareResponse);
 
 		// when & then
 		mockMvc.perform(post("/api/orders")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(prepareRequest)))
+				.content(objectMapper.writeValueAsString(prepareRequest))
+				.cookie(new Cookie("Access-Token", accessToken))) // Access-Token 쿠키 추가
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.orderNumber").value(testOrderNumber));
 
-		verify(orderService, times(1)).prepareOrder(any(), any());
+		verify(orderService, times(1)).prepareOrder(any(OrderPrepareRequest.class), eq(accessToken));
 	}
 
 	@Test
@@ -149,7 +153,7 @@ class OrderControllerTest {
 	void prepareOrder_NonMember_Success() throws Exception {
 		// given
 		// 비회원은 accessToken이 null로 전달됨
-		given(orderService.prepareOrder(eq(null), any())).willReturn(prepareResponse);
+		given(orderService.prepareOrder(any(OrderPrepareRequest.class), eq(null))).willReturn(prepareResponse);
 
 		// when & then
 		mockMvc.perform(post("/api/orders")
@@ -158,7 +162,7 @@ class OrderControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.orderNumber").value(testOrderNumber));
 
-		verify(orderService, times(1)).prepareOrder( eq(null), any());
+		verify(orderService, times(1)).prepareOrder(any(OrderPrepareRequest.class), eq(null));
 	}
 
 	@Test

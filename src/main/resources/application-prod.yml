@@ -6,8 +6,10 @@ spring:
     password: ${PROD_DB_PASSWORD}
     type: org.apache.commons.dbcp2.BasicDataSource
     dbcp2:
-      initial-size: 5
-      max-total: 50
+      initial-size: 100
+      max-total: 200
+      min-idle: 100
+      max-idle: 200
 
   datasource-quartz:
     type: com.zaxxer.hikari.HikariDataSource
