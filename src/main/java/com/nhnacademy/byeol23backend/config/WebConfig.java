@@ -11,21 +11,19 @@ import com.nhnacademy.byeol23backend.bookset.book.interceptor.ViewerIdIntercepto
 import com.nhnacademy.byeol23backend.bookset.book.resolver.ViewerIdResolver;
 import com.nhnacademy.byeol23backend.cartset.cart.interceptor.CustomerIdentificationInterceptor;
 import com.nhnacademy.byeol23backend.cartset.cart.resolver.CustomerIdentifierResolver;
-import com.nhnacademy.byeol23backend.utils.JwtParser;
 
 import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
-	private final JwtParser jwtParser;
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(new ViewerIdInterceptor(jwtParser))
+		registry.addInterceptor(new ViewerIdInterceptor())
 			.addPathPatterns("/api/books/*");
 
-		registry.addInterceptor(new CustomerIdentificationInterceptor(jwtParser))
+		registry.addInterceptor(new CustomerIdentificationInterceptor())
 			.addPathPatterns("/api/carts/**")
 			.addPathPatterns("/api/payments/**");
 	}
