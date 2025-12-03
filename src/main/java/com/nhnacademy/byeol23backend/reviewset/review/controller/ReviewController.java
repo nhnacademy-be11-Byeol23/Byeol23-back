@@ -14,7 +14,6 @@ import com.nhnacademy.byeol23backend.reviewset.review.dto.ReviewRegisterRequest;
 import com.nhnacademy.byeol23backend.reviewset.review.dto.ReviewResponse;
 import com.nhnacademy.byeol23backend.reviewset.review.service.ReviewService;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
-import com.nhnacademy.byeol23backend.utils.MemberUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,14 +40,15 @@ public class ReviewController {
 			request.reviewContent(),
 			request.reviewRate(),
 			request.orderNumber(),
-			request.bookId()
+			request.bookId(),
+			request.withImage()
 		);
 		return ResponseEntity.ok(id);
 	}
 
 	@GetMapping("/reviewable")
-	public ResponseEntity<List<OrderDetail>> getReviewableOrderDetails() {
-		Long memberId = MemberUtil.getMemberId();
+	public ResponseEntity<List<OrderDetail>> getReviewableOrderDetails(@CookieValue(name = "Access-Token") String accessToken) {
+		Long memberId = jwtParser.parseToken(accessToken).get("memberId",Long.class);
 		List<OrderDetail> reviewableOrderDetails = orderDetailService.getReviewableOrderDetailsByMemberId(memberId);
 		return ResponseEntity.ok(reviewableOrderDetails);
 	}

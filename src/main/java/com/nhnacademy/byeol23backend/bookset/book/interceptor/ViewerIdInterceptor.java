@@ -17,6 +17,7 @@ import java.util.Arrays;
 
 @Component
 @SuppressWarnings("squid:S3516")
+@RequiredArgsConstructor
 public class ViewerIdInterceptor implements HandlerInterceptor {
 
     @Override

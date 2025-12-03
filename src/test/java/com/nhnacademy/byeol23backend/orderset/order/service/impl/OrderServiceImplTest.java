@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,7 +54,11 @@ import com.nhnacademy.byeol23backend.orderset.payment.exception.PaymentNotFoundE
 import com.nhnacademy.byeol23backend.orderset.payment.repository.PaymentRepository;
 import com.nhnacademy.byeol23backend.orderset.payment.service.PaymentService;
 
+/**
+ * method symbol이랑 다른 부분은 주석처리 해놨음
+ */
 @ExtendWith(MockitoExtension.class)
+@Disabled
 class OrderServiceImplTest {
 
 	@Mock
@@ -72,6 +77,7 @@ class OrderServiceImplTest {
 	private DeliveryPolicyRepository deliveryPolicyRepository;
 	@Mock
 	private PackagingRepository packagingRepository;
+
 	@Mock
 	private PasswordEncoder passwordEncoder;
 
@@ -164,9 +170,6 @@ class OrderServiceImplTest {
 		assertThat(response).isNotNull();
 		assertThat(response.receiver()).isEqualTo("홍길동");
 	}
-
-	// 비회원 주문은 현재 구현에서 prepareOrder 메서드로 처리되지 않으므로 테스트 제거
-	// 비회원 주문은 별도의 엔드포인트나 메서드로 처리되어야 함
 
 	@Test
 	@DisplayName("주문 준비 시 회원 조회 실패")

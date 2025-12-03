@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
+import com.nhnacademy.byeol23backend.pointset.activatedpointpolicy.service.ActivatedPointPolicyService;
 import com.nhnacademy.byeol23backend.pointset.pointpolicy.dto.ReservedPolicy;
 import com.nhnacademy.byeol23backend.pointset.pointhistories.domain.PointHistory;
 import com.nhnacademy.byeol23backend.pointset.pointhistories.service.PointService;
@@ -20,30 +21,29 @@ import lombok.RequiredArgsConstructor;
 public class PointServiceImpl implements PointService {
 	private final PointInternalService pointInternalService;
 	private final PointPolicyRepository pointPolicyRepository;
+	private final ActivatedPointPolicyService activatedPointPolicyService;
 
 	@Override
-	public PointHistory offsetPointsByReserved(Member member, ReservedPolicy reservedPolicy) {
-		final PointPolicy pointPolicy = pointPolicyRepository.findByPointPolicyName(reservedPolicy.name())
-			.orElseThrow(() -> new IllegalArgumentException("Invalid Point Policy Name: " + reservedPolicy.name()));
-		return pointInternalService.addPoints(member, pointPolicy, BigDecimal.ZERO);
-	}
-
-	@Override
-	public PointHistory offsetPointsWithPolicy(Member member, PointPolicy pointPolicy) {
+	public PointHistory offsetPoints(Member member, ReservedPolicy reservedPolicy) {
+		final PointPolicy pointPolicy = activatedPointPolicyService.getActivatedPolicy(reservedPolicy);
 		return pointInternalService.addPoints(member, pointPolicy, BigDecimal.ZERO);
 	}
 
 	@Override
 	public PointHistory offsetPointsByOrder(Member member, BigDecimal orderAmount) {
-		final PointPolicy orderPolicy = pointPolicyRepository.findByPointPolicyName(ReservedPolicy.ORDER.name())
-			.orElseThrow(() -> new IllegalArgumentException("Invalid Point Policy Name: " + ReservedPolicy.ORDER.name()));
-
+		final PointPolicy orderPolicy = activatedPointPolicyService.getActivatedPolicy(ReservedPolicy.ORDER);
 		BigDecimal points = member.getGrade()
-			.getPointRate()
+			.getPointRate().add(orderPolicy.getSaveAmount()) //personal rate + base rate
 			.multiply(orderAmount)
 			.divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
 
 		return pointInternalService.addPoints(member, orderPolicy, points);
+	}
+
+	@Override
+	public PointHistory offsetPointsWithExtra(Member member, ReservedPolicy reservedPolicy, BigDecimal extraAmount) {
+		final PointPolicy pointPolicy = activatedPointPolicyService.getActivatedPolicy(reservedPolicy);
+		return pointInternalService.addPoints(member, pointPolicy, extraAmount);
 	}
 
 	@Override
@@ -53,8 +53,7 @@ public class PointServiceImpl implements PointService {
 
 	@Override
 	public PointHistory cancelPoints(PointHistory pointHistory) {
-		PointPolicy cancel = pointPolicyRepository.findByPointPolicyName(ReservedPolicy.CANCEL.name())
-			.orElseThrow(() -> new IllegalArgumentException("Invalid Point Policy Name: " + ReservedPolicy.CANCEL.name()));
+		PointPolicy cancel = activatedPointPolicyService.getActivatedPolicy(ReservedPolicy.CANCEL);
 		return pointInternalService.addPoints(
 			pointHistory.getMemberId(),
 			cancel,

@@ -1,6 +1,7 @@
 package com.nhnacademy.byeol23backend.memberset.member.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateRequest;
@@ -8,8 +9,6 @@ import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateResponse;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberMyPageResponse;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateRequest;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.ValueDuplicationCheckRequest;
-import com.nhnacademy.byeol23backend.memberset.member.dto.ValueDuplicationCheckResponse;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateRequest;
 import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateResponse;
 
@@ -30,7 +29,6 @@ public interface MemberService {
 
 	boolean checkIdDuplicated(String loginId);
 
-	ValueDuplicationCheckResponse checkDuplication(ValueDuplicationCheckRequest request);
 	//member proxy
 	Member getMemberProxy(Long memberId);
 

@@ -25,9 +25,11 @@ import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockResponse;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.service.BookService;
-import com.nhnacademy.byeol23backend.commons.aop.RequireRole;
-import com.nhnacademy.byeol23backend.memberset.member.domain.Role;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,13 +43,23 @@ public class BookController {
 
 	private final BookService bookService;
 
-	@RequireRole(Role.ADMIN)
+	@Operation(summary = "도서 추가", description = "새로운 도서를 추가합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "201", description = "도서 추가 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터")
+	})
 	@PostMapping
 	public ResponseEntity<BookResponse> createBook(@Valid @RequestBody BookCreateRequest createRequest) {
 		BookResponse response = bookService.createBook(createRequest);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
+	@Operation(summary = "도서 상세 조회", description = "도서 ID로 도서 상세 정보를 조회하고 조회수를 증가시킵니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "도서 조회 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터")
+	})
+	@Parameter(name = "bookId", description = "도서 ID", required = true, example = "1")
 	@GetMapping("/{bookId}")
 	public ResponseEntity<BookResponse> getBook(@PathVariable("bookId") Long bookId, @ViewerId String viewerId) {
 		log.info("viewerId: {}", viewerId);
@@ -55,6 +67,12 @@ public class BookController {
 		return ResponseEntity.ok(response);
 	}
 
+	@Operation(summary = "도서 수정", description = "요청 바디로 들어온 값으로 도서 정보를 수정합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "도서 수정 성공"),
+		@ApiResponse(responseCode = "400", description = "도서 수정 실패 또는 잘못된 요청")
+	})
+	@Parameter(name = "book-id", description = "도서 ID", required = true, example = "1")
 	@PutMapping("/{book-id}")
 	public ResponseEntity<BookResponse> updateBook(@PathVariable("book-id") Long bookId,
 		@Valid @RequestBody BookUpdateRequest updateRequest) {
@@ -62,12 +80,23 @@ public class BookController {
 		return ResponseEntity.ok(response);
 	}
 
+	@Operation(summary = "도서 삭제", description = "도서를 삭제합니다 (Soft Delete).")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "도서 soft delete 성공"),
+		@ApiResponse(responseCode = "400", description = "삭제 실패 또는 잘못된 요청")
+	})
+	@Parameter(name = "book-id", description = "도서 ID", required = true, example = "1")
 	@DeleteMapping("/{book-id}")
 	public ResponseEntity<Void> deleteBook(@PathVariable("book-id") Long bookId) {
 		bookService.deleteBook(bookId);
 		return ResponseEntity.noContent().build();
 	}
 
+	@Operation(summary = "도서 목록 조회", description = "페이징된 도서 목록을 조회합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "도서 목록 조회 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터")
+	})
 	@GetMapping
 	public ResponseEntity<Page<BookResponse>> getBooks(@RequestParam(value = "page", defaultValue = "0") int page,
 		@RequestParam(value = "size", defaultValue = "20") int size
@@ -77,17 +106,35 @@ public class BookController {
 		return ResponseEntity.ok(books);
 	}
 
+	@Operation(summary = "도서 목록 조회 (ID 리스트)", description = "여러 도서 ID로 도서 목록을 조회합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "도서 목록 조회 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터")
+	})
+	@Parameter(name = "ids", description = "도서 ID 리스트 (쉼표로 구분)", required = true, example = "1,2,3")
 	@GetMapping("/list")
 	public ResponseEntity<List<BookResponse>> getBooksByIds(@RequestParam("ids") List<Long> bookIds) {
 		List<BookResponse> books = bookService.getBooksByIds(bookIds);
 		return ResponseEntity.ok(books);
 	}
 
+	@Operation(summary = "도서 재고 조회", description = "도서 재고만 따로 조회합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "도서 재고 조회 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터")
+	})
+	@Parameter(name = "book-id", description = "도서 ID", required = true, example = "1")
 	@GetMapping("/{book-id}/stock")
 	public ResponseEntity<BookStockResponse> getBookStock(@PathVariable("book-id") Long bookId) {
 		return ResponseEntity.ok(bookService.getBookStock(bookId));
 	}
 
+	@Operation(summary = "도서 재고 수정", description = "도서의 재고만 따로 수정합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "도서 재고 수정 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터")
+	})
+	@Parameter(name = "book-id", description = "도서 ID", required = true, example = "1")
 	@PutMapping("/{book-id}/stock")
 	public ResponseEntity<Void> updateBookStock(@PathVariable("book-id") Long bookId,
 		@RequestBody BookStockUpdateRequest request) {
