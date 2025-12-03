@@ -2,10 +2,8 @@ server:
   port: 10333
 
 spring:
-  spring:
-    datasource-data:
+  datasource-data:
     type: org.apache.commons.dbcp2.BasicDataSource
-
     url: jdbc:mysql://s4.java21.net:13306/project_be11_team2_dev?serverTimezone=UTC&characterEncoding=UTF-8
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: project_be11_team2
