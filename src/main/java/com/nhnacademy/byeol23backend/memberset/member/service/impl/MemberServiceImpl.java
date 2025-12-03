@@ -245,4 +245,21 @@ public class MemberServiceImpl implements MemberService {
 		}
 	}
 
+	@Override
+	public ValueDuplicatedResponse checkInfoDuplicated(ValueDuplicatedRequest request) {
+		String loginId = request.loginId();
+		String nickname = request.nickname();
+		String email = request.email();
+		String phoneNumber = request.phoneNumber();
+		boolean isDuplicatedId =  memberRepository.existsByLoginId(loginId);
+
+		boolean isDuplicatedNickname = memberRepository.existsByNickname(nickname);
+
+		boolean isDuplicatedEmail = memberRepository.existsByEmail(email);
+
+		boolean isDuplicatedPhoneNumber = memberRepository.existsByPhoneNumber(phoneNumber);
+
+		return new ValueDuplicatedResponse(isDuplicatedId, isDuplicatedNickname, isDuplicatedEmail, isDuplicatedPhoneNumber);
+	}
+
 }

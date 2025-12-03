@@ -3,6 +3,8 @@ package com.nhnacademy.byeol23backend.memberset.member.controller;
 import java.util.Map;
 import java.util.Objects;
 
+import com.nhnacademy.byeol23backend.memberset.member.dto.*;
+import com.nhnacademy.byeol23backend.utils.MemberUtil;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,14 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nhnacademy.byeol23backend.memberset.member.dto.CheckIdResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberMyPageResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateResponse;
 import com.nhnacademy.byeol23backend.memberset.member.service.MemberService;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
 
@@ -45,7 +39,7 @@ public class MemberController implements MemberApi {
 	 * @param request MemberCreateRequest
 	 * @return 201(CREATED)
 	 */
-	@PostMapping("/register")
+	@PostMapping
 	public ResponseEntity<MemberCreateResponse> createMember(@Valid @RequestBody MemberCreateRequest request) {
 		MemberCreateResponse createdMember = memberService.createMember(request);
 		return ResponseEntity.status(HttpStatus.CREATED)
@@ -61,13 +55,12 @@ public class MemberController implements MemberApi {
 	/**
 	 * 마이 페이지 요청
 	 *
-	 * @param accessToken
+	 * @param
 	 * @return 200(OK) / MemberMyPageResponse
 	 */
 	@GetMapping
-	public ResponseEntity<MemberMyPageResponse> getMember(
-		@CookieValue(name = "Access-Token", required = false) String accessToken) {
-		Long memberId = jwtParser.parseToken(accessToken).get("memberId", Long.class);
+	public ResponseEntity<MemberMyPageResponse> getMember() {
+		Long memberId = MemberUtil.getMemberId();
 		return ResponseEntity.ok(memberService.getMember(memberId));
 	}
 
@@ -116,5 +109,13 @@ public class MemberController implements MemberApi {
 		memberService.deleteMember(memberId);
 		return ResponseEntity.noContent().build();
 	}
+
+	@GetMapping("/check-duplication")
+	public ResponseEntity<ValueDuplicatedResponse> checkDuplication(@RequestBody ValueDuplicatedRequest request) {
+		ValueDuplicatedResponse response = memberService.checkInfoDuplicated(request);
+		return ResponseEntity.ok(response);
+	}
+
+
 }
 

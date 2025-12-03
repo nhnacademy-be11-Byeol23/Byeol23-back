@@ -11,13 +11,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -41,15 +43,16 @@ import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareReque
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderSearchCondition;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.PointOrderResponse;
+import com.nhnacademy.byeol23backend.config.SecurityConfig;
 import com.nhnacademy.byeol23backend.orderset.order.service.OrderService;
 import com.nhnacademy.byeol23backend.orderset.packaging.domain.dto.PackagingInfoResponse;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
 
 import io.jsonwebtoken.Claims;
-import jakarta.servlet.http.Cookie;
 
-@Disabled
-@WebMvcTest(OrderController.class)
+@WebMvcTest(value = OrderController.class,
+excludeFilters = @ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, classes = {SecurityConfig.class}))
+@AutoConfigureMockMvc(addFilters = false)
 class OrderControllerTest {
 
 	@Autowired
@@ -134,26 +137,7 @@ class OrderControllerTest {
 	@DisplayName("POST /api/orders (주문 준비) - 회원")
 	void prepareOrder_Member_Success() throws Exception {
 		// given
-		String accessToken = "member-access-token";
-		given(orderService.prepareOrder(any(OrderPrepareRequest.class), eq(accessToken))).willReturn(prepareResponse);
-
-		// when & then
-		mockMvc.perform(post("/api/orders")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(prepareRequest))
-				.cookie(new Cookie("Access-Token", accessToken))) // Access-Token 쿠키 추가
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.orderNumber").value(testOrderNumber));
-
-		verify(orderService, times(1)).prepareOrder(any(OrderPrepareRequest.class), eq(accessToken));
-	}
-
-	@Test
-	@DisplayName("POST /api/orders (주문 준비) - 비회원")
-	void prepareOrder_NonMember_Success() throws Exception {
-		// given
-		// 비회원은 accessToken이 null로 전달됨
-		given(orderService.prepareOrder(any(OrderPrepareRequest.class), eq(null))).willReturn(prepareResponse);
+		given(orderService.prepareOrder(any(), any(OrderPrepareRequest.class))).willReturn(prepareResponse);
 
 		// when & then
 		mockMvc.perform(post("/api/orders")
@@ -162,7 +146,24 @@ class OrderControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.orderNumber").value(testOrderNumber));
 
-		verify(orderService, times(1)).prepareOrder(any(OrderPrepareRequest.class), eq(null));
+		verify(orderService, times(1)).prepareOrder(any(), any(OrderPrepareRequest.class));
+	}
+
+	@Test
+	@DisplayName("POST /api/orders (주문 준비) - 비회원")
+	void prepareOrder_NonMember_Success() throws Exception {
+		// given
+		// 비회원은 accessToken이 null로 전달됨
+		given(orderService.prepareOrder(eq(null), any(OrderPrepareRequest.class))).willReturn(prepareResponse);
+
+		// when & then
+		mockMvc.perform(post("/api/orders")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(prepareRequest)))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.orderNumber").value(testOrderNumber));
+
+		verify(orderService, times(1)).prepareOrder( eq(null), any(OrderPrepareRequest.class));
 	}
 
 	@Test
