@@ -8,6 +8,7 @@ public interface CategoryQueryService {
     List<CategoryListResponse> getRootCategories();
     List<CategoryListResponse> getSubCategories(Long parentId);
     List<CategoryLeafResponse> getLeafCategories();
+	List<CategoryMainPageResponse> getLeafCategoriesForMainPage();
     List<CategoryTreeResponse> getCategoriesWithChildren2Depth();
     List<SubCategoryIdListResponse> getSubCategoryIdsByPathId(String pathId);
 }

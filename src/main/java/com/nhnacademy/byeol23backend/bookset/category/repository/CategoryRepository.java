@@ -52,7 +52,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     // leaf 카테고리 조회
     @Query("""
-        select new com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse(c1.categoryId, c1.categoryName, c1.pathName)
+        select new com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse(c1.categoryId, c1.categoryName, c1.pathId)
                 from Category c1 where not exists (select 1 from Category c2 where c1.categoryId = c2.parent.categoryId)
         """)
     List<CategoryLeafResponse> findLeafCategories();
