@@ -14,11 +14,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -28,17 +25,14 @@ import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepositor
 import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentCancelRequest;
 import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentCancelResponse;
 import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentParamRequest;
-import com.nhnacademy.byeol23backend.config.SecurityConfig;
 import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentResultResponse;
 import com.nhnacademy.byeol23backend.orderset.payment.service.PaymentService;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
 
 import io.jsonwebtoken.Claims;
 
-@WebMvcTest(value = PaymentController.class,
-excludeFilters = @ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, classes = {SecurityConfig.class}))
-@AutoConfigureMockMvc(addFilters = false)
 @Disabled
+@WebMvcTest(PaymentController.class)
 class PaymentControllerTest {
 
 	@Autowired

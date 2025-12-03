@@ -30,7 +30,6 @@ import com.nhnacademy.byeol23backend.orderset.packaging.domain.dto.PackagingCrea
 import com.nhnacademy.byeol23backend.orderset.packaging.domain.dto.PackagingCreateResponse;
 import com.nhnacademy.byeol23backend.orderset.packaging.domain.dto.PackagingInfoResponse;
 import com.nhnacademy.byeol23backend.orderset.packaging.domain.dto.PackagingUpdateRequest;
-import com.nhnacademy.byeol23backend.config.SecurityConfig;
 import com.nhnacademy.byeol23backend.orderset.packaging.domain.dto.PackagingUpdateResponse;
 import com.nhnacademy.byeol23backend.orderset.packaging.service.PackagingService;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
