@@ -304,4 +304,10 @@ public class CouponServiceImpl implements CouponService {
         // 최종 금액은 0원 미만이 될 수 없음
         return Math.max(0L, finalDiscount);
     }
+
+    @Override
+    @Transactional
+    public void useCoupon(Long couponId) {
+
+    }
 }

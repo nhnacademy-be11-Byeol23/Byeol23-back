@@ -34,4 +34,10 @@ public class Coupon {
 	@JoinColumn(name = "coupon_policy_id", nullable = false)
 	private CouponPolicy couponPolicy;
 
+	public void use() {
+		if (this.usedAt != null) {
+			throw new IllegalStateException("이미 사용된 쿠폰입니다.");
+		}
+		this.usedAt = LocalDateTime.now();
+	}
 }
