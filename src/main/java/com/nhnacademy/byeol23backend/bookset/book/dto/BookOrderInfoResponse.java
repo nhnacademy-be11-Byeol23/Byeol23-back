@@ -1,4 +1,4 @@
-package com.nhnacademy.byeol23backend.bookset.book.domain.dto;
+package com.nhnacademy.byeol23backend.bookset.book.dto;
 
 import java.math.BigDecimal;
 

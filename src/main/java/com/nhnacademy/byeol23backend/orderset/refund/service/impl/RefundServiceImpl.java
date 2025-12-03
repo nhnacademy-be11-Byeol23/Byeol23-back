@@ -2,6 +2,7 @@ package com.nhnacademy.byeol23backend.orderset.refund.service.impl;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,9 @@ import com.nhnacademy.byeol23backend.orderset.refundpolicy.domain.RefundOption;
 import com.nhnacademy.byeol23backend.orderset.refundpolicy.domain.RefundPolicy;
 import com.nhnacademy.byeol23backend.orderset.refundpolicy.exception.RefundPolicyNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.refundpolicy.repository.RefundPolicyRepository;
+import com.nhnacademy.byeol23backend.pointset.orderpoint.domain.OrderPoint;
+import com.nhnacademy.byeol23backend.pointset.orderpoint.repository.OrderPointRepository;
+import com.nhnacademy.byeol23backend.pointset.pointhistories.service.PointService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,6 +37,8 @@ public class RefundServiceImpl implements RefundService {
 	private final RefundPolicyRepository refundPolicyRepository;
 	private final OrderRepository orderRepository;
 	private final DeliveryPolicyRepository deliveryPolicyRepository;
+	private final OrderPointRepository orderPointRepository;
+	private final PointService pointService;
 
 	@Override
 	@Transactional
@@ -51,11 +57,15 @@ public class RefundServiceImpl implements RefundService {
 				() -> new RefundPolicyNotFoundException("해당 이름의 환불 종류를 찾을 수 없습니다.: " + request.refundOption()));
 		LocalDateTime now = LocalDateTime.now();
 
-		// [추가] 포인트 사용 내역 있으면 돌려주는 로직 추가해야 됨
+		List<OrderPoint> orderPointList = orderPointRepository.findAllByOrder(order);
+
+		for (OrderPoint orderPoint : orderPointList) {
+			pointService.cancelPoints(orderPoint.getPointHistory());
+		}
 
 		// [추가] 쿠폰 사용 내역 있으면 쿠폰 다시 사용 가능 상태로 변경
 
-		BigDecimal refundAmount = null;
+		BigDecimal refundAmount = BigDecimal.ZERO;
 		if (request.refundOption().equals(RefundOption.BREAK)) { // 파손 파본
 			refundAmount = order.getActualOrderPrice(); // 배송비 0원
 			refund = Refund.of(order, refundPolicy, now, request.refundReason(), refundAmount, new BigDecimal(0L));

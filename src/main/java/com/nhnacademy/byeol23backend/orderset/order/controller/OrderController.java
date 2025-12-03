@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nhnacademy.byeol23backend.cartset.cartbook.dto.CartOrderRequest;
 import com.nhnacademy.byeol23backend.memberset.member.dto.NonmemberOrderRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderBulkUpdateRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelRequest;
@@ -101,6 +102,13 @@ public class OrderController {
 	public ResponseEntity<OrderDetailResponse> getNonMemberOrder(@Valid @RequestBody NonmemberOrderRequest request) {
 		OrderDetailResponse response = orderService.getNonMemberOrder(request);
 		return ResponseEntity.ok(response);
+	}
+
+	@PostMapping("/nonmembers")
+	public ResponseEntity<Void> saveGuestOrder(@RequestParam("guestId") String guestId,
+		@RequestBody CartOrderRequest orderRequest) {
+		orderService.saveGuestOrder(guestId, orderRequest);
+		return ResponseEntity.ok().build();
 	}
 
 }

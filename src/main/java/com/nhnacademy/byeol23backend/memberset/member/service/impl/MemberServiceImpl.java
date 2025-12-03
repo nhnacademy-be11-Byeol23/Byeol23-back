@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
@@ -16,6 +17,9 @@ import com.nhnacademy.byeol23backend.cartset.cart.repository.CartRepository;
 import com.nhnacademy.byeol23backend.couponset.coupon.dto.BirthdayCouponIssueRequestDto;
 import com.nhnacademy.byeol23backend.memberset.grade.domain.Grade;
 import com.nhnacademy.byeol23backend.memberset.grade.dto.AllGradeResponse;
+import com.nhnacademy.byeol23backend.memberset.address.domain.Address;
+import com.nhnacademy.byeol23backend.memberset.address.dto.AddressResponse;
+import com.nhnacademy.byeol23backend.memberset.address.repository.AddressRepository;
 import com.nhnacademy.byeol23backend.memberset.grade.repository.GradeRepository;
 import com.nhnacademy.byeol23backend.memberset.grade.service.GradeService;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
@@ -50,6 +54,7 @@ public class MemberServiceImpl implements MemberService {
 	private final CartRepository cartRepository;
 	private final ApplicationEventPublisher eventPublisher;
 	private final GradeService gradeService;
+	private final AddressRepository addressRepository;
 
 	@Value("${coupon.welcome.policy-id}")
 	private Long welcomeCouponPolicyId;
@@ -112,6 +117,23 @@ public class MemberServiceImpl implements MemberService {
 
 		Member member = findMemberById(memberId);
 
+		Address defaultAddress = addressRepository.findAddressByMemberAndIsDefault(member)
+			.orElse(null);
+
+		AddressResponse addressResponse = null;
+
+		if (!Objects.isNull(defaultAddress)) {
+			addressResponse = new AddressResponse(
+				defaultAddress.getAddressId(),
+				defaultAddress.getPostCode(),
+				defaultAddress.getAddressInfo(),
+				defaultAddress.getAddressDetail(),
+				defaultAddress.getAddressExtra(),
+				defaultAddress.getAddressAlias(),
+				defaultAddress.getIsDefault()
+			);
+		}
+
 		log.info("회원을 조회하였습니다. {}", member);
 
 		return new MemberMyPageResponse(
@@ -124,6 +146,7 @@ public class MemberServiceImpl implements MemberService {
 			member.getCurrentPoint(),
 			member.getMemberRole(),
 			member.getGrade().getGradeName(),
+			addressResponse,
 			gradeRepository.getAll()
 		);
 	}

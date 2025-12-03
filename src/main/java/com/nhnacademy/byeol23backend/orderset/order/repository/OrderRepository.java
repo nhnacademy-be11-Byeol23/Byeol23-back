@@ -39,5 +39,4 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderReposi
 		"WHERE o.deliverySentDate is null " +
 		"AND o.orderStatus = '결제 완료'")
 	int updateDeliverySentDate(@Param("today") LocalDate today);
-
 }
