@@ -30,7 +30,6 @@ import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookInfoRequest;
 import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
-import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
 import com.nhnacademy.byeol23backend.orderset.delivery.domain.DeliveryPolicy;
 import com.nhnacademy.byeol23backend.orderset.delivery.repository.DeliveryPolicyRepository;
@@ -40,7 +39,6 @@ import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelReques
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderDetailResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderInfoResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareRequest;
-import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderSearchCondition;
 import com.nhnacademy.byeol23backend.orderset.order.exception.OrderNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.order.repository.OrderRepository;
@@ -94,6 +92,7 @@ class OrderServiceImplTest {
 	private OrderPrepareRequest memberRequest;
 	private BookInfoRequest bookInfoRequestWithPackaging;
 	private BookInfoRequest bookInfoRequestWithoutPackaging;
+	private BigDecimal usedPoints = BigDecimal.ZERO;
 	private static final String ORDER_STATUS_PAYMENT_COMPLETED = "결제 완료";
 	private static final String ORDER_STATUS_ORDER_CANCELED = "주문 취소";
 	private static final String ORDER_NOT_FOUND_MESSAGE = "해당 주문 번호를 찾을 수 없습니다.: ";
@@ -128,9 +127,19 @@ class OrderServiceImplTest {
 			"홍길동", "12345", "주소", "상세주소", null, "01012345678",
 			LocalDate.now().plusDays(1),
 			List.of(bookInfoRequestWithPackaging, bookInfoRequestWithoutPackaging),
-			null // 회원 주문은 비밀번호가 null
+			null, // 회원 주문은 비밀번호가 null
+			usedPoints
 		);
 
+		// 비회원 주문 DTO
+		nonMemberRequest = new OrderPrepareRequest(
+			new BigDecimal("29000"), new BigDecimal("25000"),
+			"비회원", "54321", "주소", "상세주소", null, "01087654321",
+			LocalDate.now().plusDays(1),
+			List.of(bookInfoRequestWithPackaging, bookInfoRequestWithoutPackaging),
+			"nonMemberPassword123", // 비회원 주문은 비밀번호가 있음
+			BigDecimal.ZERO
+		);
 	}
 
 	@Test
@@ -154,6 +163,7 @@ class OrderServiceImplTest {
 		given(orderRepository.save(orderCaptor.capture())).willReturn(mockOrder);
 
 		// when
+
 		OrderPrepareResponse response = orderServiceImpl.prepareOrder(memberId, memberRequest);
 
 		// then
