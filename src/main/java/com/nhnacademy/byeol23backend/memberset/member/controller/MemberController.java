@@ -71,28 +71,27 @@ public class MemberController implements MemberApi {
 	 */
 	@PostMapping("/put")
 	public ResponseEntity<MemberUpdateResponse> updateMember(
-		@Valid @RequestBody MemberUpdateRequest request,
-		@CookieValue(name = "Access-Token", required = false) String accessToken
+		@Valid @RequestBody MemberUpdateRequest request
 	) {
-		Long memberId = jwtParser.parseToken(accessToken).get("memberId", Long.class);
+		Long memberId = MemberUtil.getMemberId();
 		return ResponseEntity.ok(memberService.updateMember(memberId, request));
 	}
 
 	@PostMapping("/put/password")
 	public ResponseEntity<MemberPasswordUpdateResponse> updateMemberPassword(
-		@Valid @RequestBody MemberPasswordUpdateRequest request,
-		@CookieValue(name = "Access-Token", required = false) String accessToken
+		@Valid @RequestBody MemberPasswordUpdateRequest request
 	) {
-		Long memberId = jwtParser.parseToken(accessToken).get("memberId", Long.class);
+
+		Long memberId = MemberUtil.getMemberId();
 		return ResponseEntity.ok(memberService.updateMemberPassword(memberId, request));
 	}
 
 	@PutMapping("/reactivate")
 	public ResponseEntity<Void> reactivateMember(
-		@CookieValue(name = "Access-Token", required = false) String accessToken,
 		@Valid @RequestBody MemberPasswordUpdateRequest request
 	) {
-		Long memberId = jwtParser.parseToken(accessToken).get("memberId", Long.class);
+
+		Long memberId = MemberUtil.getMemberId();
 		memberService.reactivateMember(memberId);
 		return ResponseEntity.noContent().build();
 	}
@@ -103,9 +102,8 @@ public class MemberController implements MemberApi {
 	 */
 	@PostMapping("/delete")
 	public ResponseEntity<Void> deleteMember(
-		@CookieValue(name = "Access-Token", required = false) String accessToken
 	) {
-		Long memberId = jwtParser.parseToken(accessToken).get("memberId", Long.class);
+		Long memberId = MemberUtil.getMemberId();
 		memberService.deleteMember(memberId);
 		return ResponseEntity.noContent().build();
 	}

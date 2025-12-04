@@ -1,8 +1,8 @@
 package com.nhnacademy.byeol23backend.bookset.book.repository;
 
-import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookReview;
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookViewCount;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -12,8 +12,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookReview;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookViewCount;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long>, JdbcBookRepository {
@@ -48,4 +49,5 @@ select b.book_id as bookId, count(distinct r.review_id) as reviewCount, round(av
 
 	@Query("select count(b) from Book b where b.publisher.publisherId = :publisherId")
 	Long countBooksByPublisherId(@Param("publisherId") Long publisherId);
+
 }

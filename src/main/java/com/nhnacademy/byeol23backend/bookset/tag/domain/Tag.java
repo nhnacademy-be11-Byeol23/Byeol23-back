@@ -1,6 +1,5 @@
 package com.nhnacademy.byeol23backend.bookset.tag.domain;
 
-import jakarta.persistence.Access;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

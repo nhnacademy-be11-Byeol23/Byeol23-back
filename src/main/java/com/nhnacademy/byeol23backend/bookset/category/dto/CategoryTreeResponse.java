@@ -1,8 +1,8 @@
 package com.nhnacademy.byeol23backend.bookset.category.dto;
 
-import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
-
 import java.util.List;
+
+import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
 
 public record CategoryTreeResponse(Long categoryId, String categoryName, String pathId, List<CategoryTreeResponse> children) {
     public static CategoryTreeResponse from(Category category, int depth) {

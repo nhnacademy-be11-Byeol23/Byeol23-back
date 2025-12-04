@@ -1,15 +1,17 @@
 package com.nhnacademy.byeol23backend.bookset.book.service.impl;
 
-import com.nhnacademy.byeol23backend.bookset.book.document.BookDocument;
-import com.nhnacademy.byeol23backend.bookset.book.service.EmbeddingService;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.nhnacademy.byeol23backend.bookset.book.document.BookDocument;
+import com.nhnacademy.byeol23backend.bookset.book.service.EmbeddingService;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor

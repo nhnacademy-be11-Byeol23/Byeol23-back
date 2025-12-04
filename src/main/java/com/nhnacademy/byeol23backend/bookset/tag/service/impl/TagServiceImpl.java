@@ -1,5 +1,10 @@
 package com.nhnacademy.byeol23backend.bookset.tag.service.impl;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.nhnacademy.byeol23backend.bookset.booktag.repository.BookTagRepository;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.Tag;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.AllTagsInfoResponse;
@@ -13,20 +18,17 @@ import com.nhnacademy.byeol23backend.bookset.tag.exception.TagNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.tag.repository.TagRepository;
 import com.nhnacademy.byeol23backend.bookset.tag.service.TagService;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class TagServiceImpl implements TagService {
 	private final TagRepository tagRepository;
 	private final BookTagRepository bookTagRepository;
 
 	@Override
+	@Transactional
 	public TagCreateResponse createTag(TagCreateRequest request) {
 		if (tagRepository.findTagByTagName(request.tagName()) != 0){
 			throw new TagAlreadyExistsException("Tag가 이미 존재합니다.");
@@ -52,6 +54,7 @@ public class TagServiceImpl implements TagService {
 	}
 
 	@Override
+	@Transactional
 	public TagUpdateResponse updateTagByTagId(Long tagId, TagUpdateRequest request) {
 		Tag tag = tagRepository.findByTagId(tagId).orElseThrow(() -> new TagNotFoundException("해당 아이디 태그를 찾을 수 없습니다: " + tagId));
 		if (tagRepository.findTagByTagName(request.tagName()) != 0){

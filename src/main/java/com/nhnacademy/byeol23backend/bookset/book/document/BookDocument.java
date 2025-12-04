@@ -1,15 +1,16 @@
 package com.nhnacademy.byeol23backend.bookset.book.document;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-import java.time.LocalDate;
-import java.util.List;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Builder

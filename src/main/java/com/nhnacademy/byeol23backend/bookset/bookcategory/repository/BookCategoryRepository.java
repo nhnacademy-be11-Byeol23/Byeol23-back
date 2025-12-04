@@ -30,4 +30,15 @@ public interface BookCategoryRepository extends JpaRepository<BookCategory, Long
 	@Modifying
 	@Query("delete from BookCategory bc where bc.book.bookId = :bookId")
 	void deleteByBookId(@Param("bookId") Long bookId);
+
+	@Query("select count(bc) from BookCategory bc where bc.category.categoryId = :categoryId")
+	Long countBookCategoriesByCategoryId(@Param("categoryId") Long categoryId);
+
+	@Query("select bc.book.bookId " +
+		"from BookCategory bc " +
+		"where bc.category.categoryId = :categoryId " +
+		"and bc.book.bookId = (" +
+		"   select min(bc2.book.bookId) from BookCategory bc2 where bc2.category.categoryId = :categoryId" +
+		")")
+	Long findRepBookIdByCategoryId(@Param("categoryId") Long categoryId);
 }

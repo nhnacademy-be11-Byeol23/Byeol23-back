@@ -1,14 +1,16 @@
 package com.nhnacademy.byeol23backend.bookset.outbox.consumer;
 
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
+
 import com.nhnacademy.byeol23backend.bookset.outbox.BookOutbox;
 import com.nhnacademy.byeol23backend.bookset.outbox.exception.BookOutboxNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.outbox.handler.BookOutboxEventHandler;
 import com.nhnacademy.byeol23backend.bookset.outbox.handler.BookOutboxEventHandlerRegistry;
 import com.nhnacademy.byeol23backend.bookset.outbox.repository.BookOutboxRepository;
 import com.nhnacademy.byeol23backend.bookset.outbox.service.BookOutboxMarkProcessedService;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor

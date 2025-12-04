@@ -2,8 +2,6 @@ package com.nhnacademy.byeol23backend.bookset.book.controller;
 
 import java.util.List;
 
-import com.nhnacademy.byeol23backend.commons.aop.RequireRole;
-import com.nhnacademy.byeol23backend.memberset.member.domain.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -45,7 +43,6 @@ public class BookController {
 
 	private final BookService bookService;
 
-	@RequireRole(Role.ADMIN)
 	@Operation(summary = "도서 추가", description = "새로운 도서를 추가합니다.")
 	@ApiResponses({
 		@ApiResponse(responseCode = "201", description = "도서 추가 성공"),
@@ -95,11 +92,11 @@ public class BookController {
 		return ResponseEntity.noContent().build();
 	}
 
-    @Operation(summary = "도서 목록 조회", description = "페이징된 도서 목록을 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "도서 목록 조회 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터")
-    })
+	@Operation(summary = "도서 목록 조회", description = "페이징된 도서 목록을 조회합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "도서 목록 조회 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터")
+	})
 	@GetMapping
 	public ResponseEntity<Page<BookResponse>> getBooks(@RequestParam(value = "page", defaultValue = "0") int page,
 		@RequestParam(value = "size", defaultValue = "20") int size

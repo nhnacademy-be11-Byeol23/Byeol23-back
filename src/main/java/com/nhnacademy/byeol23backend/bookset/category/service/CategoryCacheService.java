@@ -1,8 +1,8 @@
 package com.nhnacademy.byeol23backend.bookset.category.service;
 
-import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryTreeResponse;
-
 import java.util.List;
+
+import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryTreeResponse;
 
 public interface CategoryCacheService {
     void cacheCategoryTree2Depth();
