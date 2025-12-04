@@ -84,6 +84,9 @@ public class Order {
 	@JoinColumn(name = "point_history_id", nullable = true)
 	private PointHistory pointHistory;
 
+	@Column(name = "is_cart", nullable = false, columnDefinition = "TINYINT")
+	private Boolean isCart;
+
 	private Order(String orderNumber, String orderPassword, BigDecimal totalBookPrice, BigDecimal actualOrderPrice,
 		LocalDateTime orderedAt,
 		String orderStatus, LocalDate deliveryDesiredDate, String receiver, String postCode, String receiverAddress,
