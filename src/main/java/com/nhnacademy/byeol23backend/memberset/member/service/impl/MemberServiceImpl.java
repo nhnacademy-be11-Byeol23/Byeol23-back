@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import com.nhnacademy.byeol23backend.memberset.member.dto.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,13 +21,6 @@ import com.nhnacademy.byeol23backend.memberset.address.repository.AddressReposit
 import com.nhnacademy.byeol23backend.memberset.grade.repository.GradeRepository;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Status;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberMyPageResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateResponse;
 import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateEmailException;
 import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateIdException;
 import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateNicknameException;
