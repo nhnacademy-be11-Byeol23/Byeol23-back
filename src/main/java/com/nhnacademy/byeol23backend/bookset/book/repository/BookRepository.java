@@ -1,5 +1,6 @@
 package com.nhnacademy.byeol23backend.bookset.book.repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,25 +30,38 @@ public interface BookRepository extends JpaRepository<Book, Long>, JdbcBookRepos
 	int decreaseBookStock(@Param("bookId") Long bookId, @Param("quantity") Integer quantity);
 	// 재고가 0이 되면 도서 상태(book status) -> 품절로
 
-    @Query("select b from Book b join fetch b.publisher p where b.bookId = :bookId")
-    Book queryBookWithPublisherById(@Param("bookId") Long bookId);
+	@Query("select b from Book b join fetch b.publisher p where b.bookId = :bookId")
+	Book queryBookWithPublisherById(@Param("bookId") Long bookId);
 
-    @Query(value = """
-select b.book_id as bookId, count(distinct r.review_id) as reviewCount, round(avg(r.review_rate), 1) as ratingAverage from books b 
-    left join order_details od on b.book_id = od.book_id 
-    left join reviews r on od.order_detail_id = r.order_detail_id where b.book_id = :bookId group by b.book_id
-    """, nativeQuery = true)
-    BookReview queryBookReview(@Param("bookId") Long bookId);
+	@Query(value = """
+		select b.book_id as bookId, count(distinct r.review_id) as reviewCount, round(avg(r.review_rate), 1) as ratingAverage from books b 
+		    left join order_details od on b.book_id = od.book_id 
+		    left join reviews r on od.order_detail_id = r.order_detail_id where b.book_id = :bookId group by b.book_id
+		""", nativeQuery = true)
+	BookReview queryBookReview(@Param("bookId") Long bookId);
 
-    @Query("select new com.nhnacademy.byeol23backend.bookset.book.dto.BookViewCount(b.bookId, b.viewCount) from Book b")
-    List<BookViewCount> findAllBookViewCount();
+	@Query("select new com.nhnacademy.byeol23backend.bookset.book.dto.BookViewCount(b.bookId, b.viewCount) from Book b")
+	List<BookViewCount> findAllBookViewCount();
 
 	@EntityGraph(attributePaths = {"publisher"})
-    Page<Book> findAll(Pageable pageable);
+	Page<Book> findAll(Pageable pageable);
 
-    List<Book> findByBookIdIn(List<Long> bookIds);
+	List<Book> findByBookIdIn(List<Long> bookIds);
 
 	@Query("select count(b) from Book b where b.publisher.publisherId = :publisherId")
 	Long countBooksByPublisherId(@Param("publisherId") Long publisherId);
 
+	@Query("""
+			SELECT DISTINCT b from Book b
+			JOIN FETCH b.bookContributors bc 
+			JOIN FETCH bc.contributor c
+			WHERE b.bookId IN :bookIds
+		""")
+	List<Book> findAllByWithContributors(@Param("bookIds") Collection<Long> bookIds);
+
+    Optional<Book> findByBookId(Long bookId);
+
+    @Query("SELECT COUNT(bcp) > 0 FROM BookCouponPolicy bcp " +
+            "WHERE bcp.book.bookId = :bookId AND bcp.couponPolicy.couponPolicyId = :policyId")
+    boolean isBookIncludedInPolicy(@Param("bookId") Long bookId, @Param("policyId") Long policyId);
 }

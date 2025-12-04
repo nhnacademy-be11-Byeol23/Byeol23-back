@@ -1,22 +1,17 @@
 package com.nhnacademy.byeol23backend.bookset.category.service.impl;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
 import com.nhnacademy.byeol23backend.bookset.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.byeol23backend.bookset.bookimage.repository.BookImageRepository;
-import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse;
-import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryListResponse;
-import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryMainPageResponse;
-import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryTreeResponse;
-import com.nhnacademy.byeol23backend.bookset.category.dto.SubCategoryIdListResponse;
+import com.nhnacademy.byeol23backend.bookset.category.dto.*;
 import com.nhnacademy.byeol23backend.bookset.category.repository.CategoryRepository;
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryQueryService;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor

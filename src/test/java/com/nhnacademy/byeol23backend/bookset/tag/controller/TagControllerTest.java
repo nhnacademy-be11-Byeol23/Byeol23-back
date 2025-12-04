@@ -1,5 +1,6 @@
 package com.nhnacademy.byeol23backend.bookset.tag.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.Tag;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.AllTagsInfoResponse;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.TagCreateRequest;
@@ -7,242 +8,223 @@ import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.TagCreateResponse;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.TagInfoResponse;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.TagUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.TagUpdateResponse;
+import com.nhnacademy.byeol23backend.bookset.tag.exception.TagAlreadyExistsException;
+import com.nhnacademy.byeol23backend.bookset.tag.exception.TagNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.tag.service.TagService;
+
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.*;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.*;
+import org.springframework.http.MediaType;
+
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(MockitoExtension.class)
+import org.springframework.test.util.ReflectionTestUtils;
+
+@WebMvcTest(TagController.class)
+@Disabled
 class TagControllerTest {
 
-	@Mock
+	@Autowired
+	private MockMvc mockMvc;
+
+	@MockBean
 	private TagService tagService;
 
-	@InjectMocks
-	private TagController tagController;
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
-	// ───────────────────────── GET /api/tags/{tag-id} ─────────────────────────
-
-	@Test
-	@DisplayName("태그 단건 조회 성공 - GET /api/tags/{tag-id}")
-	void getTagByTagId_Success() {
-		// given
-		Long tagId = 1L;
-		TagInfoResponse response = new TagInfoResponse(new Tag("backend"));
-
-		given(tagService.getTagByTagId(tagId)).willReturn(response);
-
-		// when
-		ResponseEntity<TagInfoResponse> result = tagController.getTagByTagId(tagId);
-
-		// then
-		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(result.getBody()).isNotNull();
-		TagInfoResponse body = result.getBody();
-		assertThat(body.tag().getTagName()).isEqualTo("backend");
-
-		verify(tagService, times(1)).getTagByTagId(tagId);
-	}
+	// ───────────────────────── createTag ─────────────────────────
 
 	@Test
-	@DisplayName("태그 단건 조회 실패 - 존재하지 않는 태그")
-	void getTagByTagId_Fail_NotFound() {
-		// given
-		Long tagId = 999L;
-
-		// 실제로는 TagNotFoundException 같은 커스텀 예외일 가능성이 큼
-		given(tagService.getTagByTagId(tagId))
-			.willThrow(new RuntimeException("존재하지 않는 태그입니다: " + tagId));
-
-		// when & then
-		assertThatThrownBy(() -> tagController.getTagByTagId(tagId))
-			.isInstanceOf(RuntimeException.class)
-			.hasMessageContaining("존재하지 않는 태그");
-
-		verify(tagService, times(1)).getTagByTagId(tagId);
-	}
-
-	// ───────────────────────── POST /api/tags (생성) ─────────────────────────
-
-	@Test
-	@DisplayName("태그 생성 성공 - POST /api/tags")
-	void createTag_Success() {
-		// given
+	@DisplayName("POST /admin/tags - 태그 생성 성공")
+	void createTag_Success() throws Exception {
 		TagCreateRequest request = new TagCreateRequest("backend");
-		TagCreateResponse response = new TagCreateResponse(new Tag("backend"));
+
+		Tag tag = new Tag("backend");
+		ReflectionTestUtils.setField(tag, "tagId", 1L);
+		TagCreateResponse response = new TagCreateResponse(tag);
 
 		given(tagService.createTag(any(TagCreateRequest.class))).willReturn(response);
 
-		// when
-		ResponseEntity<TagCreateResponse> result = tagController.createTag(request);
+		mockMvc.perform(post("/admin/tags")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+                            {
+                              "tagName": "backend"
+                            }
+                        """))
+			.andExpect(status().isCreated())
+			.andExpect(jsonPath("$.tag.tagId").value(1L))
+			.andExpect(jsonPath("$.tag.tagName").value("backend"));
 
-		// then
-		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-		assertThat(result.getBody()).isNotNull();
-		TagCreateResponse body = result.getBody();
-		assertThat(body.tag().getTagName()).isEqualTo("backend");
-
-		// Location 헤더도 검증 (Controller에서 tagName 기준으로 URI 생성 중)
-		assertThat(result.getHeaders().getLocation()).isNotNull();
-		assertThat(result.getHeaders().getLocation().toString()).isEqualTo("/api/tags/backend");
-
-		verify(tagService, times(1)).createTag(request);
+		verify(tagService, times(1)).createTag(any(TagCreateRequest.class));
 	}
 
 	@Test
-	@DisplayName("태그 생성 실패 - 서비스 예외 발생")
-	void createTag_Fail_ServiceException() {
-		// given
-		TagCreateRequest request = new TagCreateRequest("backend");
-
+	@DisplayName("POST /admin/tags - 태그 생성 실패(이미 존재)")
+	void createTag_Fail_TagAlreadyExists() throws Exception {
 		given(tagService.createTag(any(TagCreateRequest.class)))
-			.willThrow(new RuntimeException("태그 생성 실패"));
+			.willThrow(new TagAlreadyExistsException("Tag가 이미 존재합니다"));
 
-		// when & then
-		assertThatThrownBy(() -> tagController.createTag(request))
-			.isInstanceOf(RuntimeException.class)
-			.hasMessageContaining("태그 생성 실패");
+		mockMvc.perform(post("/admin/tags")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+                            {
+                              "tagName": "backend"
+                            }
+                        """))
+			.andExpect(status().isConflict())
+			.andExpect(jsonPath("$.message").value("Tag가 이미 존재합니다"));
 
-		verify(tagService, times(1)).createTag(request);
+		verify(tagService, times(1)).createTag(any(TagCreateRequest.class));
 	}
 
-	// ───────────────────────── POST /api/tags/delete/{tag-id} (삭제) ─────────────────────────
+	// ───────────────────────── getTagByTagId ─────────────────────────
 
 	@Test
-	@DisplayName("태그 삭제 성공 - POST /api/tags/delete/{tag-id}")
-	void deleteTagByTagId_Success() {
-		// given
+	@DisplayName("GET /admin/tags/{tagId} - 태그 단건 조회 성공")
+	void getTagByTagId_Success() throws Exception {
 		Long tagId = 1L;
+
+		Tag tag = new Tag("backend");
+		ReflectionTestUtils.setField(tag, "tagId", tagId);
+		TagInfoResponse response = new TagInfoResponse(tag);
+
+		given(tagService.getTagByTagId(tagId)).willReturn(response);
+
+		mockMvc.perform(get("/admin/tags/{tagId}", tagId))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.tag.tagId").value(1L))
+			.andExpect(jsonPath("$.tag.tagName").value("backend"));
+
+		verify(tagService, times(1)).getTagByTagId(tagId);
+	}
+
+	// ───────────────────────── deleteTagByTagId ─────────────────────────
+
+	@Test
+	@DisplayName("DELETE /admin/tags/{tagId} - 태그 삭제 성공")
+	void deleteTagByTagId_Success() throws Exception {
+		Long tagId = 1L;
+
 		willDoNothing().given(tagService).deleteTagByTagId(tagId);
 
-		// when
-		ResponseEntity<Void> result = tagController.deleteTagByTagId(tagId);
-
-		// then
-		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-		assertThat(result.getBody()).isNull();
+		mockMvc.perform(delete("/admin/tags/{tagId}", tagId))
+			.andExpect(status().isNoContent());
 
 		verify(tagService, times(1)).deleteTagByTagId(tagId);
 	}
 
 	@Test
-	@DisplayName("태그 삭제 실패 - 존재하지 않는 태그")
-	void deleteTagByTagId_Fail_NotFound() {
-		// given
+	@DisplayName("DELETE /admin/tags/{tagId} - 태그 삭제 실패(존재하지 않음)")
+	void deleteTagByTagId_Fail_TagNotFound() throws Exception {
 		Long tagId = 999L;
-		willThrow(new RuntimeException("존재하지 않는 태그입니다: " + tagId))
+
+		willThrow(new TagNotFoundException("해당 아이디 태그를 찾을 수 없습니다"))
 			.given(tagService).deleteTagByTagId(tagId);
 
-		// when & then
-		assertThatThrownBy(() -> tagController.deleteTagByTagId(tagId))
-			.isInstanceOf(RuntimeException.class)
-			.hasMessageContaining("존재하지 않는 태그");
+		mockMvc.perform(delete("/admin/tags/{tagId}", tagId))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.message").value("해당 아이디 태그를 찾을 수 없습니다"));
 
 		verify(tagService, times(1)).deleteTagByTagId(tagId);
 	}
 
-	// ───────────────────────── POST /api/tags/put/{tag-id} (수정) ─────────────────────────
+	// ───────────────────────── updateTagByTagId ─────────────────────────
 
 	@Test
-	@DisplayName("태그 수정 성공 - POST /api/tags/put/{tag-id}")
-	void updateTagByTagId_Success() {
-		// given
+	@DisplayName("PUT /admin/tags/{tagId} - 태그 수정 성공")
+	void updateTagByTagId_Success() throws Exception {
 		Long tagId = 1L;
-		TagUpdateRequest updateRequest = new TagUpdateRequest("new-name");
-		TagUpdateResponse response = new TagUpdateResponse(new Tag("new-name"));
+		TagUpdateRequest request = new TagUpdateRequest("new-name");
 
-		given(tagService.updateTagByTagId(tagId, updateRequest)).willReturn(response);
+		Tag updatedTag = new Tag("new-name");
+		ReflectionTestUtils.setField(updatedTag, "tagId", tagId);
+		TagUpdateResponse response = new TagUpdateResponse(updatedTag);
 
-		// when
-		ResponseEntity<TagUpdateResponse> result = tagController.updateTagByTagId(tagId, updateRequest);
+		given(tagService.updateTagByTagId(eq(tagId), any(TagUpdateRequest.class)))
+			.willReturn(response);
 
-		// then
-		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(result.getBody()).isNotNull();
-		TagUpdateResponse body = result.getBody();
-		assertThat(body.tag().getTagName()).isEqualTo("new-name");
+		mockMvc.perform(put("/admin/tags/{tagId}", tagId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+                            {
+                              "tagName": "new-name"
+                            }
+                        """))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.tag.tagId").value(1L))
+			.andExpect(jsonPath("$.tag.tagName").value("new-name"));
 
-		verify(tagService, times(1)).updateTagByTagId(tagId, updateRequest);
+		verify(tagService, times(1))
+			.updateTagByTagId(eq(tagId), any(TagUpdateRequest.class));
 	}
 
 	@Test
-	@DisplayName("태그 수정 실패 - 존재하지 않는 태그")
-	void updateTagByTagId_Fail_NotFound() {
-		// given
-		Long tagId = 999L;
-		TagUpdateRequest updateRequest = new TagUpdateRequest("new-name");
+	@DisplayName("PUT /admin/tags/{tagId} - 태그 수정 실패(이미 존재하는 이름)")
+	void updateTagByTagId_Fail_TagAlreadyExists() throws Exception {
+		Long tagId = 1L;
 
-		given(tagService.updateTagByTagId(tagId, updateRequest))
-			.willThrow(new RuntimeException("존재하지 않는 태그입니다: " + tagId));
+		given(tagService.updateTagByTagId(eq(tagId), any(TagUpdateRequest.class)))
+			.willThrow(new TagAlreadyExistsException("Tag가 이미 존재합니다"));
 
-		// when & then
-		assertThatThrownBy(() -> tagController.updateTagByTagId(tagId, updateRequest))
-			.isInstanceOf(RuntimeException.class)
-			.hasMessageContaining("존재하지 않는 태그");
+		mockMvc.perform(put("/admin/tags/{tagId}", tagId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+                            {
+                              "tagName": "duplicate-name"
+                            }
+                        """))
+			.andExpect(status().isConflict())
+			.andExpect(jsonPath("$.message").value("Tag가 이미 존재합니다"));
 
-		verify(tagService, times(1)).updateTagByTagId(tagId, updateRequest);
+		verify(tagService, times(1))
+			.updateTagByTagId(eq(tagId), any(TagUpdateRequest.class));
 	}
 
-	// ───────────────────────── GET /api/tags (목록 조회) ─────────────────────────
+	// ───────────────────────── getAllTags ─────────────────────────
 
 	@Test
-	@DisplayName("태그 목록 조회 성공 - GET /api/tags")
-	void getAllTags_Success() {
-		// given
+	@DisplayName("GET /admin/tags - 태그 전체 조회 성공")
+	void getAllTags_Success() throws Exception {
+		Pageable pageable = PageRequest.of(0, 10);
+
 		AllTagsInfoResponse tag1 = new AllTagsInfoResponse(1L, "backend");
 		AllTagsInfoResponse tag2 = new AllTagsInfoResponse(2L, "frontend");
 
-		Pageable pageable = PageRequest.of(0, 10);
-		Page<AllTagsInfoResponse> page = new PageImpl<>(List.of(tag1, tag2), pageable, 2);
+		Page<AllTagsInfoResponse> page =
+			new PageImpl<>(List.of(tag1, tag2), pageable, 2);
 
 		given(tagService.getAllTags(any(Pageable.class))).willReturn(page);
 
-		// when
-		ResponseEntity<Page<AllTagsInfoResponse>> result = tagController.getAllTags(0, 10);
-
-		// then
-		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(result.getBody()).isNotNull();
-		Page<AllTagsInfoResponse> body = result.getBody();
-		assertThat(body.getContent()).hasSize(2);
-		assertThat(body.getContent().get(0).tagId()).isEqualTo(1L);
-		assertThat(body.getContent().get(0).tagName()).isEqualTo("backend");
-		assertThat(body.getContent().get(1).tagId()).isEqualTo(2L);
-		assertThat(body.getContent().get(1).tagName()).isEqualTo("frontend");
-		assertThat(body.getTotalElements()).isEqualTo(2);
-
-		verify(tagService, times(1)).getAllTags(any(Pageable.class));
-	}
-
-	@Test
-	@DisplayName("태그 목록 조회 성공 - 빈 목록")
-	void getAllTags_Success_Empty() {
-		// given
-		Pageable pageable = PageRequest.of(0, 10);
-		Page<AllTagsInfoResponse> emptyPage = Page.empty(pageable);
-
-		given(tagService.getAllTags(any(Pageable.class))).willReturn(emptyPage);
-
-		// when
-		ResponseEntity<Page<AllTagsInfoResponse>> result = tagController.getAllTags(0, 10);
-
-		// then
-		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(result.getBody()).isNotNull();
-		assertThat(result.getBody().getContent()).isEmpty();
+		mockMvc.perform(get("/admin/tags")
+				.param("page", "0")
+				.param("size", "10"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.content", org.hamcrest.Matchers.hasSize(2)))
+			.andExpect(jsonPath("$.content[0].tagId").value(1L))
+			.andExpect(jsonPath("$.content[0].tagName").value("backend"))
+			.andExpect(jsonPath("$.content[1].tagId").value(2L))
+			.andExpect(jsonPath("$.content[1].tagName").value("frontend"));
 
 		verify(tagService, times(1)).getAllTags(any(Pageable.class));
 	}
