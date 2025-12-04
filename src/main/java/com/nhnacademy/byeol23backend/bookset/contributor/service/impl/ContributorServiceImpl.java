@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.byeol23backend.bookset.bookcontributor.repository.BookContributorRepository;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.Contributor;
@@ -20,11 +21,11 @@ import com.nhnacademy.byeol23backend.bookset.contributor.exception.RelatedBookEx
 import com.nhnacademy.byeol23backend.bookset.contributor.repository.ContributorRepository;
 import com.nhnacademy.byeol23backend.bookset.contributor.service.ContributorService;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ContributorServiceImpl implements ContributorService {
 
 	private final ContributorRepository contributorRepository;
@@ -38,6 +39,7 @@ public class ContributorServiceImpl implements ContributorService {
 	}
 
 	@Override
+	@Transactional
 	public ContributorCreateResponse createContributor(ContributorCreateRequest request) {
 		if (request == null)
 			throw new IllegalArgumentException("request is null");
@@ -57,6 +59,7 @@ public class ContributorServiceImpl implements ContributorService {
 	}
 
 	@Override
+	@Transactional
 	public void deleteContributorByContributorId(Long contributorId) {
 		if (bookContributorRepository.countBookContributorsByContributorId(contributorId) != 0){
 			throw new RelatedBookExistsException("기여자가 기여한 책이 있습니다.");

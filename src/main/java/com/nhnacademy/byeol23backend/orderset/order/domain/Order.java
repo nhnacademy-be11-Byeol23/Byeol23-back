@@ -49,7 +49,7 @@ public class Order {
 	@Column(name = "order_status", nullable = false, length = 10)
 	private String orderStatus;
 
-	private LocalDate deliverySentDate; //배송 시작 날짜
+	private LocalDate deliverySentDate; //배송 시작 날짜 -> 스케쥴러 사용해서 결제 완료 상품은 다음 날에 배송 날짜를 지정
 
 	private LocalDate deliveryDesiredDate; //배송 희망 날짜
 
@@ -83,6 +83,9 @@ public class Order {
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "point_history_id", nullable = true)
 	private PointHistory pointHistory;
+
+	@Column(name = "is_cart", nullable = false, columnDefinition = "TINYINT")
+	private Boolean isCart;
 
 	private Order(String orderNumber, String orderPassword, BigDecimal totalBookPrice, BigDecimal actualOrderPrice,
 		LocalDateTime orderedAt,

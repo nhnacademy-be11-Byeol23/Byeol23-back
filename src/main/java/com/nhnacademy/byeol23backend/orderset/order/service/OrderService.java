@@ -3,6 +3,7 @@ package com.nhnacademy.byeol23backend.orderset.order.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.nhnacademy.byeol23backend.cartset.cartbook.dto.CartOrderRequest;
 import com.nhnacademy.byeol23backend.memberset.member.dto.NonmemberOrderRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderBulkUpdateRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelRequest;
@@ -16,7 +17,7 @@ import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderSearchCondit
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.PointOrderResponse;
 
 public interface OrderService {
-	OrderPrepareResponse prepareOrder(Long memberId, OrderPrepareRequest request);
+	OrderPrepareResponse prepareOrder(OrderPrepareRequest request, String accessToken);
 
 	OrderCreateResponse updateOrderStatus(String orderNumber, String orderStatus);
 
@@ -30,7 +31,9 @@ public interface OrderService {
 
 	void updateBulkOrderStatus(OrderBulkUpdateRequest request);
 
-	Page<OrderDetailResponse> getOrders(Long memberId, Pageable pageable);
+	Page<OrderDetailResponse> getOrders(String token, Pageable pageable);
 
 	OrderDetailResponse getNonMemberOrder(NonmemberOrderRequest request);
+
+	void saveGuestOrder(String guestId, CartOrderRequest orderRequest);
 }

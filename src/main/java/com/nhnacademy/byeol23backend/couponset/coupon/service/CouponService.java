@@ -1,10 +1,9 @@
 package com.nhnacademy.byeol23backend.couponset.coupon.service;
 
-import com.nhnacademy.byeol23backend.couponset.coupon.dto.BirthdayCouponIssueRequestDto;
-import com.nhnacademy.byeol23backend.couponset.coupon.dto.CouponIssueRequestDto;
-import com.nhnacademy.byeol23backend.couponset.coupon.dto.IssuedCouponInfoResponseDto;
-import com.nhnacademy.byeol23backend.couponset.coupon.dto.UsedCouponInfoResponseDto;
+import com.nhnacademy.byeol23backend.couponset.coupon.dto.*;
+import com.nhnacademy.byeol23backend.couponset.couponpolicy.domain.CouponPolicy;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface CouponService {
@@ -16,7 +15,17 @@ public interface CouponService {
 
     void issueBirthdayCoupon(BirthdayCouponIssueRequestDto request);
 
-    List<IssuedCouponInfoResponseDto> getIssuedCoupons(Long memberId);
+    List<IssuedCouponInfoResponseDto> getIssuedCoupons(String token);
 
-    List<UsedCouponInfoResponseDto> getUsedCoupons(Long memberId);
+    List<UsedCouponInfoResponseDto> getUsedCoupons(String token);
+
+    List<UsableCouponInfoResponse> getUsableCoupons(String token, List<OrderItemRequest> request);
+
+    Long calculateFinalDiscount(CouponApplyRequest request);
+
+    Long calculateTotalAmount(List<OrderItemRequest> orderItems);
+
+    Long calculateDiscountValue(CouponPolicy policy, BigDecimal targetSubtotal);
+
+    void useCoupon(Long couponId);
 }

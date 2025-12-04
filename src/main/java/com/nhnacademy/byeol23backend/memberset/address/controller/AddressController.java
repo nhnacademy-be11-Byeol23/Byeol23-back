@@ -18,7 +18,6 @@ import com.nhnacademy.byeol23backend.memberset.address.dto.AddressInfoResponse;
 import com.nhnacademy.byeol23backend.memberset.address.dto.AddressRequest;
 import com.nhnacademy.byeol23backend.memberset.address.dto.AddressResponse;
 import com.nhnacademy.byeol23backend.memberset.address.service.AddressService;
-import com.nhnacademy.byeol23backend.utils.MemberUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -37,10 +36,9 @@ public class AddressController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터")
 	})
 	@PostMapping
-	public ResponseEntity<AddressResponse> createAddress(
+	public ResponseEntity<AddressResponse> createAddress(@CookieValue(name = "Access-Token") String token,
 		@RequestBody AddressRequest request) {
-		Long memberId = MemberUtil.getMemberId();
-		AddressResponse response = addressService.createOrder(memberId, request);
+		AddressResponse response = addressService.createOrder(token, request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
@@ -61,9 +59,8 @@ public class AddressController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터")
 	})
 	@GetMapping
-	public ResponseEntity<List<AddressInfoResponse>> getAddresses() {
-		Long memberId = MemberUtil.getMemberId();
-		List<AddressInfoResponse> responses = addressService.getAddresses(memberId);
+	public ResponseEntity<List<AddressInfoResponse>> getAddresses(@CookieValue(name = "Access-Token") String token) {
+		List<AddressInfoResponse> responses = addressService.getAddresses(token);
 		return ResponseEntity.status(HttpStatus.OK).body(responses);
 	}
 
@@ -88,20 +85,5 @@ public class AddressController {
 		addressService.setDefaultAddress(addressId);
 		return ResponseEntity.ok().build();
 	}
-
-	//
-	// // set default address
-	// @Operation(summary = "기본 주소 설정", description = "해당 주소를 기본 주소로 설정합니다.")
-	// @ApiResponses({
-	// 	@ApiResponse(responseCode = "200", description = "기본 주소 설정 성공"),
-	// 	@ApiResponse(responseCode = "400", description = "설정 실패 또는 잘못된 요청")
-	// })
-	// @PatchMapping("/{addressId}/default")
-	// @RequestMember
-	// public ResponseEntity<Void> setDefaultAddress(@PathVariable Long addressId) {
-	// 	Member member = resolveMemberFromHeader();
-	// 	addressService.setDefaultAddress(member, addressId);
-	// 	return ResponseEntity.ok().build();
-	// }
 
 }

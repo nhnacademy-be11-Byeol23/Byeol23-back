@@ -3,7 +3,6 @@ package com.nhnacademy.byeol23backend.orderset.payment.service.impl;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -21,6 +20,7 @@ import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentCancelRe
 import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentCancelResponse;
 import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentConfirmResponse;
 import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentParamRequest;
+import com.nhnacademy.byeol23backend.orderset.payment.service.PaymentFacade;
 import com.nhnacademy.byeol23backend.orderset.payment.service.PaymentGatewayClient;
 
 /**

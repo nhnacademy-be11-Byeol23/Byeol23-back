@@ -4,20 +4,25 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
-import com.nhnacademy.byeol23backend.bookset.book.domain.dto.BookOrderInfoResponse;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookInfoRequest;
+import com.nhnacademy.byeol23backend.bookset.book.dto.BookOrderInfoResponse;
 import com.nhnacademy.byeol23backend.bookset.book.exception.BookNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
+import com.nhnacademy.byeol23backend.cartset.cartbook.dto.CartOrderRequest;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.memberset.member.dto.NonmemberOrderRequest;
 import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
@@ -52,13 +57,19 @@ import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentCancelRe
 import com.nhnacademy.byeol23backend.orderset.payment.exception.PaymentNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.payment.repository.PaymentRepository;
 import com.nhnacademy.byeol23backend.orderset.payment.service.PaymentService;
+import com.nhnacademy.byeol23backend.pointset.orderpoint.domain.OrderPoint;
+import com.nhnacademy.byeol23backend.pointset.orderpoint.repository.OrderPointRepository;
 import com.nhnacademy.byeol23backend.pointset.pointhistories.domain.PointHistory;
+import com.nhnacademy.byeol23backend.pointset.pointhistories.exception.PointNotEnoughException;
 import com.nhnacademy.byeol23backend.pointset.pointhistories.repository.PointHistoryRepository;
+import com.nhnacademy.byeol23backend.pointset.pointhistories.service.PointService;
+import com.nhnacademy.byeol23backend.pointset.pointpolicy.dto.ReservedPolicy;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
-import com.nhnacademy.byeol23backend.utils.MemberUtil;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -71,6 +82,8 @@ public class OrderServiceImpl implements OrderService {
 	private final PaymentService paymentService;
 	private final DeliveryPolicyRepository deliveryPolicyRepository;
 	private final PackagingRepository packagingRepository;
+	private final OrderPointRepository orderPointRepository;
+	private final PointService pointService;
 	private final JwtParser jwtParser;
 	private final PasswordEncoder passwordEncoder;
 	private static final String ORDER_STATUS_PAYMENT_COMPLETED = "결제 완료";
@@ -80,16 +93,23 @@ public class OrderServiceImpl implements OrderService {
 	private static final String PAYMENT_NOT_FOUND_MESSAGE = "해당 결제를 찾을 수 없습니다.: ";
 	private static final String DELIVERY_POLICY_NOT_FOUND_MESSAGE = "현재 배송 정책을 찾을 수 없습니다.";
 	private final PointHistoryRepository pointHistoryRepository;
+	private final RedisTemplate<String, Object> redisTemplate;
 
 	@Override
 	@Transactional
-	public OrderPrepareResponse prepareOrder(Long memberId, OrderPrepareRequest request) {
+	public OrderPrepareResponse prepareOrder(OrderPrepareRequest request, String accessToken) {
 		String timeStamp = new SimpleDateFormat("yyMMddHHmmss").format(new Date());
 		String randomPart = String.format("%06d", new Random().nextInt(1_000_000));
 		String orderId = timeStamp + randomPart;
-		Member member = memberRepository.findById(memberId)
-				.orElseThrow(() -> new MemberNotFoundException("해당 아이디의 멤버를 찾을 수 없습니다.: " + memberId));
+		Long memberId;
+		Member member = null;
 
+		// 회원
+		if (accessToken != null && !accessToken.isBlank()) {
+			memberId = accessTokenParser(accessToken);
+			member = memberRepository.findById(memberId)
+				.orElseThrow(() -> new MemberNotFoundException("해당 아이디의 멤버를 찾을 수 없습니다.: " + memberId));
+		}
 
 		String orderPassword = request.orderPassword() == null ? null : passwordEncoder.encode(request.orderPassword());
 
@@ -117,6 +137,24 @@ public class OrderServiceImpl implements OrderService {
 				book, packaging, order);
 
 			orderDetailRepository.save(orderDetail);
+		}
+
+		// 회원 주문이고(member가 null이 아니고) 사용한 포인트량이 null이 아니면
+		if (!Objects.isNull(member) && !Objects.isNull(request.usedPoints())) {
+			BigDecimal usedPoints = request.usedPoints();
+			BigDecimal currentPoint = member.getCurrentPoint();
+
+			if (usedPoints.compareTo(currentPoint) > 0) {
+				throw new PointNotEnoughException("보유 포인트를 초과하여 사용할 수 없습니다.");
+			}
+
+			if (usedPoints.compareTo(BigDecimal.ZERO) > 0) {
+				PointHistory pointHistory = pointService.offsetPointsWithExtra(member, ReservedPolicy.ORDER,
+					usedPoints.negate());
+				order.setPointHistory(pointHistory);
+				OrderPoint orderPoint = new OrderPoint(order, pointHistory);
+				orderPointRepository.save(orderPoint);
+			}
 		}
 
 		return new OrderPrepareResponse(order.getOrderNumber(), order.getActualOrderPrice(), order.getReceiver());
@@ -177,6 +215,13 @@ public class OrderServiceImpl implements OrderService {
 		Order order = orderRepository.findOrderByOrderNumber(orderNumber)
 			.orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND_MESSAGE + orderNumber));
 
+		PointHistory pointHistory = pointService.offsetPointsByOrder(order.getMember(), order.getActualOrderPrice());
+		pointHistoryRepository.save(pointHistory);
+		order.setPointHistory(pointHistory);
+
+		OrderPoint orderPoint = new OrderPoint(order, pointHistory);
+		orderPointRepository.save(orderPoint);
+
 		order.updateOrderStatus(ORDER_STATUS_PAYMENT_COMPLETED);
 
 		return new PointOrderResponse(order.getOrderNumber(), order.getTotalBookPrice(), PAYMENT_METHOD_POINT);
@@ -189,7 +234,9 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public Page<OrderDetailResponse> getOrders(Long memberId, Pageable pageable) {
+	public Page<OrderDetailResponse> getOrders(String token, Pageable pageable) {
+		Long memberId = accessTokenParser(token);
+
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new MemberNotFoundException("해당 아이디의 회원을 찾을 수 없습니다.: " + memberId));
 
@@ -271,6 +318,23 @@ public class OrderServiceImpl implements OrderService {
 		return mapOrderDetailsToOrderDetailResponse(order);
 	}
 
+	@Override
+	public void saveGuestOrder(String guestId, CartOrderRequest orderRequest) {
+		String key = "GUEST_ORDER:" + guestId;
+
+		HashOperations<String, String, Integer> hashOperations = redisTemplate.opsForHash();
+
+		for (Map.Entry<Long, Integer> entry : orderRequest.cartOrderList().entrySet()) {
+			Long bookId = entry.getKey();
+			Integer quantity = entry.getValue();
+
+			hashOperations.put(key, String.valueOf(bookId), quantity);
+		}
+
+		redisTemplate.expire(key, 30, TimeUnit.MINUTES);
+		log.info("비회원 주문 데이터가 Redis에 저장되었습니다.");
+	}
+
 	@Transactional
 	public void updateOrderStatusToCanceled(Long orderId) {
 		Order order = orderRepository.findById(orderId)
@@ -320,16 +384,11 @@ public class OrderServiceImpl implements OrderService {
 		DeliveryPolicyInfoResponse delivery = new DeliveryPolicyInfoResponse(deliveryPolicy.getFreeDeliveryCondition(),
 			deliveryPolicy.getDeliveryFee(), deliveryPolicy.getChangedAt());
 
-		PointHistory pointHistory = null;
+		// 포인트 amount가 0보다 작은 값을 가져옴
+		BigDecimal pointAmount = orderPointRepository.findUsedPointsAmountByOrder(order);
 
-		if (order.getPointHistory() != null) {
-			pointHistory = pointHistoryRepository.findById(order.getPointHistory().getPointHistoryId())
-				.orElse(null);
-		}
-
-		BigDecimal usedPoints = (pointHistory != null && pointHistory.getPointAmount() != null)
-			? pointHistory.getPointAmount()
-			: BigDecimal.ZERO;
+		// 포인트 내역에서 포인트 사용량이 있고, 포인트 사용량이 0보다 낮으면 orderDetail에 저장
+		BigDecimal usedPoints = pointAmount != null ? pointAmount.abs() : BigDecimal.ZERO;
 
 		return new OrderDetailResponse(order.getOrderNumber(), order.getOrderedAt(), order.getOrderStatus(),
 			order.getActualOrderPrice(), order.getReceiver(), order.getReceiverPhone(), order.getReceiverAddress(),

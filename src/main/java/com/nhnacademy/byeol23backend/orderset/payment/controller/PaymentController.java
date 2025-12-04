@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nhnacademy.byeol23backend.cartset.cart.dto.CustomerIdentifier;
 import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentCancelRequest;
 import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentCancelResponse;
 import com.nhnacademy.byeol23backend.orderset.payment.domain.dto.PaymentParamRequest;
@@ -21,8 +22,9 @@ public class PaymentController {
 	private final PaymentService paymentService;
 
 	@PostMapping("/confirm")
-	public ResponseEntity<PaymentResultResponse> confirmPayment(@RequestBody PaymentParamRequest paymentParamRequest) {
-		PaymentResultResponse response = paymentService.confirmPayment(paymentParamRequest);
+	public ResponseEntity<PaymentResultResponse> confirmPayment(CustomerIdentifier identifier,
+		@RequestBody PaymentParamRequest paymentParamRequest) {
+		PaymentResultResponse response = paymentService.confirmPayment(identifier, paymentParamRequest);
 		return ResponseEntity.ok(response);
 	}
 
