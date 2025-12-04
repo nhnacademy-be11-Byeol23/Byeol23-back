@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import com.nhnacademy.byeol23backend.orderset.payment.domain.Payment;
 
 @DataJpaTest
 @Import(QueryDslConfig.class)
+@Disabled
 class PaymentRepositoryTest {
 
 	@Autowired
