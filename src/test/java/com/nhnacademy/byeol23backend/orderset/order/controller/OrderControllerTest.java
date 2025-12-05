@@ -111,7 +111,9 @@ class OrderControllerTest {
 			receiverPhone,
 			deliveryArrivedDate,
 			bookInfoRequestList,
-			orderPassword
+			orderPassword,
+			BigDecimal.ZERO,
+			true
 		);
 		// 1. [수정] Mockito.mock(Claims.class)를 다시 사용
 		Claims mockClaims = Mockito.mock(Claims.class);
