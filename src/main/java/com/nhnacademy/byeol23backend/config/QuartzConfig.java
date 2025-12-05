@@ -148,7 +148,7 @@ public class QuartzConfig {
 	@Bean
 	public Trigger birthdayCouponJobTrigger() {
 		// Cron 표현식: 0초 10분 1시 1일 *월 ?요일
-		CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule("0 10 1 1 * ?")
+		CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule("0 40 17 * * ?")
 			.inTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
 
 		return TriggerBuilder.newTrigger()
