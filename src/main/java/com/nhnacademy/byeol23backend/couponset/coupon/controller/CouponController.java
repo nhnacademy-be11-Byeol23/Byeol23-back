@@ -33,6 +33,8 @@ public class CouponController {
         return ResponseEntity.ok(issuedCoupons);
     }
 
+
+
     @GetMapping("/used")
     public ResponseEntity<List<UsedCouponInfoResponseDto>> getUsedCoupons(@CookieValue("Access-Token") String token){
         List<UsedCouponInfoResponseDto> usedCoupons = couponService.getUsedCoupons(token);
@@ -70,4 +72,5 @@ public class CouponController {
         Long finalDiscountAmount = couponService.calculateFinalDiscount(request);
         return ResponseEntity.ok(Map.of("discountAmount", finalDiscountAmount));
     }
+
 }

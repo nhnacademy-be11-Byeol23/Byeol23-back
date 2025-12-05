@@ -1,18 +1,17 @@
 package com.nhnacademy.byeol23backend.config;
 
-import java.util.List;
-
+import com.nhnacademy.byeol23backend.bookset.book.interceptor.ViewerIdInterceptor;
+import com.nhnacademy.byeol23backend.bookset.book.resolver.ViewerIdResolver;
+import com.nhnacademy.byeol23backend.cartset.cart.interceptor.CustomerIdentificationInterceptor;
+import com.nhnacademy.byeol23backend.cartset.cart.resolver.CustomerIdentifierResolver;
+import com.nhnacademy.byeol23backend.utils.JwtParser;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.nhnacademy.byeol23backend.bookset.book.interceptor.ViewerIdInterceptor;
-import com.nhnacademy.byeol23backend.bookset.book.resolver.ViewerIdResolver;
-import com.nhnacademy.byeol23backend.cartset.cart.interceptor.CustomerIdentificationInterceptor;
-import com.nhnacademy.byeol23backend.cartset.cart.resolver.CustomerIdentifierResolver;
-
-import lombok.RequiredArgsConstructor;
+import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor

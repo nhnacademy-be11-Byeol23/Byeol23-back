@@ -1,5 +1,6 @@
 package com.nhnacademy.byeol23backend.orderset.payment.controller;
 
+import com.nhnacademy.byeol23backend.couponset.coupon.service.CouponService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentController {
 	private final PaymentService paymentService;
-
+	private final CouponService couponService;
 	@PostMapping("/confirm")
 	public ResponseEntity<PaymentResultResponse> confirmPayment(CustomerIdentifier identifier,
 		@RequestBody PaymentParamRequest paymentParamRequest) {
