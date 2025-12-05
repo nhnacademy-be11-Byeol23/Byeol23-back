@@ -35,5 +35,17 @@ public class Grade {
 	@Setter
 	@Column(name = "point_rate", nullable = false, precision = 5, scale = 2)
 	private BigDecimal pointRate;
+
+	public Grade(String gradeName, BigDecimal criterionPrice, BigDecimal pointRate) {
+		this.gradeName = gradeName;
+		this.criterionPrice = criterionPrice;
+		this.pointRate = pointRate;
+	}
+
+	public void update(String gradeName, BigDecimal criterionPrice, BigDecimal pointRate) {
+		this.gradeName = gradeName;
+		this.criterionPrice = criterionPrice;
+		this.pointRate = pointRate;
+	}
 }
 
