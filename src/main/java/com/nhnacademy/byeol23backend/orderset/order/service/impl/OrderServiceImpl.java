@@ -4,25 +4,26 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookInfoRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookOrderInfoResponse;
 import com.nhnacademy.byeol23backend.bookset.book.exception.BookNotFoundException;
 import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
-import com.nhnacademy.byeol23backend.cartset.cartbook.dto.CartOrderRequest;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.memberset.member.dto.NonmemberOrderRequest;
 import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
@@ -40,10 +41,12 @@ import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderDetailRespon
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderInfoResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderSearchCondition;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.PointOrderResponse;
 import com.nhnacademy.byeol23backend.orderset.order.exception.OrderNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.order.exception.OrderPasswordNotMatchException;
+import com.nhnacademy.byeol23backend.orderset.order.exception.OrderTemporaryStorageException;
 import com.nhnacademy.byeol23backend.orderset.order.repository.OrderRepository;
 import com.nhnacademy.byeol23backend.orderset.order.service.OrderService;
 import com.nhnacademy.byeol23backend.orderset.orderdetail.domain.OrderDetail;
@@ -94,6 +97,7 @@ public class OrderServiceImpl implements OrderService {
 	private static final String DELIVERY_POLICY_NOT_FOUND_MESSAGE = "현재 배송 정책을 찾을 수 없습니다.";
 	private final PointHistoryRepository pointHistoryRepository;
 	private final RedisTemplate<String, Object> redisTemplate;
+	private final ObjectMapper objectMapper;
 
 	@Override
 	@Transactional
@@ -119,7 +123,7 @@ public class OrderServiceImpl implements OrderService {
 		Order order = Order.of(orderId, orderPassword, request.totalBookPrice(), request.actualOrderPrice(),
 			request.deliveryArrivedDate(), request.receiver(), request.postCode(),
 			request.receiverAddress(), request.receiverAddressDetail(), request.receiverAddressExtra(),
-			request.receiverPhone(), member, currentDeliveryPolicy);
+			request.receiverPhone(), member, currentDeliveryPolicy, request.isCartCheckout());
 
 		orderRepository.save(order);
 
@@ -319,20 +323,105 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public void saveGuestOrder(String guestId, CartOrderRequest orderRequest) {
-		String key = "GUEST_ORDER:" + guestId;
+	public String saveGuestOrderTmp(String guestId, OrderRequest orderRequest) {
+		String validationToken = UUID.randomUUID().toString();
 
-		HashOperations<String, String, Integer> hashOperations = redisTemplate.opsForHash();
+		String key = "GUEST_ORDER_TMP:" + guestId + ":" + validationToken;
 
-		for (Map.Entry<Long, Integer> entry : orderRequest.cartOrderList().entrySet()) {
-			Long bookId = entry.getKey();
-			Integer quantity = entry.getValue();
-
-			hashOperations.put(key, String.valueOf(bookId), quantity);
+		try {
+			ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
+			valueOperations.set(key, orderRequest, 10, TimeUnit.MINUTES);
+		} catch (Exception e) {
+			log.error("비회원 주문 임시 데이터 저장 실패: {}", e);
+			throw new OrderTemporaryStorageException("비회원 주문 임시 데이터 Redis 저장에 실패했습니다.");
 		}
 
-		redisTemplate.expire(key, 30, TimeUnit.MINUTES);
-		log.info("비회원 주문 데이터가 Redis에 저장되었습니다.");
+		log.info("Saving order: guestId={}, validationToken={}", guestId, validationToken);
+
+		return validationToken;
+	}
+
+	@Override
+	public String saveMemberOrderTmp(Long memberId, OrderRequest orderRequest) {
+
+		String validationToken = UUID.randomUUID().toString();
+
+		String key = "MEMBER_ORDER_TMP:" + memberId + ":" + validationToken;
+
+		try {
+			ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
+			valueOperations.set(key, orderRequest, 10, TimeUnit.MINUTES);
+		} catch (Exception e) {
+			log.error("회원 주문 임시 데이터 저장 실패: {}", e);
+			throw new OrderTemporaryStorageException("회원 주문 임시 데이터 Redis 저장에 실패했습니다.");
+		}
+
+		log.info("회원 주문 데이터가 Redis에 임시 저장되었습니다. Token:{}", validationToken);
+
+		return validationToken;
+	}
+
+	@Override
+	public OrderRequest getAndRemoveOrderRequest(String validationToken) {
+
+		String guestKeyPattern = "GUEST_ORDER_TMP:*:" + validationToken;
+		String memberKeyPattern = "MEMBER_ORDER_TMP:*:" + validationToken;
+
+		String actualKey = null;
+
+		Set<String> guestKeys = redisTemplate.keys(guestKeyPattern);
+		if (guestKeys != null && !guestKeys.isEmpty()) {
+			actualKey = guestKeys.iterator().next();
+		}
+
+		if (actualKey == null) {
+			Set<String> memberKeys = redisTemplate.keys(memberKeyPattern);
+			if (memberKeys != null && !memberKeys.isEmpty()) {
+				actualKey = memberKeys.iterator().next();
+			}
+		}
+
+		if (actualKey == null) {
+			log.warn("OrderRequest data not found for token: {}", validationToken);
+			return null;
+		}
+
+		ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
+		Object rawDto = valueOperations.get(actualKey);
+
+		redisTemplate.delete(actualKey);
+
+		if (rawDto == null) {
+			return null;
+		}
+
+		return objectMapper.convertValue(rawDto, OrderRequest.class);
+	}
+
+	@Override
+	@Transactional
+	public String migrateGuestOrderToMember(String token, String validationToken) {
+		Long memberId = accessTokenParser(token);
+
+		String guestKey = "GUEST_ORDER_TMP:*:" + validationToken;
+		String memberKey = "MEMBER_ORDER_TMP:" + memberId + ":" + validationToken;
+
+		ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
+
+		Object rawDto = valueOperations.get(guestKey);
+
+		if (rawDto == null) {
+			log.warn("Guest order data not found or expired for token: {}", validationToken);
+			return validationToken;
+		}
+
+		redisTemplate.delete(guestKey);
+
+		valueOperations.set(memberKey, rawDto, 10, TimeUnit.MINUTES);
+
+		log.info("주문 데이터가 비회원({})에서 회원({})으로 성공적으로 마이그레이션되었습니다.", guestKey, memberKey);
+
+		return validationToken;
 	}
 
 	@Transactional
