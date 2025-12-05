@@ -32,6 +32,9 @@ public class PackagingServiceImpl implements PackagingService, ImageService {
 	@Override
 	@Transactional
 	public String saveImageUrl(Long Id, String imageUrl) {
+		String target = "http://storage.java21.net:8000/";
+		String replacement = "https://byeol23.shop/img-proxy/";
+		imageUrl = imageUrl.replace(target, replacement);
 		Packaging packaging = packagingRepository.findById(Id)
 			.orElseThrow(() -> new IllegalArgumentException("해당 포장재를 찾을 수 없습니다. 포장재 imageId: " + Id));
 		packaging.setPackagingImgUrl(imageUrl);
