@@ -43,7 +43,7 @@ public class BookDocumentUpdateBuilder implements BookDocumentBuilder {
 //        String imageUrl = bookImageService.getImageUrlsById(bookId).getFirst().getImageUrl();
         BookReview bookReview = bookService.getBookReview(bookId);
         List<ImageUrlProjection> bookImages = bookImageService.getImageUrlsById(bookId);
-        String imageUrl = null;
+        String imageUrl = "";
         if (!bookImages.isEmpty()) {
             // 리스트가 비어있지 않은 경우에만 첫 번째 요소 get
             imageUrl = bookImages.getFirst().getImageUrl();

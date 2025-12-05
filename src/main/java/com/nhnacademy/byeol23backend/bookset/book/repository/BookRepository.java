@@ -34,7 +34,7 @@ public interface BookRepository extends JpaRepository<Book, Long>, JdbcBookRepos
 	Book queryBookWithPublisherById(@Param("bookId") Long bookId);
 
 	@Query(value = """
-		select b.book_id as bookId, count(distinct r.review_id) as reviewCount, round(avg(r.review_rate), 1) as ratingAverage from books b 
+		select b.book_id as bookId, count(distinct r.review_id) as reviewCount, coalesce(round(avg(r.review_rate), 1), 0.0) as ratingAverage from books b 
 		    left join order_details od on b.book_id = od.book_id 
 		    left join reviews r on od.order_detail_id = r.order_detail_id where b.book_id = :bookId group by b.book_id
 		""", nativeQuery = true)

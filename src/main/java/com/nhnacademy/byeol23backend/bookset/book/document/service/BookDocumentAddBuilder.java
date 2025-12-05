@@ -44,7 +44,7 @@ public class BookDocumentAddBuilder implements BookDocumentBuilder {
 //        MQ에서 에러 뱉는거 잠시 막기 위해 수정
 //        String imageUrl = bookImageService.getImageUrlsById(bookId).getFirst().getImageUrl();
         List<ImageUrlProjection> bookImages = bookImageService.getImageUrlsById(bookId);
-        String imageUrl = new String("");
+        String imageUrl = "";
 
         if (!bookImages.isEmpty()) {
             // 리스트가 비어있지 않은 경우에만 첫 번째 요소 get

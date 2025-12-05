@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import com.nhnacademy.byeol23backend.bookset.book.event.BookReviewAddEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +40,7 @@ public class ReviewServiceImpl implements ReviewService {
 	private final MemberService memberService;
 	private final ImageServiceGate imageServiceGate;
 	private final PointService pointService;
-
+    private final ApplicationEventPublisher eventPublisher;
 	@Override
 	@Transactional
 	public List<ReviewResponse> getReviewsByProductId(Long bookId) {
@@ -79,6 +81,7 @@ public class ReviewServiceImpl implements ReviewService {
 			orderDetail
 		);
 		Review saved = reviewRepository.save(review);
+        eventPublisher.publishEvent(new BookReviewAddEvent(bookId));
 		return saved.getReviewId();
 	}
 }
