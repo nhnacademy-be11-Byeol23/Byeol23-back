@@ -1,16 +1,16 @@
 package com.nhnacademy.byeol23backend.bookset.category.repository;
 
-import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
-import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryAllResponse;
-import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse;
-import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryListResponse;
-import com.nhnacademy.byeol23backend.bookset.category.dto.SubCategoryIdListResponse;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
+import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
+import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse;
+import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryListResponse;
+import com.nhnacademy.byeol23backend.bookset.category.dto.SubCategoryIdListResponse;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     // 카테고리 테이블에서 최상위 루트 카테고리(parent_id 가 null인)를 조회하는 메서드

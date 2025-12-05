@@ -1,14 +1,15 @@
 package com.nhnacademy.byeol23backend.bookset.book.service.impl;
 
-import com.nhnacademy.byeol23backend.bookset.book.service.BookViewCountService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.time.Duration;
+
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.util.Optional;
+import com.nhnacademy.byeol23backend.bookset.book.service.BookViewCountService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service

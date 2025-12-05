@@ -2,10 +2,11 @@ package com.nhnacademy.byeol23backend.bookset.tag.repository;
 
 import java.util.Optional;
 
-import com.nhnacademy.byeol23backend.bookset.tag.domain.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import com.nhnacademy.byeol23backend.bookset.tag.domain.Tag;
 
 @Repository
 public interface TagRepository extends JpaRepository<Tag, Long> {

@@ -1,46 +1,37 @@
 package com.nhnacademy.byeol23backend.bookset.book.interceptor;
 
+import java.util.Arrays;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
+
 import com.nhnacademy.byeol23backend.utils.JwtParser;
+import com.nhnacademy.byeol23backend.utils.MemberUtil;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.HandlerInterceptor;
-
-import java.util.Arrays;
 
 @Component
 @SuppressWarnings("squid:S3516")
 @RequiredArgsConstructor
 public class ViewerIdInterceptor implements HandlerInterceptor {
-    private final JwtParser jwtParser;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         if(!"GET".equalsIgnoreCase(request.getMethod())) return true;
 
         // 회원인 경우
-        String accessToken = null;
-        if(request.getCookies() != null) {
-            accessToken = Arrays.stream(request.getCookies())
-                    .filter(cookie -> cookie.getName().equals("Access-Token"))
-                    .map(Cookie::getValue)
-                    .findFirst()
-                    .orElse(null);
+        Long memberId = MemberUtil.getMemberId();
+        if(memberId != -1L) {
+            request.setAttribute("viewerId", "member:%d".formatted(memberId));
+            return true;
         }
 
-        if(StringUtils.isNotBlank(accessToken)) {
-            try {
-                Claims claims = jwtParser.parseToken(accessToken);
-                Long memberId = claims.get("memberId", Long.class);
-                request.setAttribute("viewerId", "member:%d".formatted(memberId));
-                return true;
-            } catch (ExpiredJwtException ignored) {}
-        }
 
         // 비회원인 경우
         if(request.getCookies() != null) {
@@ -56,14 +47,6 @@ public class ViewerIdInterceptor implements HandlerInterceptor {
                 return true;
             }
         }
-        /*
-        // 비회원이지만 첫 요청인 경우
-        String guestId = (String) request.getAttribute("guestId");
-        if(StringUtils.isNotBlank(guestId)) {
-            request.setAttribute("viewerId", "guest:%s".formatted(guestId));
-            return true;
-        }
-        */
         return true;
     }
 }

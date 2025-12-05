@@ -1,12 +1,37 @@
 package com.nhnacademy.byeol23backend.bookset.category.controller;
 
-import com.nhnacademy.byeol23backend.bookset.category.dto.*;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryCreateRequest;
+import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse;
+import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryListResponse;
+import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryMainPageResponse;
+import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryTreeResponse;
+import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryUpdateRequest;
+import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryUpdateResponse;
 import com.nhnacademy.byeol23backend.bookset.category.exception.CategoryDeleteReferencedByBookException;
 import com.nhnacademy.byeol23backend.bookset.category.exception.CategoryNotFoundException;
-import com.nhnacademy.byeol23backend.commons.exception.ErrorResponse;
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryCacheService;
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryCommandService;
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryQueryService;
+import com.nhnacademy.byeol23backend.commons.exception.ErrorResponse;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
@@ -14,15 +39,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Validated
 @RestController

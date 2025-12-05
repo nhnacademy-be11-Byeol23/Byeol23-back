@@ -1,5 +1,12 @@
 package com.nhnacademy.byeol23backend.bookset.book.document.service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.nhnacademy.byeol23backend.bookset.book.document.BookDocument;
 import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import com.nhnacademy.byeol23backend.bookset.book.service.BookService;
@@ -9,17 +16,11 @@ import com.nhnacademy.byeol23backend.bookset.bookimage.service.BookImageServiceI
 import com.nhnacademy.byeol23backend.bookset.booktag.service.BookTagService;
 import com.nhnacademy.byeol23backend.bookset.category.domain.Category;
 import com.nhnacademy.byeol23backend.bookset.contributor.domain.Contributor;
-import com.nhnacademy.byeol23backend.bookset.contributor.domain.ContributorRole;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.Tag;
 import com.nhnacademy.byeol23backend.image.dto.ImageUrlProjection;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -43,7 +44,7 @@ public class BookDocumentAddBuilder implements BookDocumentBuilder {
 //        MQ에서 에러 뱉는거 잠시 막기 위해 수정
 //        String imageUrl = bookImageService.getImageUrlsById(bookId).getFirst().getImageUrl();
         List<ImageUrlProjection> bookImages = bookImageService.getImageUrlsById(bookId);
-        String imageUrl = null;
+        String imageUrl = new String("");
 
         if (!bookImages.isEmpty()) {
             // 리스트가 비어있지 않은 경우에만 첫 번째 요소 get

@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import com.nhnacademy.byeol23backend.bookset.book.job.BookDocumentViewCountSyncJob;
 import com.nhnacademy.byeol23backend.bookset.book.job.BookViewCountSyncJob;
 import com.nhnacademy.byeol23backend.memberset.member.job.InactiveMemberJob;
+import com.nhnacademy.byeol23backend.memberset.member.job.MemberGradeUpdateJob;
 
 @Configuration
 public class QuartzConfig {
@@ -34,6 +35,24 @@ public class QuartzConfig {
 			.withSchedule(
 				CronScheduleBuilder.cronSchedule("0 0 1 * * ?")
 			)
+			.build();
+	}
+
+	@Bean
+	public JobDetail updateMemberGradeJobDetail() {
+		return JobBuilder.newJob(MemberGradeUpdateJob.class)
+			.withIdentity("updateMemberGradeJob")
+			.withDescription("회원 등급 자동 업데이트 작업")
+			.storeDurably()
+			.build();
+	}
+
+	@Bean
+	Trigger updateMemberGradeTrigger() {
+		return TriggerBuilder.newTrigger()
+			.forJob(updateMemberGradeJobDetail())
+			.withIdentity("updateMemberGradeJobTrigger")
+			.withSchedule(CronScheduleBuilder.cronSchedule("0 0 1 * * ?"))
 			.build();
 	}
 

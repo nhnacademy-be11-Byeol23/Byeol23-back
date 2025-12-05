@@ -1,8 +1,12 @@
 package com.nhnacademy.byeol23backend.bookset.category.service;
 
-import com.nhnacademy.byeol23backend.bookset.category.dto.*;
-
 import java.util.List;
+
+import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryLeafResponse;
+import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryListResponse;
+import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryMainPageResponse;
+import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryTreeResponse;
+import com.nhnacademy.byeol23backend.bookset.category.dto.SubCategoryIdListResponse;
 
 public interface CategoryQueryService {
     List<CategoryListResponse> getRootCategories();

@@ -1,5 +1,11 @@
 package com.nhnacademy.byeol23backend.bookset.bookimage.service;
 
+import java.util.List;
+
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.nhnacademy.byeol23backend.bookset.book.domain.Book;
 import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
 import com.nhnacademy.byeol23backend.bookset.bookimage.domain.BookImage;
@@ -10,13 +16,9 @@ import com.nhnacademy.byeol23backend.bookset.outbox.repository.BookOutboxReposit
 import com.nhnacademy.byeol23backend.image.domain.ImageDomain;
 import com.nhnacademy.byeol23backend.image.dto.ImageUrlProjection;
 import com.nhnacademy.byeol23backend.image.service.ImageService;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -31,6 +33,9 @@ public class BookImageServiceImpl implements ImageService {
 	@Override
 	@Transactional
 	public String saveImageUrl(Long bookId, String imageUrl) {
+		String target = "http://storage.java21.net:8000/";
+		String replacement = "https://byeol23.shop/img-proxy/";
+		imageUrl = imageUrl.replace(target, replacement);
 		Book book = bookRepository.findById(bookId)
 			.orElseThrow(() -> new IllegalArgumentException("해당 도서를 찾을 수 없습니다. 도서 imageId: " + bookId));
 		BookImage bookImage = new BookImage(book, imageUrl);

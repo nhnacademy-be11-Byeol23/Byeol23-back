@@ -3,8 +3,10 @@ package com.nhnacademy.byeol23backend.memberset.member.service.impl;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
+import com.nhnacademy.byeol23backend.memberset.member.dto.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,19 +16,15 @@ import org.springframework.transaction.annotation.Transactional;
 import com.nhnacademy.byeol23backend.cartset.cart.domain.Cart;
 import com.nhnacademy.byeol23backend.cartset.cart.repository.CartRepository;
 import com.nhnacademy.byeol23backend.couponset.coupon.dto.BirthdayCouponIssueRequestDto;
+import com.nhnacademy.byeol23backend.memberset.grade.domain.Grade;
+import com.nhnacademy.byeol23backend.memberset.grade.dto.AllGradeResponse;
 import com.nhnacademy.byeol23backend.memberset.address.domain.Address;
 import com.nhnacademy.byeol23backend.memberset.address.dto.AddressResponse;
 import com.nhnacademy.byeol23backend.memberset.address.repository.AddressRepository;
 import com.nhnacademy.byeol23backend.memberset.grade.repository.GradeRepository;
+import com.nhnacademy.byeol23backend.memberset.grade.service.GradeService;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Status;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberMyPageResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateResponse;
 import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateEmailException;
 import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateIdException;
 import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateNicknameException;
@@ -49,6 +47,7 @@ public class MemberServiceImpl implements MemberService {
 	private final GradeRepository gradeRepository;
 	private final CartRepository cartRepository;
 	private final ApplicationEventPublisher eventPublisher;
+	private final GradeService gradeService;
 	private final AddressRepository addressRepository;
 
 	@Value("${coupon.welcome.policy-id}")
@@ -236,6 +235,54 @@ public class MemberServiceImpl implements MemberService {
 		log.info("마지막 로그인 날짜가 3개월 이전인 회원 휴면 상태로 전환");
 	}
 
+	@Override
+	@Transactional
+	public void updateAllMembersGrade() {
+		log.info("전체 회원 등급 업데이트 시작");
+		LocalDateTime threeMonthsAgo = LocalDateTime.now().minusMonths(3);
+
+		List<Member> activeMembers = memberRepository.findAll().stream()
+			.filter(member -> member.getStatus() == Status.ACTIVE)
+			.toList();
+
+		for (Member member : activeMembers) {
+			try {
+				BigDecimal totalBookPriceSum =
+					memberRepository.findTotalOrderAmountForLast3Months(member.getMemberId());
+				log.info("회원 ID: {}, 순수 결제 금액: {}", member.getMemberId(), totalBookPriceSum);
+				Grade prevGrade = member.getGrade();
+				Grade newGrade = determineGradeByAmount(totalBookPriceSum);
+
+				if (!prevGrade.getGradeId().equals(newGrade.getGradeId())) {
+					member.setGrade(newGrade);
+					log.info("회원 ID: {}, 등급 변경: {} -> {} (최근 3개월 도서금액 합계: {}원)",
+						member.getMemberId(),
+						prevGrade.getGradeName(),
+						newGrade.getGradeName(),
+						totalBookPriceSum);
+				}
+			} catch (Exception e) {
+				log.error("회원 ID: {} 등급 업데이트 실패", member.getMemberId(), e);
+			}
+		}
+
+	}
+
+	private Grade determineGradeByAmount(BigDecimal pureOrderAmount) {
+		List<AllGradeResponse> grades = gradeService.getAllGrades();
+
+		List<AllGradeResponse> sortedGrades = grades.stream()
+			.sorted((g1, g2) -> g2.criterionPrice().compareTo(g1.criterionPrice()))
+			.toList();
+
+		for (AllGradeResponse gradeResponse : sortedGrades) {
+			if (pureOrderAmount.compareTo(gradeResponse.criterionPrice()) >= 0) {
+				return gradeRepository.findByGradeName(gradeResponse.gradeName());
+			}
+		}
+		return gradeRepository.findByGradeName("일반");
+	}
+
 	private Member findMemberById(Long memberId) {
 		return memberRepository.findById(memberId)
 			.orElseThrow(() -> new MemberNotFoundException(memberId + "에 해당하는 멤버를 찾을 수 없습니다."));
@@ -274,6 +321,23 @@ public class MemberServiceImpl implements MemberService {
 			memberRepository.existsByPhoneNumberAndMemberIdNot(phoneNumber, memberId)) {
 			throw new DuplicatePhoneNumberException("이미 사용 중인 휴대전화입니다.");
 		}
+	}
+
+	@Override
+	public ValueDuplicatedResponse checkInfoDuplicated(ValueDuplicatedRequest request) {
+		String loginId = request.loginId();
+		String nickname = request.nickname();
+		String email = request.email();
+		String phoneNumber = request.phoneNumber();
+		boolean isDuplicatedId =  memberRepository.existsByLoginId(loginId);
+
+		boolean isDuplicatedNickname = memberRepository.existsByNickname(nickname);
+
+		boolean isDuplicatedEmail = memberRepository.existsByEmail(email);
+
+		boolean isDuplicatedPhoneNumber = memberRepository.existsByPhoneNumber(phoneNumber);
+
+		return new ValueDuplicatedResponse(isDuplicatedId, isDuplicatedNickname, isDuplicatedEmail, isDuplicatedPhoneNumber);
 	}
 
 }
