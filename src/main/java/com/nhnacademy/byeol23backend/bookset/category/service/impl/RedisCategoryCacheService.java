@@ -1,17 +1,19 @@
 package com.nhnacademy.byeol23backend.bookset.category.service.impl;
 
+import java.util.List;
+
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.byeol23backend.bookset.category.dto.CategoryTreeResponse;
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryCacheService;
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryQueryService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Slf4j
 @Service

@@ -4,13 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberMyPageResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateResponse;
+import com.nhnacademy.byeol23backend.memberset.member.dto.*;
 
 public interface MemberService {
 	MemberCreateResponse createMember(MemberCreateRequest request);
@@ -33,4 +27,6 @@ public interface MemberService {
 	Member getMemberProxy(Long memberId);
 
     void deactivateMembersNotLoggedInFor3Months();
+
+	public ValueDuplicatedResponse checkInfoDuplicated(ValueDuplicatedRequest request);
 }

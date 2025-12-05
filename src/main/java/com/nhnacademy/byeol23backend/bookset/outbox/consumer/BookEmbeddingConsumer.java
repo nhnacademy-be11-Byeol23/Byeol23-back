@@ -1,15 +1,17 @@
 package com.nhnacademy.byeol23backend.bookset.outbox.consumer;
 
-import com.nhnacademy.byeol23backend.bookset.book.document.BookDocument;
-import com.nhnacademy.byeol23backend.bookset.book.document.BookDocumentBuilderRegistry;
-import com.nhnacademy.byeol23backend.bookset.book.service.EmbeddingService;
-import com.nhnacademy.byeol23backend.bookset.outbox.dto.BookDocumentSyncMessage;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.stereotype.Component;
+
+import com.nhnacademy.byeol23backend.bookset.book.document.BookDocument;
+import com.nhnacademy.byeol23backend.bookset.book.document.BookDocumentBuilderRegistry;
+import com.nhnacademy.byeol23backend.bookset.book.service.EmbeddingService;
+import com.nhnacademy.byeol23backend.bookset.outbox.dto.BookDocumentSyncMessage;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component

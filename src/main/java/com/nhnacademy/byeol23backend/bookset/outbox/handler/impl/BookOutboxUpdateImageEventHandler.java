@@ -1,15 +1,17 @@
 package com.nhnacademy.byeol23backend.bookset.outbox.handler.impl;
 
-import com.nhnacademy.byeol23backend.bookset.bookimage.service.BookImageServiceImpl;
-import com.nhnacademy.byeol23backend.bookset.outbox.BookOutbox;
-import com.nhnacademy.byeol23backend.bookset.outbox.handler.BookOutboxEventHandler;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.document.Document;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.UpdateQuery;
 import org.springframework.stereotype.Component;
+
+import com.nhnacademy.byeol23backend.bookset.bookimage.service.BookImageServiceImpl;
+import com.nhnacademy.byeol23backend.bookset.outbox.BookOutbox;
+import com.nhnacademy.byeol23backend.bookset.outbox.handler.BookOutboxEventHandler;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component

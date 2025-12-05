@@ -1,13 +1,15 @@
 package com.nhnacademy.byeol23backend.bookset.book.service.impl;
 
-import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
-import com.nhnacademy.byeol23backend.bookset.book.service.BookViewCountBatchUpdateService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
+import com.nhnacademy.byeol23backend.bookset.book.service.BookViewCountBatchUpdateService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service

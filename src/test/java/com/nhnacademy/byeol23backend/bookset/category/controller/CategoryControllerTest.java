@@ -10,14 +10,16 @@ import com.nhnacademy.byeol23backend.bookset.category.service.CategoryCacheServi
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryCommandService;
 import com.nhnacademy.byeol23backend.bookset.category.service.CategoryQueryService;
 import com.nhnacademy.byeol23backend.cartset.cart.interceptor.CustomerIdentificationInterceptor;
-import com.nhnacademy.byeol23backend.commons.filter.TokenFilter;
+import com.nhnacademy.byeol23backend.config.SecurityConfig;
 import com.nhnacademy.byeol23backend.config.WebConfig;
+import com.nhnacademy.byeol23backend.utils.JwtParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
@@ -36,7 +38,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Disabled
 @WebMvcTest(value = CategoryController.class,
-excludeFilters = @ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, classes = {TokenFilter.class, CustomerIdentificationInterceptor.class, ViewerIdInterceptor.class, WebConfig.class}))
+excludeFilters = @ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, classes = {CustomerIdentificationInterceptor.class, ViewerIdInterceptor.class, WebConfig.class, SecurityConfig.class}))
+@AutoConfigureMockMvc(addFilters = false)
 class CategoryControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -48,6 +51,8 @@ class CategoryControllerTest {
     private CategoryQueryService categoryQueryService;
     @MockitoBean
     private CategoryCacheService categoryCacheService;
+    @MockitoBean
+    private JwtParser jwtParser;
 
 
     @Test

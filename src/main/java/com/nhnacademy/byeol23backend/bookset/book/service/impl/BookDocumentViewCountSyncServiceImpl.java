@@ -1,17 +1,17 @@
 package com.nhnacademy.byeol23backend.bookset.book.service.impl;
 
-import com.nhnacademy.byeol23backend.bookset.book.document.BookDocument;
-import com.nhnacademy.byeol23backend.bookset.book.dto.BookViewCount;
-import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
-import com.nhnacademy.byeol23backend.bookset.book.service.BookDocumentViewCountSyncService;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.document.Document;
 import org.springframework.data.elasticsearch.core.query.UpdateQuery;
 import org.springframework.stereotype.Service;
-import org.springframework.data.elasticsearch.core.document.Document;
 
-import java.util.List;
+import com.nhnacademy.byeol23backend.bookset.book.document.BookDocument;
+import com.nhnacademy.byeol23backend.bookset.book.repository.BookRepository;
+import com.nhnacademy.byeol23backend.bookset.book.service.BookDocumentViewCountSyncService;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
