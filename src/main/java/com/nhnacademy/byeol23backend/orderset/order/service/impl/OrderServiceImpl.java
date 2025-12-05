@@ -154,7 +154,7 @@ public class OrderServiceImpl implements OrderService {
 			}
 
 			if (usedPoints.compareTo(BigDecimal.ZERO) > 0) {
-				PointHistory pointHistory = pointService.offsetPointsWithExtra(member, ReservedPolicy.ORDER,
+				PointHistory pointHistory = pointService.offsetPointsWithExtra(member, ReservedPolicy.USE,
 					usedPoints.negate());
 				order.setPointHistory(pointHistory);
 				OrderPoint orderPoint = new OrderPoint(order, pointHistory);
