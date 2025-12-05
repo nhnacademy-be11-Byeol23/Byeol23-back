@@ -555,6 +555,15 @@ public class MemberServiceTest {
 			LocalDate.of(1990, 2, 1)
 		);
 
+		// Member 엔티티에 memberId 설정 (리플렉션 사용)
+		try {
+			java.lang.reflect.Field field = Member.class.getDeclaredField("memberId");
+			field.setAccessible(true);
+			field.set(member, memberId);
+		} catch (Exception e) {
+			// 리플렉션 실패 시 무시
+		}
+
 		when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
 		// updateValidation에서 닉네임은 existsByPhoneNumberAndMemberIdNot을 사용 (버그로 보이지만 실제 구현에 맞춤)
 		when(memberRepository.existsByPhoneNumberAndMemberIdNot("길동이2", memberId)).thenReturn(false);
@@ -602,6 +611,15 @@ public class MemberServiceTest {
 			"test@example.com",
 			LocalDate.of(1990, 1, 1)
 		);
+
+		// Member 엔티티에 memberId 설정 (리플렉션 사용)
+		try {
+			java.lang.reflect.Field field = Member.class.getDeclaredField("memberId");
+			field.setAccessible(true);
+			field.set(member, memberId);
+		} catch (Exception e) {
+			// 리플렉션 실패 시 무시
+		}
 
 		when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
 		// updateValidation에서 닉네임은 existsByPhoneNumberAndMemberIdNot을 사용 (버그로 보이지만 실제 구현에 맞춤)
@@ -655,7 +673,6 @@ public class MemberServiceTest {
 			"new@example.com"
 		);
 
-		when(memberRepository.existsByLoginId("newuser")).thenReturn(false);
 		when(memberRepository.existsByNickname("새닉네임")).thenReturn(false);
 		when(memberRepository.existsByEmail("new@example.com")).thenReturn(false);
 		when(memberRepository.existsByPhoneNumber("01011111111")).thenReturn(false);
@@ -668,7 +685,6 @@ public class MemberServiceTest {
 		assertThat(response.isDuplicatedNickname()).isFalse();
 		assertThat(response.isDuplicatedEmail()).isFalse();
 		assertThat(response.isDuplicatedPhoneNumber()).isFalse();
-		verify(memberRepository).existsByLoginId("newuser");
 		verify(memberRepository).existsByNickname("새닉네임");
 		verify(memberRepository).existsByEmail("new@example.com");
 		verify(memberRepository).existsByPhoneNumber("01011111111");
@@ -684,7 +700,6 @@ public class MemberServiceTest {
 			"existing@example.com"
 		);
 
-		when(memberRepository.existsByLoginId("existinguser")).thenReturn(true);
 		when(memberRepository.existsByNickname("새닉네임")).thenReturn(false);
 		when(memberRepository.existsByEmail("existing@example.com")).thenReturn(true);
 		when(memberRepository.existsByPhoneNumber("01011111111")).thenReturn(false);
@@ -697,6 +712,9 @@ public class MemberServiceTest {
 		assertThat(response.isDuplicatedNickname()).isFalse();
 		assertThat(response.isDuplicatedEmail()).isTrue();
 		assertThat(response.isDuplicatedPhoneNumber()).isFalse();
+		verify(memberRepository).existsByNickname("새닉네임");
+		verify(memberRepository).existsByEmail("existing@example.com");
+		verify(memberRepository).existsByPhoneNumber("01011111111");
 	}
 
 	@Test
