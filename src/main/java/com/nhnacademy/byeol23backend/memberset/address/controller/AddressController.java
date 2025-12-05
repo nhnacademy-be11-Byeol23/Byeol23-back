@@ -59,8 +59,8 @@ public class AddressController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청 데이터")
 	})
 	@GetMapping
-	public ResponseEntity<List<AddressInfoResponse>> getAddresses(@CookieValue(name = "Access-Token") String token) {
-		List<AddressInfoResponse> responses = addressService.getAddresses(token);
+	public ResponseEntity<List<AddressInfoResponse>> getAddresses() {
+		List<AddressInfoResponse> responses = addressService.getAddresses();
 		return ResponseEntity.status(HttpStatus.OK).body(responses);
 	}
 
