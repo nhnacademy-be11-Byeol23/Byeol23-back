@@ -11,7 +11,7 @@ public interface AddressService {
 
 	void updateAddress(AddressRequest request);
 
-	List<AddressInfoResponse> getAddresses(String token);
+	List<AddressInfoResponse> getAddresses();
 
 	void deleteAddress(Long addressId);
 

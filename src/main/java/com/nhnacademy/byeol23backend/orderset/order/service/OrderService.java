@@ -31,7 +31,7 @@ public interface OrderService {
 
 	void updateBulkOrderStatus(OrderBulkUpdateRequest request);
 
-	Page<OrderDetailResponse> getOrders(String token, Pageable pageable);
+	Page<OrderDetailResponse> getOrders(Pageable pageable);
 
 	OrderDetailResponse getNonMemberOrder(NonmemberOrderRequest request);
 
