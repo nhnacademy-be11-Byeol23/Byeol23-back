@@ -650,7 +650,6 @@ public class MemberServiceTest {
 	void checkInfoDuplicated_success_allAvailable() {
 		// given
 		ValueDuplicatedRequest request = new ValueDuplicatedRequest(
-			"newuser",
 			"새닉네임",
 			"01011111111",
 			"new@example.com"
@@ -666,7 +665,6 @@ public class MemberServiceTest {
 
 		// then
 		assertThat(response).isNotNull();
-		assertThat(response.isDuplicatedId()).isFalse();
 		assertThat(response.isDuplicatedNickname()).isFalse();
 		assertThat(response.isDuplicatedEmail()).isFalse();
 		assertThat(response.isDuplicatedPhoneNumber()).isFalse();
@@ -681,7 +679,6 @@ public class MemberServiceTest {
 	void checkInfoDuplicated_success_partialDuplicated() {
 		// given
 		ValueDuplicatedRequest request = new ValueDuplicatedRequest(
-			"existinguser",
 			"새닉네임",
 			"01011111111",
 			"existing@example.com"
@@ -697,7 +694,6 @@ public class MemberServiceTest {
 
 		// then
 		assertThat(response).isNotNull();
-		assertThat(response.isDuplicatedId()).isTrue();
 		assertThat(response.isDuplicatedNickname()).isFalse();
 		assertThat(response.isDuplicatedEmail()).isTrue();
 		assertThat(response.isDuplicatedPhoneNumber()).isFalse();

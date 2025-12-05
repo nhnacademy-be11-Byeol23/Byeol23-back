@@ -262,14 +262,12 @@ class MemberControllerTest {
 	void checkDuplication_Success() {
 		// given
 		ValueDuplicatedRequest request = new ValueDuplicatedRequest(
-			"testuser",
 			"길동이",
 			"01012345678",
 			"test@example.com"
 		);
 
 		ValueDuplicatedResponse response = new ValueDuplicatedResponse(
-			false,
 			false,
 			false,
 			false
@@ -283,7 +281,6 @@ class MemberControllerTest {
 		// then
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(result.getBody()).isNotNull();
-		assertThat(result.getBody().isDuplicatedId()).isFalse();
 		assertThat(result.getBody().isDuplicatedNickname()).isFalse();
 		assertThat(result.getBody().isDuplicatedEmail()).isFalse();
 		assertThat(result.getBody().isDuplicatedPhoneNumber()).isFalse();
@@ -295,14 +292,12 @@ class MemberControllerTest {
 	void checkDuplication_PartialDuplicated() {
 		// given
 		ValueDuplicatedRequest request = new ValueDuplicatedRequest(
-			"testuser",
 			"길동이",
 			"01012345678",
 			"test@example.com"
 		);
 
 		ValueDuplicatedResponse response = new ValueDuplicatedResponse(
-			true,
 			false,
 			true,
 			false
@@ -316,7 +311,6 @@ class MemberControllerTest {
 		// then
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(result.getBody()).isNotNull();
-		assertThat(result.getBody().isDuplicatedId()).isTrue();
 		assertThat(result.getBody().isDuplicatedNickname()).isFalse();
 		assertThat(result.getBody().isDuplicatedEmail()).isTrue();
 		assertThat(result.getBody().isDuplicatedPhoneNumber()).isFalse();
