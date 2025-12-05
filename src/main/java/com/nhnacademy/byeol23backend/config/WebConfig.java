@@ -23,7 +23,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/api/books/*");
 
         registry.addInterceptor(new CustomerIdentificationInterceptor())
-                .addPathPatterns("/api/carts/**");
+                .addPathPatterns("/api/carts/**")
+                .addPathPatterns("/api/payments/**");
     }
 
     @Override
