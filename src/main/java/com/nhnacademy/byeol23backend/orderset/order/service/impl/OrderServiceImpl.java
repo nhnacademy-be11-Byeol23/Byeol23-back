@@ -65,6 +65,7 @@ import com.nhnacademy.byeol23backend.pointset.pointhistories.repository.PointHis
 import com.nhnacademy.byeol23backend.pointset.pointhistories.service.PointService;
 import com.nhnacademy.byeol23backend.pointset.pointpolicy.dto.ReservedPolicy;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
+import com.nhnacademy.byeol23backend.utils.MemberUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -234,8 +235,8 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public Page<OrderDetailResponse> getOrders(String token, Pageable pageable) {
-		Long memberId = accessTokenParser(token);
+	public Page<OrderDetailResponse> getOrders(Pageable pageable) {
+		Long memberId = MemberUtil.getMemberId();
 
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new MemberNotFoundException("해당 아이디의 회원을 찾을 수 없습니다.: " + memberId));

@@ -92,9 +92,9 @@ public class OrderController {
 	}
 
 	@GetMapping("/members")
-	public ResponseEntity<Page<OrderDetailResponse>> getOrders(@CookieValue(name = "Access-Token") String token,
+	public ResponseEntity<Page<OrderDetailResponse>> getOrders(
 		Pageable pageable) {
-		Page<OrderDetailResponse> responses = orderService.getOrders(token, pageable);
+		Page<OrderDetailResponse> responses = orderService.getOrders(pageable);
 		return ResponseEntity.ok(responses);
 	}
 

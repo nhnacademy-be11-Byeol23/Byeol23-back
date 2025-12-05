@@ -33,6 +33,10 @@ import com.nhnacademy.byeol23backend.memberset.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 회원 서비스 구현체
+ * 회원 관련 비즈니스 로직을 처리하는 서비스 클래스
+ */
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -55,9 +59,16 @@ public class MemberServiceImpl implements MemberService {
 	private int validityDays;
 
 	/**
-	 * 회원을 저장하는 함수
-	 * @param request MemberCreateRequest
-	 * @return MemberCreateResponse
+	 * 새로운 회원을 생성합니다.
+	 * 회원가입 시 ID, 닉네임, 전화번호, 이메일 중복 검사를 수행하고,
+	 * 회원 정보를 저장한 후 장바구니를 생성하고 환영 쿠폰을 발급합니다.
+	 *
+	 * @param request 회원가입 요청 정보 (로그인 ID, 비밀번호, 이름, 닉네임, 전화번호, 이메일, 생년월일 등)
+	 * @return 회원가입 응답
+	 * @throws DuplicateIdException ID가 중복된 경우
+	 * @throws DuplicateNicknameException 닉네임이 중복된 경우
+	 * @throws DuplicatePhoneNumberException 전화번호가 중복된 경우
+	 * @throws DuplicateEmailException 이메일이 중복된 경우
 	 */
 	@Override
 	@Transactional
@@ -96,9 +107,12 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	/**
-	 * 회원을 조회하고 회원 정보를 반환하는 함수
-	 * @param memberId Long
-	 * @return MemberMyPageResponse
+	 * 회원 ID로 회원 정보를 조회합니다.
+	 * 회원의 기본 정보, 포인트, 등급, 기본 주소, 전체 등급 목록을 포함한 마이페이지 정보를 반환합니다.
+	 *
+	 * @param memberId 조회할 회원 ID
+	 * @return 회원 마이페이지 정보 (로그인 ID, 이름, 닉네임, 전화번호, 이메일, 생년월일, 포인트, 역할, 등급, 주소, 등급 목록)
+	 * @throws MemberNotFoundException 회원을 찾을 수 없는 경우
 	 */
 	@Override
 	@Transactional(readOnly = true)
@@ -141,10 +155,16 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	/**
-	 * 회원 정보를 수정하는 함수
-	 * @param memberId Long
-	 * @param request MemberUpdateRequest
-	 * @return MemberUpdateResponse
+	 * 회원 정보를 수정합니다.
+	 * 닉네임, 전화번호, 이메일의 중복 검사를 수행한 후 회원 정보를 업데이트합니다.
+	 *
+	 * @param memberId 수정할 회원 ID
+	 * @param request 수정할 회원 정보 (이름, 닉네임, 전화번호, 이메일, 생년월일)
+	 * @return 회원 정보 수정 응답
+	 * @throws MemberNotFoundException 회원을 찾을 수 없는 경우
+	 * @throws DuplicateNicknameException 닉네임이 중복된 경우
+	 * @throws DuplicatePhoneNumberException 전화번호가 중복된 경우
+	 * @throws DuplicateEmailException 이메일이 중복된 경우
 	 */
 	@Override
 	@Transactional
@@ -160,6 +180,16 @@ public class MemberServiceImpl implements MemberService {
 		return new MemberUpdateResponse();
 	}
 
+	/**
+	 * 회원 비밀번호를 변경합니다.
+	 * 현재 비밀번호를 확인한 후 새 비밀번호로 변경합니다.
+	 *
+	 * @param memberId 비밀번호를 변경할 회원 ID
+	 * @param request 비밀번호 변경 요청 정보 (로그인 ID, 현재 비밀번호, 새 비밀번호)
+	 * @return 비밀번호 변경 응답
+	 * @throws MemberNotFoundException 회원을 찾을 수 없는 경우
+	 * @throws IncorrectPasswordException 현재 비밀번호가 일치하지 않는 경우
+	 */
 	@Override
 	@Transactional
 	public MemberPasswordUpdateResponse updateMemberPassword(Long memberId, MemberPasswordUpdateRequest request) {
@@ -175,6 +205,13 @@ public class MemberServiceImpl implements MemberService {
 		return new MemberPasswordUpdateResponse();
 	}
 
+	/**
+	 * 회원의 포인트를 업데이트합니다.
+	 *
+	 * @param memberId 포인트를 업데이트할 회원 ID
+	 * @param point 변경할 포인트 값
+	 * @throws MemberNotFoundException 회원을 찾을 수 없는 경우
+	 */
 	@Override
 	@Transactional
 	public void updateMemberPoint(Long memberId, BigDecimal point) {
@@ -182,19 +219,34 @@ public class MemberServiceImpl implements MemberService {
 		member.updatePoint(point);
 	}
 
+	/**
+	 * 회원 엔티티를 프록시로 조회합니다.
+	 * 지연 로딩을 위한 프록시 객체를 반환합니다.
+	 *
+	 * @param memberId 조회할 회원 ID
+	 * @return 회원 엔티티 프록시
+	 */
 	@Override
 	public Member getMemberProxy(Long memberId) {
 		return memberRepository.getReferenceById(memberId);
 	}
 
+	/**
+	 * 로그인 ID의 중복 여부를 확인합니다.
+	 *
+	 * @param loginId 확인할 로그인 ID
+	 * @return 중복 여부 (true: 중복됨, false: 사용 가능)
+	 */
 	@Override
 	public boolean checkIdDuplicated(String loginId) {
 		return memberRepository.existsByLoginId(loginId);
 	}
 
 	/**
-	 * 휴면 상태인 회원을 활성 상태로 변경한다.
-	 * @param memberId Long
+	 * 휴면 상태인 회원을 활성 상태로 변경합니다.
+	 *
+	 * @param memberId 재활성화할 회원 ID
+	 * @throws MemberNotFoundException 회원을 찾을 수 없는 경우
 	 */
 	@Override
 	public void reactivateMember(Long memberId) {
@@ -206,9 +258,11 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	/**
-	 * 회원을 삭제하는 기능을 구현한 함수이다.
-	 * 실제로 삭제되지는 않고 상태: 활성 -> 탈퇴 로 변경한다.
-	 * @param memberId Long
+	 * 회원을 탈퇴 처리합니다 (Soft Delete).
+	 * 실제로 데이터를 삭제하지 않고 회원 상태를 WITHDRAWN으로 변경합니다.
+	 *
+	 * @param memberId 탈퇴 처리할 회원 ID
+	 * @throws MemberNotFoundException 회원을 찾을 수 없는 경우
 	 */
 	@Override
 	@Transactional
@@ -222,6 +276,10 @@ public class MemberServiceImpl implements MemberService {
 		log.info("{} 멤버가 탈퇴 처리 되었습니다.", memberId);
 	}
 
+	/**
+	 * 3개월 이상 로그인하지 않은 회원을 휴면 상태로 전환합니다.
+	 * 스케줄러에 의해 주기적으로 실행됩니다.
+	 */
 	@Override
 	@Transactional
 	public void deactivateMembersNotLoggedInFor3Months() {
@@ -270,21 +328,32 @@ public class MemberServiceImpl implements MemberService {
 		}
 	}
 
+	/**
+	 * 회원 정보(ID, 닉네임, 전화번호, 이메일)의 중복 여부를 확인합니다.
+	 * 여러 필드의 중복 여부를 한 번에 확인할 수 있습니다.
+	 *
+	 * @param request 중복 확인 요청 정보 (로그인 ID, 닉네임, 전화번호, 이메일)
+	 * @return 각 필드별 중복 여부 (ID, 닉네임, 이메일, 전화번호)
+	 */
 	@Override
 	public ValueDuplicatedResponse checkInfoDuplicated(ValueDuplicatedRequest request) {
-		String loginId = request.loginId();
 		String nickname = request.nickname();
 		String email = request.email();
 		String phoneNumber = request.phoneNumber();
-		boolean isDuplicatedId =  memberRepository.existsByLoginId(loginId);
 
-		boolean isDuplicatedNickname = memberRepository.existsByNickname(nickname);
+		boolean isDuplicatedNickname =
+			nickname != null && !nickname.isBlank()
+				&& memberRepository.existsByNickname(nickname);
 
-		boolean isDuplicatedEmail = memberRepository.existsByEmail(email);
+		boolean isDuplicatedEmail =
+			email != null && !email.isBlank()
+				&& memberRepository.existsByEmail(email);
 
-		boolean isDuplicatedPhoneNumber = memberRepository.existsByPhoneNumber(phoneNumber);
+		boolean isDuplicatedPhoneNumber =
+			phoneNumber != null && !phoneNumber.isBlank()
+				&& memberRepository.existsByPhoneNumber(phoneNumber);
 
-		return new ValueDuplicatedResponse(isDuplicatedId, isDuplicatedNickname, isDuplicatedEmail, isDuplicatedPhoneNumber);
+		return new ValueDuplicatedResponse(isDuplicatedNickname, isDuplicatedEmail, isDuplicatedPhoneNumber);
 	}
 
 }

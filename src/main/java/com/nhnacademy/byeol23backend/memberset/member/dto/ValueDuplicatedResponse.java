@@ -1,9 +1,17 @@
 package com.nhnacademy.byeol23backend.memberset.member.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "값 중복 확인 응답")
 public record ValueDuplicatedResponse(
-        boolean isDuplicatedId,
-        boolean isDuplicatedNickname,
-        boolean isDuplicatedEmail,
-        boolean isDuplicatedPhoneNumber
+
+	@Schema(description = "닉네임 중복 여부", example = "false")
+	boolean isDuplicatedNickname,
+
+	@Schema(description = "이메일 중복 여부", example = "false")
+	boolean isDuplicatedEmail,
+
+	@Schema(description = "전화번호 중복 여부", example = "false")
+	boolean isDuplicatedPhoneNumber
 ) {
 }
