@@ -36,6 +36,9 @@ public class ImageServiceGateImpl implements ImageServiceGate {
 		String imageUrl,
 		ImageDomain imageDomain
 	) {
+		String target = "http://storage.java21.net:8000/";
+		String replacement = "https://byeol23.shop/img-proxy/";
+		imageUrl = imageUrl.replace(target, replacement);
 		return getBookImageService(imageDomain).saveImageUrl(Id, imageUrl);
 	}
 

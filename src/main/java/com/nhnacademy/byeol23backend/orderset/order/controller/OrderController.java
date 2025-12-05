@@ -1,11 +1,16 @@
 package com.nhnacademy.byeol23backend.orderset.order.controller;
 
 import java.net.URI;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nhnacademy.byeol23backend.cartset.cartbook.dto.CartOrderRequest;
+import com.nhnacademy.byeol23backend.commons.exception.ErrorResponse;
 import com.nhnacademy.byeol23backend.memberset.member.dto.NonmemberOrderRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderBulkUpdateRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelRequest;
@@ -26,9 +31,12 @@ import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderDetailRespon
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderInfoResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderSearchCondition;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.PointOrderResponse;
+import com.nhnacademy.byeol23backend.orderset.order.exception.OrderTemporaryStorageException;
 import com.nhnacademy.byeol23backend.orderset.order.service.OrderService;
+import com.nhnacademy.byeol23backend.utils.MemberUtil;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -105,10 +113,53 @@ public class OrderController {
 	}
 
 	@PostMapping("/nonmembers")
-	public ResponseEntity<Void> saveGuestOrder(@RequestParam("guestId") String guestId,
-		@RequestBody CartOrderRequest orderRequest) {
-		orderService.saveGuestOrder(guestId, orderRequest);
-		return ResponseEntity.ok().build();
+	public ResponseEntity<Map<String, Object>> saveGuestOrder(@RequestParam("guestId") String guestId,
+		@RequestBody OrderRequest orderRequest) {
+		String validationToken = orderService.saveGuestOrderTmp(guestId, orderRequest);
+
+		Map<String, Object> responseBody = new HashMap<>();
+		responseBody.put("validationToken", validationToken);
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
+	}
+
+	@PostMapping("/tmp")
+	public ResponseEntity<Map<String, Object>> saveMemberOrderTmp(
+		@RequestBody OrderRequest orderRequest) {
+
+		Long memberId = MemberUtil.getMemberId();
+
+		String validationToken = orderService.saveMemberOrderTmp(memberId, orderRequest);
+
+		Map<String, Object> responseBody = new HashMap<>();
+		responseBody.put("validationToken", validationToken);
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
+	}
+
+	@GetMapping("/validationToken")
+	public OrderRequest getAndRemoveOrderRequest(@RequestParam("validationToken") String validationToken) {
+		return orderService.getAndRemoveOrderRequest(validationToken);
+	}
+
+	@PostMapping("/migrate")
+	public void migrateGuestOrderToMember(@CookieValue(name = "Access-Token") String token,
+		@RequestParam("validationToken") String validationToken) {
+		orderService.migrateGuestOrderToMember(token, validationToken);
+	}
+
+	@ExceptionHandler(OrderTemporaryStorageException.class)
+	public ResponseEntity<ErrorResponse> handleOrderTemporaryStorageException(
+		OrderTemporaryStorageException exception) {
+
+		ErrorResponse errorResponse = new ErrorResponse(
+			500,
+			exception.getMessage(),
+			"/api/orders",
+			LocalDateTime.now()
+		);
+
+		return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 }

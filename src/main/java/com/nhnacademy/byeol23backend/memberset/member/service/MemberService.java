@@ -76,11 +76,13 @@ public interface MemberService {
 	 * 3개월 이상 로그인하지 않은 회원을 비활성화합니다.
 	 */
 	void deactivateMembersNotLoggedInFor3Months();
-
 	/**
 	 * 회원 정보(ID, 닉네임, 전화번호, 이메일)의 중복 여부를 확인합니다.
 	 * @param request 중복 확인 요청 정보
 	 * @return 각 필드별 중복 여부
 	 */
-	ValueDuplicatedResponse checkInfoDuplicated(ValueDuplicatedRequest request);
+  	ValueDuplicatedResponse checkInfoDuplicated(ValueDuplicatedRequest request);
+
+	void updateAllMembersGrade();
+
 }

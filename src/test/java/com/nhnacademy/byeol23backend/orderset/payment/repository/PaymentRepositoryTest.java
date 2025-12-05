@@ -71,7 +71,7 @@ class PaymentRepositoryTest {
 		testOrder = Order.of(
 			"20251114-001", null, new BigDecimal("15000"), new BigDecimal("15000"),
 			LocalDate.now().plusDays(2), "홍길동", "12345", "주소", "상세주소1", null, "01011111111",
-			testMember, testPolicy
+			testMember, testPolicy, true
 		);
 		orderRepository.save(testOrder); // Order 저장
 
@@ -119,7 +119,7 @@ class PaymentRepositoryTest {
 		Order otherOrder = Order.of(
 			"999999", null, BigDecimal.TEN, BigDecimal.TEN,
 			LocalDate.now(), "이방인", "00000", "주소", "상세주소", null, "01099999999",
-			member, policy
+			member, policy, true
 		);
 		orderRepository.save(otherOrder);
 		entityManager.flush();

@@ -3,7 +3,6 @@ package com.nhnacademy.byeol23backend.orderset.order.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.nhnacademy.byeol23backend.cartset.cartbook.dto.CartOrderRequest;
 import com.nhnacademy.byeol23backend.memberset.member.dto.NonmemberOrderRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderBulkUpdateRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderCancelRequest;
@@ -13,6 +12,7 @@ import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderDetailRespon
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderInfoResponse;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderPrepareResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderRequest;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderSearchCondition;
 import com.nhnacademy.byeol23backend.orderset.order.domain.dto.PointOrderResponse;
 
@@ -35,5 +35,11 @@ public interface OrderService {
 
 	OrderDetailResponse getNonMemberOrder(NonmemberOrderRequest request);
 
-	void saveGuestOrder(String guestId, CartOrderRequest orderRequest);
+	String saveGuestOrderTmp(String guestId, OrderRequest orderRequest);
+
+	String saveMemberOrderTmp(Long memberId, OrderRequest orderRequest);
+
+	OrderRequest getAndRemoveOrderRequest(String validationToken);
+
+	String migrateGuestOrderToMember(String token, String validationToken);
 }

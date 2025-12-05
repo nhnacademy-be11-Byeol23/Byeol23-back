@@ -81,7 +81,7 @@ public class PaymentServiceImpl implements PaymentService {
 			orderPointRepository.save(orderPoint);
 		}
 
-		if (orderDetails.size() > 1) {
+		if (order.getIsCart()) {
 			List<Long> bookIds = orderDetails.stream()
 				.map(orderDetail -> orderDetail.getBook().getBookId())
 				.toList();
