@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
+import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
 import com.nhnacademy.byeol23backend.orderset.delivery.domain.DeliveryPolicy;
 import com.nhnacademy.byeol23backend.orderset.delivery.exception.DeliveryPolicyNotFoundException;
 import com.nhnacademy.byeol23backend.orderset.delivery.repository.DeliveryPolicyRepository;
@@ -38,6 +39,7 @@ public class RefundServiceImpl implements RefundService {
 	private final OrderRepository orderRepository;
 	private final DeliveryPolicyRepository deliveryPolicyRepository;
 	private final OrderPointRepository orderPointRepository;
+	private final MemberRepository memberRepository;
 	private final PointService pointService;
 
 	@Override
@@ -80,7 +82,10 @@ public class RefundServiceImpl implements RefundService {
 		}
 
 		// 나머지 금액은 포인트로 환불, 현재 포인트에 실제로 결제한 금액을 더해줌
-		orderedMember.updatePoint(orderedMember.getCurrentPoint().add(refundAmount));
+		orderedMember.updatePoint(
+			orderedMember.getCurrentPoint().add(refundAmount)
+		);
+		memberRepository.save(orderedMember);
 
 		refundRepository.save(refund);
 		order.updateOrderStatus("반품");
