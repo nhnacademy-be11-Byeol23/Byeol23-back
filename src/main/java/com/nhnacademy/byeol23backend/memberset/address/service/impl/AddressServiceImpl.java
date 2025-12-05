@@ -17,6 +17,7 @@ import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.byeol23backend.memberset.member.repository.MemberRepository;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
+import com.nhnacademy.byeol23backend.utils.MemberUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -64,8 +65,9 @@ public class AddressServiceImpl implements AddressService {
 	}
 
 	@Override
-	public List<AddressInfoResponse> getAddresses(String token) {
-		Member member = getMember(token);
+	public List<AddressInfoResponse> getAddresses() {
+		Member member = memberRepository.findById(MemberUtil.getMemberId())
+			.orElseThrow(() -> new MemberNotFoundException("Member not found"));
 
 		List<Address> addresses = addressRepository.findByMemberOrderByIsDefaultDesc(member);
 

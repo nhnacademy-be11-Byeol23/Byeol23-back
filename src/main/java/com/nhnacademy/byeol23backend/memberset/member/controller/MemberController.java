@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/members")
-public class MemberController implements MemberApi {
+public class MemberController {
 	private final MemberService memberService;
 
 	@PostMapping
@@ -117,7 +117,7 @@ public class MemberController implements MemberApi {
 		return ResponseEntity.noContent().build();
 	}
 
-	@GetMapping("/check-duplication")
+	@PostMapping("/check-duplication")
 	@Operation(summary = "회원 정보 중복 체크", description = "닉네임/이메일/전화번호 등의 중복 여부를 검증합니다.")
 	public ResponseEntity<ValueDuplicatedResponse> checkDuplication(@RequestBody ValueDuplicatedRequest request) {
 		ValueDuplicatedResponse response = memberService.checkInfoDuplicated(request);
