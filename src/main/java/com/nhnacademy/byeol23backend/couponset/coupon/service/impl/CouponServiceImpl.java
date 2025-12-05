@@ -305,9 +305,4 @@ public class CouponServiceImpl implements CouponService {
         return Math.max(0L, finalDiscount);
     }
 
-    @Override
-    @Transactional
-    public void useCoupon(Long couponId) {
-
-    }
 }

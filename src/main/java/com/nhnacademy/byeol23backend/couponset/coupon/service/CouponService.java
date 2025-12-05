@@ -26,6 +26,4 @@ public interface CouponService {
     Long calculateTotalAmount(List<OrderItemRequest> orderItems);
 
     Long calculateDiscountValue(CouponPolicy policy, BigDecimal targetSubtotal);
-
-    void useCoupon(Long couponId);
 }
