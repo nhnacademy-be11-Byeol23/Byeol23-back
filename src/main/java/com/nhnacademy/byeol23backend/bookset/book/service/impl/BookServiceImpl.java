@@ -51,8 +51,8 @@ import com.nhnacademy.byeol23backend.bookset.publisher.exception.PublisherNotFou
 import com.nhnacademy.byeol23backend.bookset.publisher.repository.PublisherRepository;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.Tag;
 import com.nhnacademy.byeol23backend.bookset.tag.domain.dto.AllTagsInfoResponse;
-import com.nhnacademy.byeol23backend.cartset.cartbook.dto.CartOrderRequest;
 import com.nhnacademy.byeol23backend.image.dto.GetUrlResponse;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderRequest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -262,9 +262,9 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	public BookOrderRequest getBookOrder(CartOrderRequest cartOrderRequest) {
+	public BookOrderRequest getBookOrder(OrderRequest orderRequest) {
 
-		Set<Long> bookIds = cartOrderRequest.cartOrderList().keySet();
+		Set<Long> bookIds = orderRequest.orderList().keySet();
 
 		List<Book> books = bookRepository.findAllByWithContributors(bookIds);
 
@@ -289,7 +289,7 @@ public class BookServiceImpl implements BookService {
 				book.getRegularPrice(),
 				book.getSalePrice(),
 				new AllPublishersInfoResponse(book.getPublisher()),
-				cartOrderRequest.cartOrderList().get(book.getBookId()), // 수량을 가져옴
+				orderRequest.orderList().get(book.getBookId()), // 수량을 가져옴
 				book.getBookContributors().stream().map(
 					bc -> new AllContributorResponse(bc.getContributor())
 				).toList(),

@@ -88,10 +88,9 @@ public class Order {
 	private Boolean isCart;
 
 	private Order(String orderNumber, String orderPassword, BigDecimal totalBookPrice, BigDecimal actualOrderPrice,
-		LocalDateTime orderedAt,
-		String orderStatus, LocalDate deliveryDesiredDate, String receiver, String postCode, String receiverAddress,
-		String receiverAddressDetail, String receiverAddressExtra, String receiverPhone, Member member,
-		DeliveryPolicy deliveryPolicy) {
+		LocalDateTime orderedAt, String orderStatus, LocalDate deliveryDesiredDate, String receiver, String postCode,
+		String receiverAddress, String receiverAddressDetail, String receiverAddressExtra, String receiverPhone,
+		Member member, DeliveryPolicy deliveryPolicy, Boolean isCart) {
 		this.orderNumber = orderNumber;
 		this.orderPassword = orderPassword;
 		this.totalBookPrice = totalBookPrice;
@@ -107,17 +106,18 @@ public class Order {
 		this.receiverPhone = receiverPhone;
 		this.member = member;
 		this.deliveryPolicy = deliveryPolicy;
+		this.isCart = isCart;
 	}
 
 	public static Order of(String orderNumber, String orderPassword, BigDecimal totalBookPrice,
 		BigDecimal actualOrderPrice,
 		LocalDate deliveryDesiredDate, String receiver, String postCode, String receiverAddress,
 		String receiverAddressDetail, String receiverAddressExtra, String receiverPhone, Member member,
-		DeliveryPolicy deliveryPolicy) {
+		DeliveryPolicy deliveryPolicy, Boolean isCart) {
 
 		return new Order(orderNumber, orderPassword, totalBookPrice, actualOrderPrice, LocalDateTime.now(),
 			"대기", deliveryDesiredDate, receiver, postCode, receiverAddress, receiverAddressDetail, receiverAddressExtra,
-			receiverPhone, member, deliveryPolicy);
+			receiverPhone, member, deliveryPolicy, isCart);
 	}
 
 	public void updateOrderStatus(String orderStatus) {

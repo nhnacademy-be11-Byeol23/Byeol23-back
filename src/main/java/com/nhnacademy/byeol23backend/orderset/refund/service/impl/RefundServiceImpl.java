@@ -49,7 +49,6 @@ public class RefundServiceImpl implements RefundService {
 
 		// 주문한 멤버를 가져옴
 		Member orderedMember = order.getMember();
-		BigDecimal actualOrderPrice = order.getActualOrderPrice();
 
 		Refund refund = null;
 		RefundPolicy refundPolicy = refundPolicyRepository.findByRefundOption(request.refundOption())
