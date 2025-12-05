@@ -1,5 +1,11 @@
 package com.nhnacademy.byeol23backend.bookset.book.interceptor;
 
+import java.util.Arrays;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
+
 import com.nhnacademy.byeol23backend.utils.JwtParser;
 import com.nhnacademy.byeol23backend.utils.MemberUtil;
 
@@ -9,11 +15,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.HandlerInterceptor;
-
-import java.util.Arrays;
 
 @Component
 @SuppressWarnings("squid:S3516")
@@ -32,7 +33,6 @@ public class ViewerIdInterceptor implements HandlerInterceptor {
         }
 
 
-
         // 비회원인 경우
         if(request.getCookies() != null) {
             String guestId = Arrays.stream(request.getCookies())
@@ -47,14 +47,6 @@ public class ViewerIdInterceptor implements HandlerInterceptor {
                 return true;
             }
         }
-        /*
-        // 비회원이지만 첫 요청인 경우
-        String guestId = (String) request.getAttribute("guestId");
-        if(StringUtils.isNotBlank(guestId)) {
-            request.setAttribute("viewerId", "guest:%s".formatted(guestId));
-            return true;
-        }
-        */
         return true;
     }
 }

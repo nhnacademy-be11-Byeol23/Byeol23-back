@@ -58,4 +58,10 @@ public interface BookRepository extends JpaRepository<Book, Long>, JdbcBookRepos
 			WHERE b.bookId IN :bookIds
 		""")
 	List<Book> findAllByWithContributors(@Param("bookIds") Collection<Long> bookIds);
+
+    Optional<Book> findByBookId(Long bookId);
+
+    @Query("SELECT COUNT(bcp) > 0 FROM BookCouponPolicy bcp " +
+            "WHERE bcp.book.bookId = :bookId AND bcp.couponPolicy.couponPolicyId = :policyId")
+    boolean isBookIncludedInPolicy(@Param("bookId") Long bookId, @Param("policyId") Long policyId);
 }

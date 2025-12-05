@@ -1,12 +1,14 @@
 package com.nhnacademy.byeol23backend.bookset.book.repository.impl;
 
-import com.nhnacademy.byeol23backend.bookset.book.repository.JdbcBookRepository;
-import com.nhnacademy.byeol23backend.bookset.book.service.impl.BookViewCountSyncServiceImpl;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.nhnacademy.byeol23backend.bookset.book.repository.JdbcBookRepository;
+import com.nhnacademy.byeol23backend.bookset.book.service.impl.BookViewCountSyncServiceImpl;
+
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor

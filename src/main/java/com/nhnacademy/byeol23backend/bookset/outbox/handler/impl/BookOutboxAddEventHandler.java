@@ -1,13 +1,15 @@
 package com.nhnacademy.byeol23backend.bookset.outbox.handler.impl;
 
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.stereotype.Component;
+
 import com.nhnacademy.byeol23backend.bookset.outbox.BookOutbox;
 import com.nhnacademy.byeol23backend.bookset.outbox.dto.BookDocumentSyncMessage;
 import com.nhnacademy.byeol23backend.bookset.outbox.handler.BookOutboxEventHandler;
 import com.nhnacademy.byeol23backend.config.BookEmbeddingRabbitProperties;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component

@@ -1,12 +1,14 @@
 package com.nhnacademy.byeol23backend.bookset.outbox.handler.impl;
 
-import com.nhnacademy.byeol23backend.bookset.outbox.consumer.ReindexStatus;
-import com.nhnacademy.byeol23backend.bookset.outbox.handler.OutboxConsumerHandler;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistry;
 import org.springframework.stereotype.Component;
+
+import com.nhnacademy.byeol23backend.bookset.outbox.consumer.ReindexStatus;
+import com.nhnacademy.byeol23backend.bookset.outbox.handler.OutboxConsumerHandler;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component

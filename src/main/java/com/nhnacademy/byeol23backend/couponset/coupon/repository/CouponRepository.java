@@ -49,4 +49,7 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
 
     @EntityGraph(attributePaths = {"couponPolicy"})
     List<Coupon> findByMember_MemberIdAndUsedAtIsNotNull(Long memberId);
+
+    List<Coupon> findByMember_MemberIdAndUsedAtIsNullAndExpiredDateGreaterThanEqual(Long memberId, LocalDate now);
+
 }

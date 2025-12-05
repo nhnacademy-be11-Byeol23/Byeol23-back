@@ -8,10 +8,10 @@ public class MemberUtil {
     public static Long getMemberId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) return null;
-        if(!auth.getPrincipal().equals("anonymousUser")) {
-            return (Long) auth.getPrincipal();
+        if(auth.getPrincipal().equals("anonymousUser")) {
+            return -1L;
         }
-        return -1L;
+        return (Long) auth.getPrincipal();
     }
 
     public static String getRole() {

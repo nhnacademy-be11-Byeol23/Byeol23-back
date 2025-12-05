@@ -1,16 +1,18 @@
 package com.nhnacademy.byeol23backend.bookset.book.service.impl;
 
-import com.nhnacademy.byeol23backend.bookset.book.service.BookViewCountBatchUpdateService;
-import com.nhnacademy.byeol23backend.bookset.book.service.BookViewCountSyncService;
-import lombok.RequiredArgsConstructor;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import com.nhnacademy.byeol23backend.bookset.book.service.BookViewCountBatchUpdateService;
+import com.nhnacademy.byeol23backend.bookset.book.service.BookViewCountSyncService;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor

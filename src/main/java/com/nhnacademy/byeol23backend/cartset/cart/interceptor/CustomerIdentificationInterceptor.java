@@ -3,7 +3,6 @@ package com.nhnacademy.byeol23backend.cartset.cart.interceptor;
 import com.nhnacademy.byeol23backend.cartset.cart.dto.CustomerIdentifier;
 import com.nhnacademy.byeol23backend.utils.JwtParser;
 import com.nhnacademy.byeol23backend.utils.MemberUtil;
-
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +17,7 @@ import java.util.Arrays;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class CustomerIdentificationInterceptor implements HandlerInterceptor {
 
     @Override
@@ -28,11 +28,11 @@ public class CustomerIdentificationInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        String guestId = getCookieValue(request, "guestId");
-        if(StringUtils.isNotBlank(guestId)) {
-            request.setAttribute("customerIdentifier", CustomerIdentifier.guest(guestId));
-            return true;
-        }
+            String guestId = getCookieValue(request, "guestId");
+            if(StringUtils.isNotBlank(guestId)) {
+                request.setAttribute("customerIdentifier", CustomerIdentifier.guest(guestId));
+                return true;
+            }
         return true;
     }
 

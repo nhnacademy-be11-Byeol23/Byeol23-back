@@ -1,10 +1,12 @@
 package com.nhnacademy.byeol23backend.bookset.book.job;
 
-import com.nhnacademy.byeol23backend.bookset.book.service.BookViewCountSyncService;
-import lombok.RequiredArgsConstructor;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.springframework.stereotype.Component;
+
+import com.nhnacademy.byeol23backend.bookset.book.service.BookViewCountSyncService;
+
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor

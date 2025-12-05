@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+import com.nhnacademy.byeol23backend.memberset.member.dto.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,13 +25,6 @@ import com.nhnacademy.byeol23backend.memberset.grade.repository.GradeRepository;
 import com.nhnacademy.byeol23backend.memberset.grade.service.GradeService;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Member;
 import com.nhnacademy.byeol23backend.memberset.member.domain.Status;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberCreateResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberMyPageResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberPasswordUpdateResponse;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateRequest;
-import com.nhnacademy.byeol23backend.memberset.member.dto.MemberUpdateResponse;
 import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateEmailException;
 import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateIdException;
 import com.nhnacademy.byeol23backend.memberset.member.exception.DuplicateNicknameException;
@@ -327,6 +321,23 @@ public class MemberServiceImpl implements MemberService {
 			memberRepository.existsByPhoneNumberAndMemberIdNot(phoneNumber, memberId)) {
 			throw new DuplicatePhoneNumberException("이미 사용 중인 휴대전화입니다.");
 		}
+	}
+
+	@Override
+	public ValueDuplicatedResponse checkInfoDuplicated(ValueDuplicatedRequest request) {
+		String loginId = request.loginId();
+		String nickname = request.nickname();
+		String email = request.email();
+		String phoneNumber = request.phoneNumber();
+		boolean isDuplicatedId =  memberRepository.existsByLoginId(loginId);
+
+		boolean isDuplicatedNickname = memberRepository.existsByNickname(nickname);
+
+		boolean isDuplicatedEmail = memberRepository.existsByEmail(email);
+
+		boolean isDuplicatedPhoneNumber = memberRepository.existsByPhoneNumber(phoneNumber);
+
+		return new ValueDuplicatedResponse(isDuplicatedId, isDuplicatedNickname, isDuplicatedEmail, isDuplicatedPhoneNumber);
 	}
 
 }

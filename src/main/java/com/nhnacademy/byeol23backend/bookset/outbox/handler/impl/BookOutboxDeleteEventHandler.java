@@ -1,12 +1,14 @@
 package com.nhnacademy.byeol23backend.bookset.outbox.handler.impl;
 
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.stereotype.Component;
+
 import com.nhnacademy.byeol23backend.bookset.book.document.BookDocument;
 import com.nhnacademy.byeol23backend.bookset.outbox.BookOutbox;
 import com.nhnacademy.byeol23backend.bookset.outbox.handler.BookOutboxEventHandler;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component

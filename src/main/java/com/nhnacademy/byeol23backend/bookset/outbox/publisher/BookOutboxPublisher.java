@@ -1,14 +1,16 @@
 package com.nhnacademy.byeol23backend.bookset.outbox.publisher;
 
-import com.nhnacademy.byeol23backend.bookset.outbox.event.BookOutboxEvent;
-import com.nhnacademy.byeol23backend.config.BookOutboxRabbitProperties;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
+
+import com.nhnacademy.byeol23backend.bookset.outbox.event.BookOutboxEvent;
+import com.nhnacademy.byeol23backend.config.BookOutboxRabbitProperties;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
