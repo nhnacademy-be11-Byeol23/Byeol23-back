@@ -33,6 +33,9 @@ public class BookImageServiceImpl implements ImageService {
 	@Override
 	@Transactional
 	public String saveImageUrl(Long bookId, String imageUrl) {
+		String target = "http://storage.java21.net:8000/";
+		String replacement = "https://byeol23.shop/img-proxy/";
+		imageUrl = imageUrl.replace(target, replacement);
 		Book book = bookRepository.findById(bookId)
 			.orElseThrow(() -> new IllegalArgumentException("해당 도서를 찾을 수 없습니다. 도서 imageId: " + bookId));
 		BookImage bookImage = new BookImage(book, imageUrl);
