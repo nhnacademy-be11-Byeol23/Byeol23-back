@@ -13,7 +13,7 @@ import com.nhnacademy.byeol23backend.bookset.book.dto.BookReview;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockResponse;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookUpdateRequest;
-import com.nhnacademy.byeol23backend.cartset.cartbook.dto.CartOrderRequest;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderRequest;
 
 public interface BookService {
 	BookResponse createBook(BookCreateRequest createRequest);
@@ -38,5 +38,5 @@ public interface BookService {
 
 	BookReview getBookReview(Long bookId);
 
-	BookOrderRequest getBookOrder(CartOrderRequest cartOrderRequest);
+	BookOrderRequest getBookOrder(OrderRequest orderRequest);
 }

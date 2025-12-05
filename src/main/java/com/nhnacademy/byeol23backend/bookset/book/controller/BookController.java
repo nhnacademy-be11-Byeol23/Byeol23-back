@@ -26,7 +26,7 @@ import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockResponse;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookStockUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.dto.BookUpdateRequest;
 import com.nhnacademy.byeol23backend.bookset.book.service.BookService;
-import com.nhnacademy.byeol23backend.cartset.cartbook.dto.CartOrderRequest;
+import com.nhnacademy.byeol23backend.orderset.order.domain.dto.OrderRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -145,8 +145,8 @@ public class BookController {
 	}
 
 	@PostMapping("/orders")
-	public ResponseEntity<BookOrderRequest> getBookOrder(@RequestBody CartOrderRequest cartOrderRequest) {
-		BookOrderRequest request = bookService.getBookOrder(cartOrderRequest);
+	public ResponseEntity<BookOrderRequest> getBookOrder(@RequestBody OrderRequest orderRequest) {
+		BookOrderRequest request = bookService.getBookOrder(orderRequest);
 		return ResponseEntity.ok(request);
 	}
 

@@ -82,21 +82,21 @@ class OrderRepositoryCustomImplTest {
 		order1 = Order.of(
 			"20251114-001", null, new BigDecimal("15000"), new BigDecimal("15000"),
 			LocalDate.now().plusDays(2), "홍길동", "12345", "주소", "상세주소1", null, "01011111111",
-			testMember, testPolicy
+			testMember, testPolicy, true
 		);
 		order1.updateOrderStatus("ORDERED");
 
 		order2 = Order.of(
 			"20251114-002", null, new BigDecimal("25000"), new BigDecimal("25000"),
 			LocalDate.now().plusDays(2), "이몽룡", "23456", "주소2", "상세주소2", null, "01022222222",
-			testMember, testPolicy
+			testMember, testPolicy, true
 		);
 		order2.updateOrderStatus("SHIPPED");
 
 		order3 = Order.of(
 			"20251113-001", null, new BigDecimal("30000"), new BigDecimal("30000"),
 			LocalDate.now().plusDays(2), "홍길동", "34567", "주소3", "상세주소3", null, "01033333333",
-			testMember, testPolicy
+			testMember, testPolicy, true
 		);
 		order3.updateOrderStatus("ORDERED");
 

@@ -17,19 +17,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new ViewerIdInterceptor())
-                .addPathPatterns("/api/books/*");
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(new ViewerIdInterceptor())
+			.addPathPatterns("/api/books/*");
 
-        registry.addInterceptor(new CustomerIdentificationInterceptor())
-                .addPathPatterns("/api/carts/**")
-                .addPathPatterns("/api/payments/**");
-    }
+		registry.addInterceptor(new CustomerIdentificationInterceptor())
+			.addPathPatterns("/api/carts/**")
+			.addPathPatterns("/api/payments/**");
+	}
 
-    @Override
-    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(new ViewerIdResolver());
-        resolvers.add(new CustomerIdentifierResolver());
-    }
+	@Override
+	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+		resolvers.add(new ViewerIdResolver());
+		resolvers.add(new CustomerIdentifierResolver());
+	}
 }
