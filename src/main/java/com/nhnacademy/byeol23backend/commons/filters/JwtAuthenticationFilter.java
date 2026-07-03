@@ -33,29 +33,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if(token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        }
+        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        try {
-            Claims claims = jwtParser.parseToken(token);
+        // Bearer 토큰이 있을 때만 인증을 시도한다. (공개 자원 요청은 토큰 없이 통과)
+        if (header != null && header.startsWith("Bearer ")) {
+            String token = header.substring(7);
+            try {
+                Claims claims = jwtParser.parseToken(token);
 
-            Long memberId = claims.get("memberId", Long.class);
-            String role = claims.get("role", String.class); // "USER", "ADMIN" 등
+                Long memberId = claims.get("memberId", Long.class);
+                String role = claims.get("role", String.class); // "USER", "ADMIN" 등
 
-            if (memberId != null && role != null) {
-                var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
+                if (memberId != null && role != null) {
+                    var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
 
-                Authentication authentication =
-                        new UsernamePasswordAuthenticationToken(memberId, null, authorities);
+                    Authentication authentication =
+                            new UsernamePasswordAuthenticationToken(memberId, null, authorities);
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            } catch (Exception e) {
+                // 토큰이 유효하지 않으면 인증을 채우지 않고 넘긴다.
+                // 보호 자원이면 SecurityConfig가 EntryPoint를 통해 401을 반환한다.
+                log.warn("JWT 인증 필터 - 토큰 파싱 실패: {}", e.getMessage());
             }
-        } catch (Exception e) {
-            log.warn("JWT 인증 필터 - 토큰 파싱 실패: {}", e.getMessage());
         }
-
 
         filterChain.doFilter(request, response);
     }
